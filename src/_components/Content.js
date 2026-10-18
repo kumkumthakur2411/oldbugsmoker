@@ -96,7 +96,7 @@ export default function Content() {
                         {/* Statement Paragraph with Inline Images and Scroll Reveal */}
                         <div
                             ref={textRef}
-                            className="font-['Outfit'] sm:font-['Inter'] text-2xl sm:text-3xl md:text-4xl lg:text-[2.6rem] xl:text-[2.85rem] font-bold leading-[1.18] sm:leading-[1.15] tracking-tight text-neutral-900"
+                            className="font-['Outfit'] sm:font-['Inter'] text-2xl sm:text-3xl md:text-4xl lg:text-[2.6rem] xl:text-[2.85rem] font-medium leading-[1.18] sm:leading-[1.15] tracking-tight text-neutral-900"
                         >
                             {part1Words.map((word) => {
                                 const idx = globalIndex++;
@@ -173,7 +173,7 @@ export default function Content() {
 
                         {/* Stats Row */}
                         <div className="grid grid-cols-2 gap-8 sm:gap-16">
-                            
+
                             {/* Stat 1: Years Experience */}
                             <div className="flex flex-col">
                                 <div className="flex items-start">
@@ -255,9 +255,8 @@ function InlineImage({ src, alt, progress, index, total, rotate = 0 }) {
                 scale,
                 filter: blur,
             }}
-            className={`relative mx-[0.16em] inline-block h-[0.74em] w-[1.12em] translate-y-[0.06em] overflow-hidden rounded-[0.2em] align-baseline shadow-sm border border-neutral-300/60 ${
-                rotate > 0 ? "rotate-2" : rotate < 0 ? "-rotate-2" : ""
-            }`}
+            className={`relative mx-[0.16em] inline-block h-[0.74em] w-[1.12em] translate-y-[0.06em] overflow-hidden rounded-[0.2em] align-baseline shadow-sm border border-neutral-300/60 ${rotate > 0 ? "rotate-2" : rotate < 0 ? "-rotate-2" : ""
+                }`}
         >
             <Image
                 src={src}
