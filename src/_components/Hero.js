@@ -178,10 +178,10 @@ export default function Hero() {
         <>
             <section
                 ref={heroRef}
-                className="relative isolate w-full overflow-hidden bg-white text-black"
+                className="relative isolate w-full  bg-white text-black"
             >
                 {/* Heading and description */}
-                <div className="relative z-30 bg-transparent">
+                <div className="relative z-30 bg-transparent ">
                     <div className="px-5 pb-10 pt-7 sm:px-8 sm:pb-14 sm:pt-9 md:px-12 lg:px-16">
                         <div className="mx-auto max-w-[1400px]">
                             <div className="mt-[50vh] sm:mt-64">
@@ -205,7 +205,7 @@ export default function Hero() {
                                     </div>
 
                                     <div className="hidden lg:col-span-1 lg:block">
-                                        <div className="relative aspect-[3/4] overflow-hidden">
+                                        <div className="relative aspect-[3/4] ">
                                             <Image
                                                 src="/home/1.png"
                                                 alt="Bugsmoker"
@@ -227,8 +227,8 @@ export default function Hero() {
                 <div
                     ref={gridRef}
                     className="pointer-events-none absolute inset-x-0 top-0 z-20
-        h-[150svh] overflow-hidden
-        sm:h-[80vh]"
+        h-[50vh] 
+        sm:h-[50vh]"
                 >
                     <div
                         className="absolute inset-0 grid
@@ -258,7 +258,7 @@ export default function Hero() {
                                             <div
                                                 className="mosaic-tile-image-inner absolute inset-0 bg-no-repeat"
                                                 style={{
-                                                    backgroundImage: "url('/home/1.png')",
+                                                    backgroundImage: "url('/home/mos.png')",
                                                     backgroundSize: "100vw auto",
                                                     backgroundPosition: `${bgX} ${bgY}`,
                                                 }}
