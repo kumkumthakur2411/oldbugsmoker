@@ -4,7 +4,7 @@ import React, { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
-import { ArrowUpRight } from "lucide-react";
+import { ArrowUpRight, ArrowLeft, ArrowRight, MoveLeft, MoveRight } from "lucide-react";
 
 const SERVICES_DATA = [
     {
@@ -49,135 +49,214 @@ const SERVICES_DATA = [
     },
 ];
 
-// Swipeable stacked card deck for mobile view
+
+
+
 function MobileStackedServicesDeck({ services }) {
     const [deck, setDeck] = useState(services);
+    const [direction, setDirection] = useState(1);
+
+    useEffect(() => {
+        setDeck(services);
+    }, [services]);
+
+    if (!deck?.length) return null;
 
     const activeService = deck[0];
-    const activeIndex = services.findIndex((s) => s.id === activeService.id);
+    const activeIndex = services.findIndex(
+        (service) => service.id === activeService.id
+    );
 
-    const handleSwipe = (direction = 1) => {
-        setDeck((prev) => {
-            if (direction === 1) {
-                // Next: front card goes to the back
-                return [...prev.slice(1), prev[0]];
-            } else {
-                // Prev: back card comes to the front
-                return [prev[prev.length - 1], ...prev.slice(0, prev.length - 1)];
+    const handleSwipe = (nextDirection = 1) => {
+        if (deck.length < 2) return;
+
+        setDirection(nextDirection);
+
+        setDeck((previous) => {
+            if (nextDirection === 1) {
+                return [...previous.slice(1), previous[0]];
             }
+
+            return [
+                previous[previous.length - 1],
+                ...previous.slice(0, -1),
+            ];
         });
     };
 
+    const visibleCards = deck.slice(0, Math.min(3, deck.length));
+
     return (
-        <div className="relative flex w-full flex-col items-center pt-10 pb-2">
-            {/* Cards Stack Area */}
-            <div className="relative w-full max-w-[340px] sm:max-w-[380px] h-[340px] sm:h-[370px]">
-                {deck.slice(0, 4).reverse().map((service, reverseIndex) => {
-                    const index = deck.slice(0, 4).length - 1 - reverseIndex;
-                    const isFront = index === 0;
+        <div className="w-full overflow-hidden px-4 pb-8 pt-6 sm:px-6">
 
-                    // Stack calculations matching the screenshot:
-                    // Rear cards peek out from the top with vertical offset and slight scale
-                    const yOffset = -index * 18;
-                    const scale = 1 - index * 0.055;
-                    const zIndex = 40 - index * 10;
-                    const darkness = index * 0.22;
 
-                    return (
-                        <motion.div
-                            key={service.id}
-                            layout
-                            drag={isFront ? "x" : false}
-                            dragConstraints={{ left: 0, right: 0 }}
-                            dragElastic={0.7}
-                            onDragEnd={(e, { offset, velocity }) => {
-                                const swipeThreshold = 50;
-                                if (offset.x > swipeThreshold || velocity.x > 300) {
-                                    handleSwipe(-1);
-                                } else if (offset.x < -swipeThreshold || velocity.x < -300) {
-                                    handleSwipe(1);
-                                }
-                            }}
-                            animate={{
-                                y: yOffset,
-                                scale: scale,
-                                zIndex: zIndex,
-                            }}
-                            transition={{
-                                type: "spring",
-                                stiffness: 280,
-                                damping: 24,
-                            }}
-                            whileDrag={{
-                                scale: 1.02,
-                                cursor: "grabbing",
-                            }}
-                            className={`absolute inset-x-0 bottom-0 select-none ${isFront ? "cursor-grab active:cursor-grabbing" : "pointer-events-none"
-                                }`}
-                            style={{
-                                transformOrigin: "bottom center",
-                            }}
-                        >
-                            <div className="relative w-full overflow-hidden rounded-lg border border-white/20 bg-white p-2.5 shadow-2xl shadow-black/60">
-                                {/* Dimming overlay for stacked cards in background */}
-                                {!isFront && (
-                                    <div
-                                        className="pointer-events-none absolute inset-0 z-30 transition-opacity duration-300"
-                                        style={{ backgroundColor: `rgba(0, 0, 0, ${darkness})` }}
-                                    />
-                                )}
+            {/* Stacked cards */}
+            <div className="relative mx-auto w-full max-w-[390px]">
+                <div className="relative h-[390px] w-full sm:h-[420px]">
+                    {visibleCards
+                        .map((service, index) => {
+                            const isFront = index === 0;
+                            const originalIndex = services.findIndex(
+                                (item) => item.id === service.id
+                            );
 
-                                {/* Image */}
-                                <div className="relative aspect-[16/10] w-full overflow-hidden rounded-md bg-neutral-900">
-                                    <Image
-                                        src={service.src}
-                                        alt={service.alt}
-                                        fill
-                                        priority={isFront}
-                                        sizes="(max-width: 640px) 90vw, 380px"
-                                        className="object-cover pointer-events-none"
-                                    />
+                            return (
+                                <motion.div
+                                    key={service.id}
+                                    layout
+                                    drag={isFront && deck.length > 1 ? "x" : false}
+                                    dragConstraints={{
+                                        left: 0,
+                                        right: 0,
+                                    }}
+                                    dragElastic={0.85}
+                                    onDragEnd={(event, info) => {
+                                        if (
+                                            info.offset.x > 65 ||
+                                            info.velocity.x > 450
+                                        ) {
+                                            handleSwipe(-1);
+                                        } else if (
+                                            info.offset.x < -65 ||
+                                            info.velocity.x < -450
+                                        ) {
+                                            handleSwipe(1);
+                                        }
+                                    }}
+                                    animate={{
+                                        y: index * -13,
+                                        scale: 1 - index * 0.045,
+                                        rotate: isFront ? 0 : index === 1 ? 2 : -3,
+                                        opacity: 1 - index * 0.16,
+                                        zIndex: 30 - index,
+                                    }}
+                                    transition={{
+                                        type: "spring",
+                                        stiffness: 300,
+                                        damping: 27,
+                                    }}
+                                    whileDrag={
+                                        isFront
+                                            ? {
+                                                rotate: direction === 1 ? 3 : -3,
+                                                scale: 1.02,
+                                                cursor: "grabbing",
+                                            }
+                                            : undefined
+                                    }
+                                    className={`absolute inset-x-0 bottom-0 ${isFront
+                                        ? "cursor-grab active:cursor-grabbing"
+                                        : "pointer-events-none"
+                                        }`}
+                                    style={{
+                                        transformOrigin: "bottom center",
+                                        touchAction: isFront ? "pan-y" : "auto",
+                                    }}
+                                >
+                                    <div className="relative overflow-hidden border border-black/10 bg-white p-2.5 shadow-[0_20px_60px_rgba(0,0,0,0.12)] sm:p-3">
+                                        {/* Image */}
+                                        <div className="relative aspect-[4/3] w-full overflow-hidden bg-neutral-200">
+                                            <Image
+                                                src={service.src}
+                                                alt={service.alt}
+                                                fill
+                                                priority={isFront}
+                                                sizes="(max-width: 640px) 92vw, 390px"
+                                                draggable={false}
+                                                className="pointer-events-none object-cover"
+                                            />
 
-                                    {/* Number Badge */}
-                                    <span className="absolute left-3 top-3 flex h-7 min-w-7 items-center justify-center rounded-sm bg-black/75 px-2 font-mono text-[11px] font-semibold text-white backdrop-blur-md">
-                                        0{services.findIndex((s) => s.id === service.id) + 1}
-                                    </span>
-                                </div>
+                                            <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/10" />
 
-                                {/* Content */}
-                                <div className="flex items-center justify-between gap-3 px-1 pt-3 pb-1">
-                                    <div className="min-w-0">
-                                        <h3 className="truncate font-['Outfit'] text-[15px] sm:text-base font-bold tracking-tight text-neutral-900">
-                                            {service.title}
-                                        </h3>
-                                        <p className="text-[11px] text-neutral-500 font-medium">
-                                            Tap arrow to view details
-                                        </p>
+
+
+                                            {/* Large image number */}
+                                            <span className="absolute bottom-[-15px] left-2 font-['Outfit'] text-[100px] font-bold leading-none tracking-[-0.09em] text-white/75">
+                                                {String(originalIndex + 1).padStart(2, "0")}
+                                            </span>
+
+
+                                        </div>
+
+                                        {/* Card details */}
+                                        <div className="flex items-center justify-between gap-3 px-1 pb-1 pt-4">
+                                            <div className="min-w-0">
+
+
+                                                <h3 className="font-['Outfit'] text-xl font-semibold leading-tight tracking-[-0.05em] text-neutral-950 sm:text-2xl">
+                                                    {service.title}
+                                                </h3>
+                                            </div>
+
+                                            {isFront ? (
+                                                <Link
+                                                    href={`/service/${service.serviceSlug || service.href}`}
+                                                    aria-label={`Explore ${service.title}`}
+                                                    onPointerDown={(event) =>
+                                                        event.stopPropagation()
+                                                    }
+                                                    className="flex h-11 w-11 shrink-0 items-center justify-center bg-[#ff5a1f] text-white transition-colors hover:bg-black active:scale-95"
+                                                >
+                                                    <ArrowUpRight
+                                                        size={21}
+                                                        strokeWidth={1.8}
+                                                    />
+                                                </Link>
+                                            ) : (
+                                                <span className="flex h-10 w-10 shrink-0 items-center justify-center border border-neutral-200 text-neutral-400">
+                                                    <ArrowUpRight size={19} />
+                                                </span>
+                                            )}
+                                        </div>
+
+                                        {/* Orange bottom accent */}
+                                        <div
+                                            className={`absolute bottom-0 left-0 h-[3px] bg-[#ff5a1f] transition-all duration-500 ${isFront ? "w-full" : "w-0"
+                                                }`}
+                                        />
                                     </div>
+                                </motion.div>
+                            );
+                        })
+                        .reverse()}
+                </div>
 
-                                    {isFront ? (
-                                        <Link
-                                            href={`/service/${service.serviceSlug || service.href}`}
-                                            className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-[#ff5a1f] text-white shadow-md shadow-[#ff5a1f]/30 transition-transform hover:scale-105 active:scale-95"
-                                        >
-                                            <ArrowUpRight size={17} strokeWidth={2.2} />
-                                        </Link>
-                                    ) : (
-                                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full bg-neutral-100 text-neutral-400">
-                                            <ArrowUpRight size={17} strokeWidth={2} />
-                                        </span>
-                                    )}
-                                </div>
-                            </div>
-                        </motion.div>
-                    );
-                })}
+
+
+                {/* Progress indicator */}
+                <div className="mt-5 flex gap-1.5">
+                    {services.map((service, index) => (
+                        <button
+                            key={service.id}
+                            type="button"
+                            aria-label={`Go to ${service.title}`}
+                            onClick={() => {
+                                const targetIndex = deck.findIndex(
+                                    (item) => item.id === service.id
+                                );
+
+                                if (targetIndex < 0) return;
+
+                                setDirection(1);
+                                setDeck((previous) => [
+                                    ...previous.slice(targetIndex),
+                                    ...previous.slice(0, targetIndex),
+                                ]);
+                            }}
+                            className={`h-[3px] flex-1 transition-colors duration-300 ${index === activeIndex
+                                ? "bg-[#ff5a1f]"
+                                : "bg-neutral-200"
+                                }`}
+                        />
+                    ))}
+                </div>
             </div>
-
-
         </div>
     );
 }
+
+
+
 
 export default function Services() {
     const containerRef = useRef(null);
@@ -280,7 +359,10 @@ export default function Services() {
 
                             <Link
                                 href="/services"
-                                className="mt-5 inline-flex min-h-11 items-center gap-5 bg-white px-5 py-3 text-[10px] font-bold uppercase tracking-[0.16em] text-black transition-colors duration-300 hover:bg-[#ff5a1f] hover:text-white sm:mt-7 sm:px-6 sm:text-xs md:mt-9"
+                                className="mt-5 inline-flex min-h-11 items-center gap-5 
+                                bg-white px-2 py-2 text-[10px] font-bold uppercase tracking-[0.16em]
+                                 text-black transition-colors duration-300 hover:bg-[#ff5a1f] hover:text-white 
+                                 sm:mt-7  sm:text-xs md:mt-9 rounded rounded-xl"
                             >
                                 View all services
                                 <ArrowUpRight size={16} />
@@ -307,40 +389,61 @@ export default function Services() {
                                         className="flex w-full flex-col gap-4 pb-4 md:gap-5"
                                     >
                                         {SERVICES_DATA.map((service, index) => (
+
                                             <Link
                                                 key={service.id}
                                                 href={`/service/${service.serviceSlug || service.href}`}
-                                                className="group block w-full shrink-0 border border-white/15 bg-white p-2.5 shadow-xl shadow-black/10 transition-colors duration-300 hover:border-white/50 sm:p-3 md:p-3.5"
+                                                className="group relative block w-full shrink-0 overflow-hidden bg-[#f3f1ed] p-3 transition-all duration-500 hover:bg-[#ff5a1f] sm:p-4"
                                             >
-                                                {/* Image */}
-                                                <div className="relative aspect-[16/8] w-full overflow-hidden bg-neutral-200 sm:aspect-[16/9] md:aspect-[16/11]">
+                                                {/* Image Area */}
+                                                <div className="relative aspect-[5/4] overflow-hidden bg-neutral-200 sm:aspect-[4/3]">
                                                     <Image
                                                         src={service.src}
                                                         alt={service.alt}
                                                         fill
-                                                        sizes="420px"
+                                                        sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 420px"
                                                         className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                                                     />
 
-                                                    <span className="absolute left-3 top-3 flex h-7 min-w-7 items-center justify-center bg-black/60 px-2 font-mono text-[10px] text-white backdrop-blur-sm sm:left-4 sm:top-4">
-                                                        0{index + 1}
+                                                    {/* Image tint */}
+                                                    <div className="absolute inset-0 bg-black/10 transition-colors duration-500 group-hover:bg-black/25" />
+
+                                                    {/* Oversized number */}
+                                                    <span className="absolute -bottom-5 -left-1 font-['Outfit'] text-[100px] font-bold leading-none tracking-[-0.1em] text-white/80 transition-transform duration-500 group-hover:translate-x-2 sm:text-[125px]">
+                                                        {String(index + 1).padStart(2, "0")}
+                                                    </span>
+
+                                                    {/* Top label */}
+
+
+                                                    {/* Floating arrow */}
+                                                    <span className="absolute right-3 top-3 flex h-11 w-11 items-center justify-center rounded-full bg-[#ff5a1f] text-white transition-transform duration-500 group-hover:rotate-45 sm:right-4 sm:top-4 sm:h-12 sm:w-12">
+                                                        <ArrowUpRight size={21} strokeWidth={1.7} />
                                                     </span>
                                                 </div>
 
-                                                {/* Card Footer */}
-                                                <div className="flex items-center justify-between gap-3 px-1 py-2 sm:py-2.5">
-                                                    <h3 className="min-w-0 font-['Outfit'] text-sm font-semibold tracking-tight text-neutral-900 sm:text-base md:text-[17px]">
-                                                        {service.title}
-                                                    </h3>
+                                                {/* Footer */}
+                                                <div className="flex items-end justify-between gap-3 px-1 pb-1 pt-5 sm:px-2 sm:pt-6">
+                                                    <div className="min-w-0">
+                                                        {/* <p className="mb-2 font-mono text-[9px] uppercase tracking-[0.18em] text-neutral-500 transition-colors duration-300 group-hover:text-black/60">
+                                                            Bugsmoker Studio / {String(index + 1).padStart(2, "0")}
+                                                        </p> */}
 
-                                                    <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-neutral-200 text-[#ff5a1f] transition-all duration-300 group-hover:border-black group-hover:bg-black group-hover:text-white sm:h-9 sm:w-9">
-                                                        <ArrowUpRight
-                                                            size={16}
-                                                            strokeWidth={1.8}
-                                                        />
+                                                        <h3 className="font-['Outfit'] text-xl font-semibold leading-[1.05] tracking-[-0.055em] text-neutral-950 transition-transform duration-300 group-hover:translate-x-1 sm:text-2xl md:text-[28px]">
+                                                            {service.title}
+                                                        </h3>
+                                                    </div>
+
+                                                    <span className="mb-1 shrink-0 text-[10px] font-semibold uppercase tracking-wider text-neutral-500 transition-colors duration-300 group-hover:text-black">
+                                                        ↗
                                                     </span>
                                                 </div>
+
+                                                {/* Bottom accent */}
+                                                <div className="absolute bottom-0 left-0 h-1 w-0 bg-black transition-all duration-500 group-hover:w-full" />
                                             </Link>
+
+
                                         ))}
                                     </motion.div>
                                 </div>
