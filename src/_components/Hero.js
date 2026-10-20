@@ -72,7 +72,7 @@ export default function Hero() {
 
             if (!tiles.length) return;
 
-            const isMobile = window.innerWidth < 768;
+            const isMobile = window.innerWidth < 600;
 
             gsap.set(tiles, {
                 opacity: 0,
