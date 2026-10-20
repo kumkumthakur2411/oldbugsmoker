@@ -112,9 +112,8 @@ function MobileStackedServicesDeck({ services }) {
                                 scale: 1.02,
                                 cursor: "grabbing",
                             }}
-                            className={`absolute inset-x-0 bottom-0 select-none ${
-                                isFront ? "cursor-grab active:cursor-grabbing" : "pointer-events-none"
-                            }`}
+                            className={`absolute inset-x-0 bottom-0 select-none ${isFront ? "cursor-grab active:cursor-grabbing" : "pointer-events-none"
+                                }`}
                             style={{
                                 transformOrigin: "bottom center",
                             }}
@@ -175,37 +174,7 @@ function MobileStackedServicesDeck({ services }) {
                 })}
             </div>
 
-            {/* Swipe Controls and Indicator */}
-            <div className="mt-5 flex w-full max-w-[340px] sm:max-w-[380px] items-center justify-between px-1 text-white">
-                <div className="flex items-center gap-1.5 font-mono text-xs">
-                    <span className="font-bold text-[#ff5a1f]">0{activeIndex + 1}</span>
-                    <span className="text-white/40">/</span>
-                    <span className="text-white/55">0{services.length}</span>
-                </div>
 
-                <div className="text-[10px] uppercase tracking-[0.16em] text-white/60 font-medium">
-                    ← Swipe cards →
-                </div>
-
-                <div className="flex items-center gap-1.5">
-                    <button
-                        type="button"
-                        onClick={() => handleSwipe(-1)}
-                        aria-label="Previous card"
-                        className="flex h-8 w-8 items-center justify-center rounded-full border border-white/20 bg-white/10 text-xs text-white transition-colors active:bg-white/30 cursor-pointer"
-                    >
-                        ←
-                    </button>
-                    <button
-                        type="button"
-                        onClick={() => handleSwipe(1)}
-                        aria-label="Next card"
-                        className="flex h-8 w-8 items-center justify-center rounded-full border border-white/20 bg-white/10 text-xs text-white transition-colors active:bg-white/30 cursor-pointer"
-                    >
-                        →
-                    </button>
-                </div>
-            </div>
         </div>
     );
 }
@@ -380,14 +349,7 @@ export default function Services() {
 
                     </div>
 
-                    {/* Bottom Indicator */}
-                    <div className="relative z-20 mt-3 flex shrink-0 items-center justify-between border-t border-white/20 pt-3 text-[9px] uppercase tracking-[0.18em] text-white/55 sm:pt-4 sm:text-[10px] md:mt-5">
-                        <span>Bugsmoker Studio</span>
-                        <span className="flex items-center gap-2">
-                            <span className="hidden md:inline">Scroll to explore ↓</span>
-                            <span className="inline md:hidden">Swipe cards above</span>
-                        </span>
-                    </div>
+
 
                 </div>
             </div>
