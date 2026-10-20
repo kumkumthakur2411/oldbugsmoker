@@ -1,9 +1,9 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef } from "react";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUpRight, X } from "lucide-react";
+import { ArrowUpRight, X, ChevronLeft, ChevronRight } from "lucide-react";
 
 const BLOG_ARTICLES = [
     {
@@ -66,6 +66,28 @@ export default function Blog({
     articles = BLOG_ARTICLES,
 }) {
     const [selectedArticle, setSelectedArticle] = useState(null);
+    const [activeMobileIndex, setActiveMobileIndex] = useState(0);
+    const mobileScrollRef = useRef(null);
+
+    const handleMobileScroll = () => {
+        if (!mobileScrollRef.current) return;
+        const scrollLeft = mobileScrollRef.current.scrollLeft;
+        const cardWidth = mobileScrollRef.current.children[0]?.offsetWidth || 300;
+        const gap = 16;
+        const newIndex = Math.round(scrollLeft / (cardWidth + gap));
+        setActiveMobileIndex(Math.min(Math.max(0, newIndex), articles.length - 1));
+    };
+
+    const scrollToSlide = (i) => {
+        if (!mobileScrollRef.current) return;
+        const cardWidth = mobileScrollRef.current.children[0]?.offsetWidth || 300;
+        const gap = 16;
+        mobileScrollRef.current.scrollTo({
+            left: i * (cardWidth + gap),
+            behavior: "smooth",
+        });
+        setActiveMobileIndex(i);
+    };
 
     return (
         <section
@@ -90,8 +112,8 @@ export default function Blog({
                     </h2>
                 </div>
 
-                {/* 4-Column Image Grid */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
+                {/* Desktop & Tablet: Multi-Column Grid (hidden on mobile < sm) */}
+                <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
                     {articles.map((item, index) => (
                         <div
                             key={item.id}
@@ -112,7 +134,7 @@ export default function Blog({
                                     src={item.src}
                                     alt={item.alt}
                                     fill
-                                    sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
+                                    sizes="(max-width: 1024px) 50vw, 25vw"
                                     className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
                                     priority={index < 2}
                                 />
@@ -133,12 +155,88 @@ export default function Blog({
                                     <span>( {item.number} )</span>
                                     <span className="ml-2">{item.title}</span>
                                 </p>
-                                <span className="text-[10px] font-mono text-neutral-400 group-hover:text-neutral-600 transition-colors hidden sm:inline">
+                                <span className="text-[10px] font-mono text-neutral-400 group-hover:text-neutral-600 transition-colors">
                                     {item.category}
                                 </span>
                             </div>
                         </div>
                     ))}
+                </div>
+
+                {/* Mobile View: Touch Swiper with Snap & Navigation Controls */}
+                <div className="block sm:hidden">
+                    <div
+                        ref={mobileScrollRef}
+                        onScroll={handleMobileScroll}
+                        className="flex overflow-x-auto snap-x snap-mandatory scrollbar-none gap-4 pb-2 -mx-6 px-6 select-none"
+                        style={{
+                            scrollbarWidth: "none",
+                            msOverflowStyle: "none",
+                            WebkitOverflowScrolling: "touch",
+                        }}
+                    >
+                        {articles.map((item, index) => (
+                            <div
+                                key={item.id}
+                                onClick={() => setSelectedArticle(item)}
+                                className="group shrink-0 snap-start w-[82vw] max-w-[340px] flex flex-col focus:outline-none cursor-pointer"
+                                role="button"
+                                tabIndex={0}
+                            >
+                                {/* Image Frame */}
+                                <div className="relative w-full aspect-[4/5] overflow-hidden bg-[#e8e7e1] shadow-xs">
+                                    <Image
+                                        src={item.src}
+                                        alt={item.alt}
+                                        fill
+                                        sizes="85vw"
+                                        className="object-cover object-center active:scale-105 transition-transform duration-500"
+                                        priority={index === 0}
+                                    />
+
+                                    {/* Tap to view badge */}
+                                    <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-xs px-2.5 py-1 rounded-sm text-[10px] font-mono uppercase tracking-wider text-neutral-900 flex items-center gap-1 shadow-sm">
+                                        <span>View</span>
+                                        <ArrowUpRight size={11} />
+                                    </div>
+                                </div>
+
+                                {/* Caption Under Image */}
+                                <div className="mt-3 flex items-baseline justify-between select-none">
+                                    <p className="font-['Inter'] text-[11px] font-medium tracking-[0.06em] text-[#222222] uppercase">
+                                        <span>( {item.number} )</span>
+                                        <span className="ml-2">{item.title}</span>
+                                    </p>
+                                    <span className="text-[10px] font-mono text-neutral-500">
+                                        {item.category}
+                                    </span>
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Mobile Swiper Controls: Counter, Dots, Prev/Next Arrows */}
+                    <div className="flex items-center justify-center mt-5 pt-2">
+                        {/* Slide Counter */}
+
+
+                        {/* Interactive Pagination Dots */}
+                        <div className="flex items-center gap-1.5">
+                            {articles.map((_, i) => (
+                                <button
+                                    key={i}
+                                    onClick={() => scrollToSlide(i)}
+                                    aria-label={`Go to slide ${i + 1}`}
+                                    className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${activeMobileIndex === i
+                                        ? "w-6 bg-black"
+                                        : "w-1.5 bg-black/20"
+                                        }`}
+                                />
+                            ))}
+                        </div>
+
+
+                    </div>
                 </div>
 
                 {/* Bottom Editorial Divider Line */}

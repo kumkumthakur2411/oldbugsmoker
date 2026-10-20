@@ -1,3 +1,4 @@
+
 "use client";
 
 import React, { useRef, useState, useEffect } from "react";
@@ -9,41 +10,41 @@ import { ArrowUpRight } from "lucide-react";
 const SERVICES_DATA = [
     {
         id: "1",
-        title: "web development",
+        title: "Web Development",
         src: "/home/1.png",
-        alt: "web development",
+        alt: "Web development",
         href: "web-development",
         serviceSlug: "web-development",
     },
     {
         id: "2",
-        title: "software development",
+        title: "Software Development",
         src: "/home/2.png",
-        alt: "software development",
+        alt: "Software development",
         href: "software-development",
         serviceSlug: "software-development",
     },
     {
         id: "3",
-        title: "website optimization",
+        title: "Website Optimization",
         src: "/home/3.png",
-        alt: "website optimization",
+        alt: "Website optimization",
         href: "website-optimization",
         serviceSlug: "website-optimization",
     },
     {
         id: "4",
-        title: "hosting and maintenance",
+        title: "Hosting & Maintenance",
         src: "/home/4.png",
-        alt: "hosting maintenance",
+        alt: "Hosting and maintenance",
         href: "hosting-maintenance",
         serviceSlug: "hosting-maintenance",
     },
     {
         id: "5",
-        title: "tech support",
+        title: "Tech Support",
         src: "/home/5.png",
-        alt: "tech support",
+        alt: "Technical support",
         href: "tech-support",
         serviceSlug: "tech-support",
     },
@@ -53,136 +54,153 @@ export default function Services() {
     const containerRef = useRef(null);
     const maskContainerRef = useRef(null);
     const cardsWrapperRef = useRef(null);
-    const [maxScrollDistance, setMaxScrollDistance] = useState(null);
 
-    // Track scroll through the pinned container
+    const [maxScrollDistance, setMaxScrollDistance] = useState(0);
+
     const { scrollYProgress } = useScroll({
         target: containerRef,
         offset: ["start start", "end end"],
     });
 
-    // Measure exact scroll height so the 5th card is guaranteed 100% visible
     useEffect(() => {
         const calculateScroll = () => {
-            if (cardsWrapperRef.current && maskContainerRef.current) {
-                const totalCardsHeight = cardsWrapperRef.current.scrollHeight;
-                const visibleMaskHeight = maskContainerRef.current.clientHeight;
-                // Extra 24px padding ensures the last card sits comfortably inside the view
-                const distance = Math.max(0, totalCardsHeight - visibleMaskHeight + 24);
-                setMaxScrollDistance(distance);
-            }
+            if (!cardsWrapperRef.current || !maskContainerRef.current) return;
+
+            const totalHeight = cardsWrapperRef.current.scrollHeight;
+            const visibleHeight = maskContainerRef.current.clientHeight;
+
+            setMaxScrollDistance(
+                Math.max(0, totalHeight - visibleHeight + 12)
+            );
         };
 
         calculateScroll();
+
+        const resizeObserver = new ResizeObserver(calculateScroll);
+
+        if (cardsWrapperRef.current) {
+            resizeObserver.observe(cardsWrapperRef.current);
+        }
+
+        if (maskContainerRef.current) {
+            resizeObserver.observe(maskContainerRef.current);
+        }
+
         window.addEventListener("resize", calculateScroll);
-        // Small timeout for image load layout shifts
-        const timer = setTimeout(calculateScroll, 300);
 
         return () => {
+            resizeObserver.disconnect();
             window.removeEventListener("resize", calculateScroll);
-            clearTimeout(timer);
         };
     }, []);
 
-    // Reach full view of Card 5 slightly before the end of the scroll track (by 88% scroll)
-    // so the user can easily see, hover, and click the last card without needing to scroll to the extreme edge
-    const yPixel = useTransform(
+    const y = useTransform(
         scrollYProgress,
         [0, 0.88, 1],
-        [0, -(maxScrollDistance || 0), -(maxScrollDistance || 0)]
+        [0, -maxScrollDistance, -maxScrollDistance]
     );
-
-    const yPercent = useTransform(
-        scrollYProgress,
-        [0, 0.88, 1],
-        ["0%", "-64%", "-64%"]
-    );
-
-    const y = maxScrollDistance !== null ? yPixel : yPercent;
 
     return (
         <section
             ref={containerRef}
-            className="relative w-full h-[280vh] bg-neutral-950"
+            className="relative h-[240vh] w-full overflow-clip bg-neutral-950 md:h-[280vh]"
         >
-            {/* Sticky 100vh Viewport Container */}
-            <div className="sticky top-0 w-full h-screen overflow-hidden flex items-center">
+            {/* Sticky Background */}
+            <div className="sticky top-0 flex h-[100svh] w-full flex-col overflow-hidden md:h-screen md:flex-row md:items-center">
 
-                {/* Background Image with Dark Vignette Overlay */}
+                {/* Background Image */}
                 <div className="absolute inset-0 z-0">
                     <Image
                         src="/home/servicebg.png"
-                        alt="Services Background"
+                        alt="Bugsmoker services background"
                         fill
                         priority
                         sizes="100vw"
                         className="object-cover object-center"
                     />
-                    {/* Gradient & Darkening Overlays for text contrast */}
-                    <div className="absolute inset-0 bg-black/40 backdrop-blur-[0.5px]" />
-                    <div className="absolute inset-0 bg-gradient-to-r from-black/60 via-black/25 to-transparent" />
+
+                    <div className="absolute inset-0 bg-black/45" />
+
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/15 to-black/70 md:bg-gradient-to-r md:from-black/70 md:via-black/35 md:to-black/10" />
                 </div>
 
-                {/* Main Content Area */}
-                <div className="relative z-10 w-full max-w-[1400px] mx-auto h-full px-6 sm:px-10 md:px-14 lg:px-16 flex items-center justify-between">
-                    <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-14 w-full h-full items-center">
+                {/* Main Content */}
+                <div className="relative z-10 mx-auto flex h-full w-full max-w-[1400px] flex-col px-5 pb-5 pt-[max(2rem,env(safe-area-inset-top))] sm:px-8 md:px-12 md:py-8 lg:px-16">
 
-                        {/* Left Column: Fixed Headline & View All Button */}
-                        <div className="lg:col-span-6 flex flex-col items-start justify-center text-white py-12 z-20">
-                            <h2 className="font-['Outfit'] font-bold text-5xl sm:text-6xl md:text-7xl lg:text-[5.5rem] xl:text-[6.2rem] leading-[0.92] tracking-tight text-white select-none drop-shadow-md">
-                                Where<br />
-                                Style Meets<br />
-                                Function
+                    <div className="grid min-h-0 flex-1 grid-cols-1 grid-rows-[auto_minmax(0,1fr)] gap-5 md:grid-cols-12 md:grid-rows-1 md:items-center md:gap-8 lg:gap-14">
+
+                        {/* Heading */}
+                        <div className="relative z-20 flex flex-col items-start justify-center text-white md:col-span-6">
+                            <span className="mb-3 flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.24em] text-white/65 sm:mb-4 sm:text-xs md:mb-6">
+                                <span className="h-1.5 w-1.5 rounded-full bg-[#ff5a1f]" />
+                                What we do
+                            </span>
+
+                            <h2 className="max-w-[600px] font-['Outfit'] text-[clamp(2.5rem,9vw,4rem)] font-bold leading-[0.91] tracking-[-0.055em] text-white drop-shadow-md sm:text-6xl md:text-6xl lg:text-[5.5rem] xl:text-[6.2rem]">
+                                Where
+                                <br />
+                                Style Meets
+                                <br />
+                                Function<span className="text-[#ff5a1f]">.</span>
                             </h2>
+
+                            <p className="mt-4 max-w-[320px] text-xs leading-relaxed text-white/70 sm:mt-5 sm:text-sm md:mt-6 md:max-w-[340px]">
+                                Thoughtful design. Smart technology.
+                                Digital experiences that work for your business.
+                            </p>
 
                             <Link
                                 href="/services"
-                                className="mt-8 sm:mt-10 inline-flex items-center justify-center px-7 py-2.5 sm:px-8 sm:py-3 bg-white text-black text-xs font-bold tracking-[0.18em] uppercase hover:bg-neutral-100 hover:shadow-xl transition-all duration-300 active:scale-95 shadow-lg select-none"
+                                className="mt-5 inline-flex min-h-11 items-center gap-5 bg-white px-5 py-3 text-[10px] font-bold uppercase tracking-[0.16em] text-black transition-colors duration-300 hover:bg-[#ff5a1f] hover:text-white sm:mt-7 sm:px-6 sm:text-xs md:mt-9"
                             >
-                                VIEW ALL
+                                View all services
+                                <ArrowUpRight size={16} />
                             </Link>
                         </div>
 
-                        {/* Right Column: Vertically Scrolling Service Cards (2.5 visible at any time) */}
-                        <div className="lg:col-span-6 h-full flex justify-end items-center overflow-hidden relative pt-8 pb-4">
+                        {/* Service Cards */}
+                        <div className="relative flex min-h-0 w-full items-start justify-center overflow-hidden md:col-span-6 md:items-center md:justify-end">
 
-                            {/* Mask container showing 2 full cards and 1 half card */}
                             <div
                                 ref={maskContainerRef}
-                                className="relative w-full max-w-[340px] sm:max-w-[380px] lg:max-w-[400px] h-[88vh] overflow-hidden flex flex-col justify-start"
+                                className="relative h-full min-h-0 w-full max-w-[440px] overflow-hidden sm:max-h-[52vh] md:h-[84vh] md:max-h-none md:max-w-[400px] lg:max-w-[420px]"
                             >
                                 <motion.div
                                     ref={cardsWrapperRef}
                                     style={{ y }}
-                                    className="flex flex-col gap-5 sm:gap-6 w-full will-change-transform pb-8"
+                                    className="flex w-full flex-col gap-3 pb-4 sm:gap-4 md:gap-5"
                                 >
-                                    {SERVICES_DATA.map((service) => (
+                                    {SERVICES_DATA.map((service, index) => (
                                         <Link
                                             key={service.id}
                                             href={`/service/${service.serviceSlug || service.href}`}
-                                            className="group block bg-white  p-3 sm:p-3.5 shadow-2xl transition-all duration-500 hover:shadow-black/30 hover:-translate-y-1 cursor-pointer select-none border border-neutral-100"
+                                            className="group block w-full shrink-0 border border-white/15 bg-white p-2.5 shadow-xl shadow-black/10 transition-colors duration-300 hover:border-white/50 sm:p-3 md:p-3.5"
                                         >
-                                            {/* Card Image Container */}
-                                            <div className="relative w-full aspect-[16/11]  overflow-hidden bg-neutral-100">
+                                            {/* Image */}
+                                            <div className="relative aspect-[16/8] w-full overflow-hidden bg-neutral-200 sm:aspect-[16/9] md:aspect-[16/11]">
                                                 <Image
                                                     src={service.src}
                                                     alt={service.alt}
                                                     fill
-                                                    sizes="(max-width: 768px) 100vw, 400px"
-                                                    className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
+                                                    sizes="(max-width: 767px) 100vw, 420px"
+                                                    className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                                                 />
+
+                                                <span className="absolute left-3 top-3 flex h-7 min-w-7 items-center justify-center bg-black/60 px-2 font-mono text-[10px] text-white backdrop-blur-sm sm:left-4 sm:top-4">
+                                                    0{index + 1}
+                                                </span>
                                             </div>
 
-                                            {/* Card Info Bar */}
-                                            <div className="mt-3 sm:mt-3.5 px-1.5 pb-0.5 flex items-center justify-between">
-                                                <h3 className="font-['Outfit'] font-semibold text-neutral-900 text-sm sm:text-base capitalize tracking-tight group-hover:text-black transition-colors">
+                                            {/* Card Footer */}
+                                            <div className="flex items-center justify-between gap-3 px-1 py-2 sm:py-2.5">
+                                                <h3 className="min-w-0 font-['Outfit'] text-sm font-semibold tracking-tight text-neutral-900 sm:text-base md:text-[17px]">
                                                     {service.title}
                                                 </h3>
-                                                <span className="font-mono text-xs sm:text-sm text-neutral-400 font-medium">
+
+                                                <span className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full border border-neutral-200 text-[#ff5a1f] transition-all duration-300 group-hover:border-black group-hover:bg-black group-hover:text-white sm:h-9 sm:w-9">
                                                     <ArrowUpRight
-                                                        size={13}
-                                                        className="text-[#ff5a1f] transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
-                                                        strokeWidth={2.5}
+                                                        size={16}
+                                                        strokeWidth={1.8}
                                                     />
                                                 </span>
                                             </div>
@@ -190,12 +208,18 @@ export default function Services() {
                                     ))}
                                 </motion.div>
                             </div>
-
                         </div>
+                    </div>
 
+                    {/* Bottom Indicator */}
+                    <div className="relative z-20 mt-3 flex shrink-0 items-center justify-between border-t border-white/20 pt-3 text-[9px] uppercase tracking-[0.18em] text-white/55 sm:pt-4 sm:text-[10px] md:mt-5">
+                        <span>Bugsmoker Studio</span>
+                        <span className="flex items-center gap-2">
+                            Scroll to explore
+                            <span className="text-[#ff5a1f]">↓</span>
+                        </span>
                     </div>
                 </div>
-
             </div>
         </section>
     );
