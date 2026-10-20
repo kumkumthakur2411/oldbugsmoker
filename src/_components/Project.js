@@ -88,7 +88,7 @@ export default function Project() {
                             {/* STI Brandmark */}
                             <div className="flex flex-col items-start pl-2 sm:pl-4 pb-4 sm:pb-8 select-none">
                                 <span className="font-['Outfit'] text-4xl sm:text-5xl md:text-[54px] font-semibold text-black tracking-tight leading-none">
-                                    sti
+                                    bgsmkr.
                                 </span>
 
                                 {/* Underline symbols: leaf + 2 diamond sparkles */}

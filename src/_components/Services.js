@@ -337,35 +337,38 @@ export default function Services() {
 
                     <div className="grid min-h-0 flex-1 grid-cols-1 gap-6 md:grid-cols-12 md:items-center md:gap-8 lg:gap-14">
 
-                        {/* Left: Heading and Info */}
                         <div className="relative z-20 flex flex-col items-start justify-center text-white md:col-span-6">
-                            <span className="mb-3 flex items-center gap-2 text-[10px] font-medium uppercase tracking-[0.24em] text-white/65 sm:mb-4 sm:text-xs md:mb-6">
-                                <span className="h-1.5 w-1.5 rounded-full bg-[#ff5a1f]" />
-                                What we do
+                            <span className="mb-5 flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.18em] text-white/55 sm:mb-7 sm:text-[10px] sm:tracking-[0.22em]">
+                                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#ff5a1f]" />
+                                What we bring to the table
                             </span>
 
-                            <h2 className="max-w-[600px] font-['Outfit'] text-[clamp(2.5rem,9vw,4rem)] font-bold leading-[0.91] tracking-[-0.055em] text-white drop-shadow-md sm:text-6xl md:text-6xl lg:text-[5.5rem] xl:text-[6.2rem]">
-                                Where
+                            <h2 className="max-w-full font-['Outfit'] text-[clamp(2.65rem,10.5vw,5.5rem)] font-medium leading-[0.94] tracking-[-0.065em] sm:text-[clamp(3rem,7vw,5.5rem)]">
+                                Where style
                                 <br />
-                                Style Meets
-                                <br />
-                                Function<span className="text-[#ff5a1f]">.</span>
+                                meets function<span className="text-[#ff5a1f]">.</span>
                             </h2>
 
-                            <p className="mt-4 max-w-[320px] text-xs leading-relaxed text-white/70 sm:mt-5 sm:text-sm md:mt-6 md:max-w-[340px]">
+                            <p className="mt-4 max-w-[310px] text-[13px] leading-[1.8] text-white/65 sm:mt-6 sm:max-w-[340px] sm:text-sm sm:leading-7">
                                 Thoughtful design. Smart technology.
-                                Digital experiences that work for your business.
+                                Digital experiences that move your business forward.
                             </p>
 
                             <Link
                                 href="/services"
-                                className="mt-5 inline-flex min-h-11 items-center gap-5 
-                                bg-white px-2 py-2 text-[10px] font-bold uppercase tracking-[0.16em]
-                                 text-black transition-colors duration-300 hover:bg-[#ff5a1f] hover:text-white 
-                                 sm:mt-7  sm:text-xs md:mt-9 rounded rounded-xl"
+                                className="group mt-7 flex w-full max-w-[340px] items-center justify-between border-t border-white/20 py-4 sm:mt-9 sm:w-auto sm:justify-start sm:gap-6 sm:border-0 sm:py-2"
                             >
-                                View all services
-                                <ArrowUpRight size={16} />
+                                <span className="relative pb-1 font-mono text-[10px] uppercase tracking-[0.16em] sm:text-[11px] sm:tracking-[0.18em]">
+                                    Explore our services
+                                    <span className="absolute bottom-0 left-0 h-px w-full origin-left scale-x-40 bg-[#ff5a1f] transition-transform duration-500 group-hover:scale-x-100" />
+                                </span>
+
+                                <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/25 transition-all duration-300 group-hover:border-[#ff5a1f] group-hover:bg-[#ff5a1f]">
+                                    <ArrowUpRight
+                                        size={16}
+                                        className="transition-transform duration-300 group-hover:translate-x-0.5 group-hover:-translate-y-0.5"
+                                    />
+                                </span>
                             </Link>
                         </div>
 

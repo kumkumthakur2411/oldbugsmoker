@@ -36,8 +36,8 @@ const Navbar = ({ isLoaded: propIsLoaded }) => {
         const footerEl = document.querySelector("footer");
 
         if (footerEl && footerEl.getBoundingClientRect().top <= 80) {
-          // Footer has dark background, switch back to white logo
-          setIsHeroSection(true);
+          // Footer has light cream background, use dark logo
+          setIsHeroSection(false);
         } else if (manifestoEl) {
           const rect = manifestoEl.getBoundingClientRect();
 
@@ -49,7 +49,7 @@ const Navbar = ({ isLoaded: propIsLoaded }) => {
       } else {
         const footerEl = document.querySelector("footer");
         if (footerEl && footerEl.getBoundingClientRect().top <= 80) {
-          setIsHeroSection(true);
+          setIsHeroSection(false);
         } else {
           setIsHeroSection(false);
         }

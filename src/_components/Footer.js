@@ -1,8 +1,6 @@
 import Link from "next/link";
-import {
+import { ArrowUpRight } from "lucide-react";
 
-    ArrowUpRight,
-} from "lucide-react";
 function Instagram({ size = 20, className = "", ...props }) {
     return (
         <svg
@@ -40,6 +38,7 @@ function Linkedin({ size = 20, className = "", ...props }) {
         </svg>
     );
 }
+
 function Github({ size = 24, strokeWidth = 2, className = "", ...props }) {
     return (
         <svg
@@ -73,7 +72,6 @@ const company = [
     { label: "About Us", href: "/about" },
     { label: "Blog", href: "/blog" },
     { label: "Contact", href: "/contact" },
-
 ];
 
 const legal = [
@@ -114,7 +112,6 @@ function FooterLinks({ title, links }) {
                             className="group inline-flex items-center gap-1 text-sm text-white/75 transition-colors duration-300 hover:text-white sm:text-[15px]"
                         >
                             <span>{link.label}</span>
-
                             <ArrowUpRight
                                 size={13}
                                 className="opacity-0 transition-all duration-300 group-hover:-translate-y-0.5 group-hover:translate-x-0.5 group-hover:opacity-100"
@@ -130,48 +127,40 @@ function FooterLinks({ title, links }) {
 export default function Footer() {
     return (
         <footer className="relative isolate overflow-hidden bg-[#171b13] text-white">
-
-            {/* FULL FOOTER BACKGROUND */}
+            {/* Background */}
             <div
-                className="absolute inset-0 -z-20 bg-cover bg-center bg-no-repeat "
-                style={{
-                    backgroundImage: "url('/footer.png')",
-                }}
+                className="absolute inset-0 -z-20 bg-cover bg-center bg-no-repeat"
+                style={{ backgroundImage: "url('/footer.png')" }}
             />
 
-            {/* DARK OVERLAY FOR TEXT READABILITY */}
-            <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#10130f]/85 via-[#10130f]/45 to-[#10130f]/10" />
+            <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#10130f]/85 via-[#10130f]/65 to-[#10130f]/40" />
 
-            {/* BOTTOM GRADIENT */}
-            <div className="absolute inset-x-0 bottom-0 -z-10 h-[75%] bg-gradient-to-t from-[#10130f]/85 via-[#10130f]/25 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 -z-10 h-[75%] bg-gradient-to-t from-[#10130f]/90 via-[#10130f]/35 to-transparent" />
 
             <div className="mx-auto flex min-h-[680px] max-w-[1800px] flex-col justify-between px-6 pb-6 pt-12 sm:px-10 sm:pt-16 lg:min-h-[760px] lg:px-16 lg:pt-20">
-
-                {/* TOP CONTENT */}
-                <div className="grid grid-cols-1 gap-12 lg:grid-cols-12 lg:gap-8 pt-20" >
-
-                    {/* BRAND */}
+                {/* Desktop + Mobile Brand */}
+                <div className="grid grid-cols-1 gap-10 pt-8 sm:pt-12 lg:grid-cols-12 lg:gap-8 lg:pt-20">
                     <div className="lg:col-span-5">
                         <Link
                             href="/"
                             aria-label="Bugsmoker home"
                             className="inline-block"
                         >
-                            <span className="block text-[clamp(2.5rem,6vw,7.5rem)] font-bold leading-[0.8] tracking-[-0.085em] text-[#f5f1df]">
+                            <span className="block text-[clamp(2.8rem,6vw,7.5rem)] font-bold leading-[0.8] tracking-[-0.085em] text-[#f5f1df]">
                                 bugsmoker
                             </span>
                         </Link>
 
-                        <p className="mt-6 text-[10px] font-medium uppercase tracking-[0.38em] text-white/75 sm:text-xs">
+                        <p className="mt-5 text-[9px] font-medium uppercase tracking-[0.32em] text-white/70 sm:text-xs sm:tracking-[0.38em]">
                             We make tech easy
                         </p>
 
-                        <p className="mt-5 max-w-xs text-sm leading-6 text-white/60">
+                        <p className="mt-4 max-w-xs text-sm leading-6 text-white/65">
                             Turning business challenges into digital possibilities.
                         </p>
 
-                        {/* SOCIAL LINKS */}
-                        <div className="mt-8 flex items-center gap-3">
+                        {/* Social links */}
+                        <div className="mt-6 flex items-center gap-2.5 sm:mt-8 sm:gap-3">
                             {socialLinks.map(({ label, href, icon: Icon }) => (
                                 <a
                                     key={label}
@@ -184,64 +173,49 @@ export default function Footer() {
                                     <Icon size={17} strokeWidth={1.7} />
                                 </a>
                             ))}
+                            <Link
+                                href="/contact"
+                                className=" inline-flex items-center gap-2 rounded-full border border-white/25 px-4 py-2.5 text-xs text-white/90 transition-colors hover:bg-white hover:text-black sm:mt-8 lg:hidden"
+                            >
+                                Have  project in mind?
+                                <ArrowUpRight size={14} />
+                            </Link>
                         </div>
+
+                        {/* Mobile contact link */}
+
                     </div>
 
-                    {/* NAVIGATION */}
-                    <div className="grid grid-cols-2 gap-x-6 gap-y-10 sm:grid-cols-3 lg:col-span-7 lg:grid-cols-3 lg:pt-2">
+                    {/* Desktop navigation */}
+                    <div className="hidden lg:grid lg:col-span-7 lg:grid-cols-3 lg:gap-8 lg:pt-2">
+                        <FooterLinks title="Services" links={services} />
+                        <FooterLinks title="Company" links={company} />
+                        <FooterLinks title="Legal" links={legal} />
+                    </div>
 
-                        {/* SERVICES */}
-                        <FooterLinks
-                            title="Services"
-                            links={services}
-                        />
-
-                        {/* COMPANY + LEGAL */}
-                        <div className="flex flex-col gap-10">
-                            <FooterLinks
-                                title="Company"
-                                links={company}
-                            />
-
-                            {/* Mobile: below Company | Desktop: third column */}
-                            <div className="lg:hidden">
-                                <FooterLinks
-                                    title="Legal"
-                                    links={legal}
-                                />
-                            </div>
-                        </div>
-
-                        {/* LEGAL — desktop only */}
-                        <div className="hidden lg:block">
-                            <FooterLinks
-                                title="Legal"
-                                links={legal}
-                            />
-                        </div>
-
+                    {/* Simple mobile navigation */}
+                    <div className="grid grid-cols-2 gap-8 pt-7 lg:hidden">
+                        <FooterLinks title="Explore" links={company} />
+                        <FooterLinks title="The essentials" links={legal} />
                     </div>
                 </div>
 
-                {/* BOTTOM BAR */}
-                <div className="mt-16 border-t border-white/20 pt-5">
-                    <div className="flex flex-col gap-4 text-[10px] uppercase tracking-[0.12em] text-white/60 sm:flex-row sm:items-center sm:justify-between sm:text-xs">
+                {/* Bottom bar */}
+                <div className="mt-12 border-t border-white/20 pt-5 sm:mt-16">
+                    <div className="flex flex-col gap-3 text-[10px] uppercase tracking-[0.1em] text-white/55 sm:flex-row sm:items-center sm:justify-between sm:text-xs">
+                        <p>© 2026 Bugsmoker. All rights reserved.</p>
 
-                        <p>
-                            © 2026 Bugsmoker. All rights reserved.
-                        </p>
-
-                        <div className="flex items-center gap-5">
+                        <div className="flex items-center gap-4 sm:gap-5">
                             <Link
                                 href="/privacy-policy"
-                                className="transition-colors hover:text-white"
+                                className="transition-colors hover:text-white lg:hidden"
                             >
                                 Privacy
                             </Link>
 
                             <Link
                                 href="/terms-and-conditions"
-                                className="transition-colors hover:text-white"
+                                className="transition-colors hover:text-white lg:hidden"
                             >
                                 Terms
                             </Link>
@@ -250,13 +224,11 @@ export default function Footer() {
                                 href="/contact"
                                 className="transition-colors hover:text-white"
                             >
-                                Get in touch ↗
+                                Say hello ↗
                             </Link>
                         </div>
-
                     </div>
                 </div>
-
             </div>
         </footer>
     );

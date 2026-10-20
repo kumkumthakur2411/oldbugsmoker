@@ -1,8 +1,8 @@
 "use client";
 
-import React, { useState, useRef } from "react";
+import React, { useEffect, useRef, useState, useCallback } from "react";
 import Image from "next/image";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence, motion } from "framer-motion";
 import { ArrowUpRight, X, ChevronLeft, ChevronRight } from "lucide-react";
 
 const BLOG_ARTICLES = [
@@ -67,254 +67,337 @@ export default function Blog({
 }) {
     const [selectedArticle, setSelectedArticle] = useState(null);
     const [activeMobileIndex, setActiveMobileIndex] = useState(0);
+    const [activeDescription, setActiveDescription] = useState(null);
     const mobileScrollRef = useRef(null);
+    const cardRefs = useRef([]);
 
-    const handleMobileScroll = () => {
-        if (!mobileScrollRef.current) return;
-        const scrollLeft = mobileScrollRef.current.scrollLeft;
-        const cardWidth = mobileScrollRef.current.children[0]?.offsetWidth || 300;
-        const gap = 16;
-        const newIndex = Math.round(scrollLeft / (cardWidth + gap));
-        setActiveMobileIndex(Math.min(Math.max(0, newIndex), articles.length - 1));
-    };
+    const handleMobileScroll = useCallback(() => {
+        const container = mobileScrollRef.current;
+        if (!container || !articles.length) return;
 
-    const scrollToSlide = (i) => {
-        if (!mobileScrollRef.current) return;
-        const cardWidth = mobileScrollRef.current.children[0]?.offsetWidth || 300;
-        const gap = 16;
-        mobileScrollRef.current.scrollTo({
-            left: i * (cardWidth + gap),
+        const containerCenter =
+            container.getBoundingClientRect().left + container.clientWidth / 2;
+
+        let closestIndex = 0;
+        let closestDistance = Infinity;
+
+        cardRefs.current.forEach((card, index) => {
+            if (!card) return;
+
+            const rect = card.getBoundingClientRect();
+            const cardCenter = rect.left + rect.width / 2;
+            const distance = Math.abs(cardCenter - containerCenter);
+
+            if (distance < closestDistance) {
+                closestDistance = distance;
+                closestIndex = index;
+            }
+        });
+
+        setActiveMobileIndex(closestIndex);
+    }, [articles.length]);
+
+    const scrollToSlide = (index) => {
+        const container = mobileScrollRef.current;
+        const card = cardRefs.current[index];
+
+        if (!container || !card) return;
+
+        const target =
+            card.offsetLeft -
+            (container.clientWidth - card.offsetWidth) / 2;
+
+        container.scrollTo({
+            left: target,
             behavior: "smooth",
         });
-        setActiveMobileIndex(i);
+
+        setActiveMobileIndex(index);
     };
+
+    const changeSlide = (direction) => {
+        const nextIndex = Math.max(
+            0,
+            Math.min(articles.length - 1, activeMobileIndex + direction)
+        );
+
+        scrollToSlide(nextIndex);
+    };
+
+    useEffect(() => {
+        const container = mobileScrollRef.current;
+        if (!container) return;
+
+        handleMobileScroll();
+
+        const observer = new ResizeObserver(handleMobileScroll);
+        observer.observe(container);
+
+        return () => observer.disconnect();
+    }, [handleMobileScroll]);
+
+    useEffect(() => {
+        if (!selectedArticle) return;
+
+        const previousOverflow = document.body.style.overflow;
+
+        const handleKeyDown = (event) => {
+            if (event.key === "Escape") {
+                setSelectedArticle(null);
+            }
+        };
+
+        document.body.style.overflow = "hidden";
+        window.addEventListener("keydown", handleKeyDown);
+
+        return () => {
+            document.body.style.overflow = previousOverflow;
+            window.removeEventListener("keydown", handleKeyDown);
+        };
+    }, [selectedArticle]);
+
+    const openArticle = (article) => setSelectedArticle(article);
 
     return (
         <section
             id="blog-section"
-            className="relative w-full text-[#18181b] px-6 sm:px-10 md:px-14 lg:px-16 py-12 sm:py-16 md:py-20 overflow-hidden"
+            className="relative w-full overflow-hidden bg-white/90 py-16 text-[#181818] sm:py-20 md:py-28"
         >
-            <div className="w-full max-w-[1400px] mx-auto">
-                {/* Top Editorial Divider Line */}
-                <div className="w-full border-t border-[#18181b]/15 mb-10 sm:mb-14 md:mb-16" />
+            <div className="mx-auto max-w-[1600px] px-5 sm:px-8 md:px-12 lg:px-16">
+                {/* Section header */}
+                <div className="">
+                    <div className="mb-10 flex flex-col gap-7 sm:mb-14 md:mb-16 md:flex-row md:items-end md:justify-between md:gap-10">
+                        <div className="max-w-[900px]">
 
-                {/* Headline Statement */}
-                <div className="mb-10 sm:mb-14 md:mb-16 lg:mb-20">
-                    <h2 className="font-['Outfit'] font-semibold text-2xl sm:text-3xl md:text-4xl lg:text-[42px] xl:text-[46px] text-[#141414] tracking-[-0.03em] leading-[1.14] max-w-[860px]">
-                        {headline || (
-                            <>
-                                At {brand}, design isn’t just decoration—
-                                <span className="block mt-1 sm:mt-1.5">
-                                    it’s a tool for connection.
-                                </span>
-                            </>
-                        )}
-                    </h2>
+
+                            <h2 className="font-['Outfit'] text-[clamp(1.8rem,7vw,3.2rem)] font-semibold leading-[1.02] tracking-[-0.06em]">
+                                {headline || (
+                                    <>
+                                        At {brand}, design isn&apos;t just
+                                        decoration.
+                                        <span className="mt-1 block text-neutral-400">
+                                            It&apos;s a tool for connection.
+                                        </span>
+                                    </>
+                                )}
+                            </h2>
+                        </div>
+
+                        <p className="max-w-[300px] text-sm leading-6 text-neutral-500 md:mb-1 md:text-[13px]">
+                            A closer look at the ideas, experiments, and
+                            details behind the work we create.
+                        </p>
+                    </div>
                 </div>
 
-                {/* Desktop & Tablet: Multi-Column Grid (hidden on mobile < sm) */}
-                <div className="hidden sm:grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5 md:gap-6">
+                {/* Desktop and tablet grid */}
+                {/* Desktop and tablet cards */}
+                <div className="hidden grid-cols-2 gap-x-5 gap-y-12 sm:grid lg:grid-cols-4 lg:gap-x-6 lg:gap-y-14">
                     {articles.map((item, index) => (
-                        <div
+                        <button
                             key={item.id}
-                            onClick={() => setSelectedArticle(item)}
-                            className="group cursor-pointer flex flex-col focus:outline-none"
-                            role="button"
-                            tabIndex={0}
-                            onKeyDown={(e) => {
-                                if (e.key === "Enter" || e.key === " ") {
-                                    e.preventDefault();
-                                    setSelectedArticle(item);
-                                }
-                            }}
+                            type="button"
+                            onClick={() => openArticle(item)}
+                            className="group min-w-0 text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff5a1f] focus-visible:ring-offset-4"
                         >
-                            {/* Image Frame with Aspect Ratio ~4:5 */}
-                            <div className="relative w-full aspect-[4/5] overflow-hidden bg-[#e8e7e1] shadow-xs">
-                                <Image
-                                    src={item.src}
-                                    alt={item.alt}
-                                    fill
-                                    sizes="(max-width: 1024px) 50vw, 25vw"
-                                    className="object-cover object-center transition-transform duration-700 ease-out group-hover:scale-105"
-                                    priority={index < 2}
-                                />
+                            <div className="relative aspect-[4/5] overflow-hidden bg-[#e8e6df]">
+                                {/* Image */}
+                                <div className="absolute inset-0 transition-all duration-500 ease-out group-hover:scale-[1.04] group-hover:opacity-0">
+                                    <Image
+                                        src={item.src}
+                                        alt={item.alt}
+                                        fill
+                                        sizes="(max-width: 1024px) 50vw, 25vw"
+                                        priority={index < 2}
+                                        className="object-cover"
+                                    />
+                                </div>
 
-                                {/* Subtle dark tint on hover */}
-                                <div className="absolute inset-0 bg-black/0 group-hover:bg-black/10 transition-colors duration-300" />
+                                {/* Description revealed on hover */}
+                                <div className="absolute inset-0 flex flex-col justify-between bg-white/90 p-5 text-black opacity-0 transition-opacity duration-300 group-hover:opacity-100 sm:p-6">
+                                    <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.15em]">
+                                        <span>Project / {item.number}</span>
+                                        <ArrowUpRight size={17} />
+                                    </div>
 
-                                {/* Quick inspect badge on hover */}
-                                <div className="absolute top-3 right-3 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-white/90 backdrop-blur-xs px-2 py-1 rounded-sm text-[10px] font-mono uppercase tracking-wider text-neutral-900 flex items-center gap-1 shadow-sm">
-                                    <span>View</span>
-                                    <ArrowUpRight size={11} />
+                                    <div>
+                                        <p className="mb-3 font-mono text-[9px] uppercase tracking-[0.16em] ">
+                                            {item.category}
+                                        </p>
+
+                                        <h3 className="mb-3 font-['Outfit'] text-xl font-semibold leading-tight tracking-[-0.04em] lg:text-2xl">
+                                            {item.tagline}
+                                        </h3>
+
+                                        <p className="text-xs leading-6 text-black lg:text-[13px]">
+                                            {item.description}
+                                        </p>
+
+                                        <p className="mt-5 flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.15em]">
+                                            Explore story <ArrowUpRight size={13} />
+                                        </p>
+                                    </div>
+                                </div>
+
+                                {/* Image label */}
+                                <div className="absolute left-3 top-3 font-mono text-[10px] tracking-widest text-white drop-shadow-md transition-opacity duration-200 group-hover:opacity-0 sm:left-4 sm:top-4">
+                                    / {item.number}
                                 </div>
                             </div>
 
-                            {/* Caption Under Image */}
-                            <div className="mt-3 sm:mt-3.5 flex items-baseline justify-between select-none">
-                                <p className="font-['Inter'] text-[10.5px] sm:text-[11px] md:text-[11.5px] font-medium tracking-[0.06em] text-[#222222] uppercase group-hover:text-black transition-colors">
-                                    <span>( {item.number} )</span>
-                                    <span className="ml-2">{item.title}</span>
-                                </p>
-                                <span className="text-[10px] font-mono text-neutral-400 group-hover:text-neutral-600 transition-colors">
+                            {/* Caption */}
+                            <div className="mt-4 flex items-start justify-between gap-3">
+                                <div className="min-w-0">
+                                    <h3 className="font-['Outfit'] text-sm font-semibold tracking-[-0.025em] sm:text-base">
+                                        {item.title}
+                                    </h3>
+                                    <p className="mt-1 text-xs leading-5 text-neutral-500 sm:text-[13px]">
+                                        {item.tagline}
+                                    </p>
+                                </div>
+
+                                <span className="mt-1 shrink-0 font-mono text-[9px] uppercase tracking-wide text-neutral-400">
                                     {item.category}
                                 </span>
                             </div>
-                        </div>
+
+                            <div className="mt-4 h-px w-full bg-black/10">
+                                <div className="h-px w-0 bg-[#ff5a1f] transition-all duration-500 group-hover:w-full" />
+                            </div>
+                        </button>
                     ))}
                 </div>
 
-                {/* Mobile View: Touch Swiper with Snap & Navigation Controls */}
-                <div className="block sm:hidden">
+                {/* Mobile carousel */}
+                <div className="sm:hidden">
                     <div
                         ref={mobileScrollRef}
                         onScroll={handleMobileScroll}
-                        className="flex overflow-x-auto snap-x snap-mandatory scrollbar-none gap-4 pb-2 -mx-6 px-6 select-none"
+                        className="-mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-3 pt-1"
                         style={{
                             scrollbarWidth: "none",
                             msOverflowStyle: "none",
                             WebkitOverflowScrolling: "touch",
                         }}
                     >
-                        {articles.map((item, index) => (
-                            <div
-                                key={item.id}
-                                onClick={() => setSelectedArticle(item)}
-                                className="group shrink-0 snap-start w-[82vw] max-w-[340px] flex flex-col focus:outline-none cursor-pointer"
-                                role="button"
-                                tabIndex={0}
-                            >
-                                {/* Image Frame */}
-                                <div className="relative w-full aspect-[4/5] overflow-hidden bg-[#e8e7e1] shadow-xs">
-                                    <Image
-                                        src={item.src}
-                                        alt={item.alt}
-                                        fill
-                                        sizes="85vw"
-                                        className="object-cover object-center active:scale-105 transition-transform duration-500"
-                                        priority={index === 0}
-                                    />
+                        {articles.map((item, index) => {
+                            const showDescription = activeDescription === item.id;
 
-                                    {/* Tap to view badge */}
-                                    <div className="absolute top-3 right-3 bg-white/90 backdrop-blur-xs px-2.5 py-1 rounded-sm text-[10px] font-mono uppercase tracking-wider text-neutral-900 flex items-center gap-1 shadow-sm">
-                                        <span>View</span>
-                                        <ArrowUpRight size={11} />
-                                    </div>
-                                </div>
-
-                                {/* Caption Under Image */}
-                                <div className="mt-3 flex items-baseline justify-between select-none">
-                                    <p className="font-['Inter'] text-[11px] font-medium tracking-[0.06em] text-[#222222] uppercase">
-                                        <span>( {item.number} )</span>
-                                        <span className="ml-2">{item.title}</span>
-                                    </p>
-                                    <span className="text-[10px] font-mono text-neutral-500">
-                                        {item.category}
-                                    </span>
-                                </div>
-                            </div>
-                        ))}
-                    </div>
-
-                    {/* Mobile Swiper Controls: Counter, Dots, Prev/Next Arrows */}
-                    <div className="flex items-center justify-center mt-5 pt-2">
-                        {/* Slide Counter */}
-
-
-                        {/* Interactive Pagination Dots */}
-                        <div className="flex items-center gap-1.5">
-                            {articles.map((_, i) => (
-                                <button
-                                    key={i}
-                                    onClick={() => scrollToSlide(i)}
-                                    aria-label={`Go to slide ${i + 1}`}
-                                    className={`h-1.5 rounded-full transition-all duration-300 cursor-pointer ${activeMobileIndex === i
-                                        ? "w-6 bg-black"
-                                        : "w-1.5 bg-black/20"
-                                        }`}
-                                />
-                            ))}
-                        </div>
-
-
-                    </div>
-                </div>
-
-                {/* Bottom Editorial Divider Line */}
-                <div className="w-full border-b border-[#18181b]/15 mt-12 sm:mt-16 md:mt-20" />
-            </div>
-
-            {/* Detail Modal / Lightbox for rich interaction */}
-            <AnimatePresence>
-                {selectedArticle && (
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.2 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 md:p-10 bg-black/60 backdrop-blur-sm"
-                        onClick={() => setSelectedArticle(null)}
-                    >
-                        <motion.div
-                            initial={{ scale: 0.94, opacity: 0, y: 15 }}
-                            animate={{ scale: 1, opacity: 1, y: 0 }}
-                            exit={{ scale: 0.94, opacity: 0, y: 15 }}
-                            transition={{ duration: 0.25, ease: "easeOut" }}
-                            className="relative w-full max-w-3xl bg-[#fbfbf8] text-[#18181b] shadow-2xl rounded-sm overflow-hidden border border-neutral-300"
-                            onClick={(e) => e.stopPropagation()}
-                        >
-                            {/* Close Button */}
-                            <button
-                                onClick={() => setSelectedArticle(null)}
-                                aria-label="Close dialog"
-                                className="absolute top-4 right-4 z-10 w-9 h-9 rounded-full bg-white/80 hover:bg-white text-neutral-800 flex items-center justify-center transition-colors shadow-sm cursor-pointer"
-                            >
-                                <X size={18} />
-                            </button>
-
-                            <div className="grid grid-cols-1 md:grid-cols-2">
-                                {/* Image */}
-                                <div className="relative w-full aspect-[4/5] md:aspect-auto md:min-h-[460px] bg-[#e5e4de]">
-                                    <Image
-                                        src={selectedArticle.src}
-                                        alt={selectedArticle.alt}
-                                        fill
-                                        sizes="(max-width: 768px) 100vw, 500px"
-                                        className="object-cover object-center"
-                                    />
-                                </div>
-
-                                {/* Content */}
-                                <div className="p-6 sm:p-8 flex flex-col justify-between">
-                                    <div>
-                                        <div className="flex items-center gap-2 text-[11px] font-mono uppercase tracking-widest text-neutral-500 mb-3">
-                                            <span>( {selectedArticle.number} )</span>
-                                            <span>•</span>
-                                            <span>{selectedArticle.category}</span>
+                            return (
+                                <div
+                                    key={item.id}
+                                    ref={(element) => {
+                                        cardRefs.current[index] = element;
+                                    }}
+                                    className="w-[82%] max-w-[370px] shrink-0 snap-center"
+                                >
+                                    <button
+                                        type="button"
+                                        onClick={() =>
+                                            setActiveDescription((current) =>
+                                                current === item.id ? null : item.id
+                                            )
+                                        }
+                                        aria-expanded={showDescription}
+                                        aria-label={
+                                            showDescription
+                                                ? `Show image for ${item.title}`
+                                                : `Show description for ${item.title}`
+                                        }
+                                        className="group relative block aspect-[4/5] w-full overflow-hidden bg-[#e8e6df] text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#ff5a1f]"
+                                    >
+                                        {/* Image */}
+                                        <div
+                                            className={`absolute inset-0 transition-all duration-500 ${showDescription
+                                                ? "scale-[1.04] opacity-0"
+                                                : "scale-100 opacity-100"
+                                                }`}
+                                        >
+                                            <Image
+                                                src={item.src}
+                                                alt={item.alt}
+                                                fill
+                                                sizes="82vw"
+                                                priority={index === 0}
+                                                className="object-cover"
+                                            />
                                         </div>
 
-                                        <h3 className="font-['Outfit'] font-bold text-2xl sm:text-3xl text-[#141414] tracking-tight leading-tight">
-                                            {selectedArticle.title}
-                                        </h3>
+                                        {/* Description panel */}
+                                        <div
+                                            className={`absolute inset-0 flex flex-col justify-between bg-white/90 p-5 text-black transition-all duration-400 ${showDescription
+                                                ? "translate-y-0 opacity-100"
+                                                : "translate-y-3 opacity-0"
+                                                }`}
+                                        >
+                                            <div className="flex items-center justify-between font-mono text-[10px] uppercase tracking-[0.15em]">
+                                                <span>Project / {item.number}</span>
+                                                <ArrowUpRight size={18} />
+                                            </div>
 
-                                        <p className="font-['Inter'] text-sm text-[#ff5a1f] font-medium mt-1 mb-4">
-                                            {selectedArticle.tagline}
-                                        </p>
+                                            <div>
+                                                <p className="mb-3 font-mono text-[9px] uppercase tracking-[0.15em] ">
+                                                    {item.category}
+                                                </p>
 
-                                        <p className="font-['Inter'] text-xs sm:text-[13px] leading-relaxed text-neutral-600 mb-6">
-                                            {selectedArticle.description}
-                                        </p>
+                                                <h3 className="mb-3 font-['Outfit'] text-2xl font-semibold leading-tight tracking-[-0.04em]">
+                                                    {item.tagline}
+                                                </h3>
+
+                                                <p className="text-[13px] leading-6 ">
+                                                    {item.description}
+                                                </p>
+
+                                                <p className="mt-5 font-mono text-[9px] uppercase tracking-[0.15em] text-white/75">
+                                                    Tap to see image
+                                                </p>
+                                            </div>
+                                        </div>
+
+                                        {/* Image state labels */}
+                                        <div
+                                            className={`absolute left-3 top-3 font-mono text-[10px] tracking-widest text-white drop-shadow-md transition-opacity duration-200 ${showDescription ? "opacity-0" : "opacity-100"
+                                                }`}
+                                        >
+                                            / {item.number}
+                                        </div>
+
+                                        <div
+                                            className={`absolute bottom-3 right-3 flex h-10 w-10 items-center justify-center rounded-full bg-[#faf9f6] text-black transition-opacity duration-200 ${showDescription ? "opacity-0" : "opacity-100"
+                                                }`}
+                                        >
+                                            <ArrowUpRight size={18} />
+                                        </div>
+                                    </button>
+                                    <div className="mt-4 flex items-start justify-between gap-3">
+                                        <div className="min-w-0">
+                                            <h3 className="font-['Outfit'] text-base font-semibold tracking-[-0.03em]">
+                                                {item.title}
+                                            </h3>
+                                            <p className="mt-1 text-xs leading-5 text-neutral-500">
+                                                {item.tagline}
+                                            </p>
+                                        </div>
+
+                                        <span className="mt-1 max-w-[100px] shrink-0 text-right font-mono text-[9px] uppercase leading-4 tracking-wide text-neutral-400">
+                                            {item.category}
+                                        </span>
                                     </div>
 
-                                    <div className="pt-4 border-t border-neutral-200 flex items-center justify-between text-xs text-neutral-500 font-mono">
-                                        <span>{selectedArticle.date}</span>
-                                        <span>{selectedArticle.readTime}</span>
-                                    </div>
+
                                 </div>
-                            </div>
-                        </motion.div>
-                    </motion.div>
-                )}
-            </AnimatePresence>
+                            );
+                        })}
+                    </div>
+
+
+                </div>
+
+                {/* Bottom divider */}
+                <div className="mt-14  sm:mt-16 md:mt-20" />
+            </div>
+
+
         </section>
     );
 }

@@ -1,7 +1,7 @@
 
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useRef } from "react";
 import Image from "next/image";
 import {
     motion,
@@ -10,62 +10,70 @@ import {
     useReducedMotion,
 } from "framer-motion";
 
-const PROJECTS = [
+const CONTENT_PARTS = [
+    { type: "text", value: "World shaped by experience," },
     {
-        id: "1",
-        title: "Sunset Monitor Installation",
-        tag: "Digital Art & Experience",
+        type: "image",
         src: "/home/1.png",
-        alt: "Bugsmoker art installation",
+        alt: "Creative design project",
+        rotate: -3,
+    },
+    { type: "text", value: "space matters more than ever." },
+    {
+        type: "image",
+        src: "/home/hero.png",
+        alt: "Digital design experience",
+        rotate: 2,
+    },
+    { type: "text", value: "At Bugsmoker," },
+    {
+        type: "image",
+        src: "/home/1.png",
+        alt: "Visual design detail",
+        rotate: -2,
+    },
+    { type: "text", value: " we fuse interior and digital design with strategic " },
+    {
+        type: "image",
+        src: "/home/hero.png",
+        alt: "Creative digital landscape",
+        rotate: 3,
+    },
+    { type: "text", value: "with strategic thinking, " },
+    {
+        type: "image",
+        src: "/home/1.png",
+        alt: "Design inspiration",
+        rotate: -2,
     },
     {
-        id: "2",
-        title: "Vintage Media Meadow",
-        tag: "Scenic Production",
-        src: "/home/hero.png",
-        alt: "Bugsmoker creative digital landscape",
+        type: "text",
+        value: "creating environments that don't just look good, but work smart.",
     },
-];
-
-const PARTS = [
-    "World shaped by experience, space matters more than ever.".split(" "),
-    "At Bugsmoker, we fuse interior and digital design".split(" "),
-    "with strategic thinking, creating environments that don't just look good, but work smart.".split(" "),
 ];
 
 export default function Content() {
     const textRef = useRef(null);
-    const [activeProject, setActiveProject] = useState(0);
     const shouldReduceMotion = useReducedMotion();
 
     const { scrollYProgress } = useScroll({
         target: textRef,
-        offset: ["start 85%", "start 25%"],
+        offset: ["start 90%", "end 20%"],
     });
 
-    const currentProject = PROJECTS[activeProject];
+    let wordIndex = 0;
 
-    const content = [
-        ...PARTS[0].map((word) => ({ type: "word", value: word })),
-        {
-            type: "image",
-            src: "/home/1.png",
-            alt: "Interior and digital design detail",
-            rotate: -2,
-        },
-        ...PARTS[1].map((word) => ({ type: "word", value: word })),
-        {
-            type: "image",
-            src: "/home/hero.png",
-            alt: "Creative digital landscape",
-            rotate: 2,
-        },
-        ...PARTS[2].map((word) => ({ type: "word", value: word })),
-    ];
+    const content = CONTENT_PARTS.flatMap((part, partIndex) => {
+        if (part.type === "image") {
+            return [{ ...part, key: `image - ${partIndex} ` }];
+        }
 
-    const toggleProject = () => {
-        setActiveProject((prev) => (prev + 1) % PROJECTS.length);
-    };
+        return part.value.split(" ").map((word) => ({
+            type: "word",
+            value: word,
+            key: `word - ${wordIndex++} `,
+        }));
+    });
 
     return (
         <section
@@ -74,42 +82,10 @@ export default function Content() {
         >
             <div className="mx-auto w-full max-w-[1440px]">
                 <div className="grid grid-cols-1 items-start gap-10 sm:gap-12 lg:grid-cols-12 lg:gap-14 xl:gap-20">
+                    {/* Empty space on desktop */}
+                    <div className="hidden lg:col-span-4 lg:block" />
 
-                    {/* Left Column */}
-                    <div className="flex flex-col gap-6 lg:col-span-4 lg:sticky lg:top-10 lg:self-start">
-                        <div className="flex items-center gap-3">
-                            <span className="h-2 w-2 rounded-full bg-[#]" />
-
-
-                        </div>
-
-                        <div className="w-full max-w-[420px]">
-                            <button
-                                type="button"
-                                onClick={toggleProject}
-                                aria-label={`View next project. Current project: ${currentProject.title}`}
-                                className="group block w-full text-left focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-4"
-                            >
-                                <div className="relative aspect-[5/3] w-full overflow-hidden rounded-2xl border border-neutral-200 bg-neutral-100 sm:aspect-[4/3]">
-                                    <Image
-                                        key={currentProject.src}
-                                        src={currentProject.src}
-                                        alt={currentProject.alt}
-                                        fill
-                                        sizes="(max-width: 639px) 100vw, (max-width: 1023px) 70vw, 380px"
-                                        className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                                    />
-
-
-                                </div>
-                            </button>
-
-
-
-                        </div>
-                    </div>
-
-                    {/* Right Column */}
+                    {/* Animated content */}
                     <div className="min-w-0 lg:col-span-8">
                         <div
                             ref={textRef}
@@ -119,7 +95,7 @@ export default function Content() {
                                 if (item.type === "image") {
                                     return (
                                         <InlineImage
-                                            key={`image-${index}`}
+                                            key={item.key}
                                             src={item.src}
                                             alt={item.alt}
                                             progress={scrollYProgress}
@@ -133,7 +109,7 @@ export default function Content() {
 
                                 return (
                                     <Reveal
-                                        key={`word-${index}`}
+                                        key={item.key}
                                         word={item.value}
                                         progress={scrollYProgress}
                                         index={index}
@@ -143,24 +119,6 @@ export default function Content() {
                                 );
                             })}
                         </div>
-
-                        {/* Divider */}
-                        <div className="my-10 h-px w-full bg-neutral-200 sm:my-14 lg:my-16" />
-
-                        {/* Statistics */}
-                        <div className="grid grid-cols-2 gap-5 sm:gap-8">
-                            <Stat
-                                number="13"
-                                label="Years Experience"
-                                accent="#2563eb"
-                            />
-
-                            <Stat
-                                number="64"
-                                label="Total Projects"
-                                accent="#ff5a1f"
-                            />
-                        </div>
                     </div>
                 </div>
             </div>
@@ -168,12 +126,18 @@ export default function Content() {
     );
 }
 
-function Reveal({ word, progress, index, total, reduceMotion }) {
-    const start = (index / total) * 0.55;
-    const end = Math.min(start + 0.12, 0.65);
+function getAnimationRange(index, total) {
+    const start = (index / total) * 0.9;
+    const end = Math.min(start + 0.09, 1);
 
-    const opacity = useTransform(progress, [start, end], [0.2, 1]);
-    const y = useTransform(progress, [start, end], [10, 0]);
+    return [start, end];
+}
+
+
+function Reveal({ word, progress, index, total, reduceMotion }) {
+    const [start, end] = getAnimationRange(index, total);
+
+    const opacity = useTransform(progress, [start, end], [0.55, 1]);
     const blur = useTransform(
         progress,
         [start, end],
@@ -184,10 +148,13 @@ function Reveal({ word, progress, index, total, reduceMotion }) {
         <motion.span
             style={
                 reduceMotion
-                    ? { opacity: 1 }
-                    : { opacity, y, filter: blur }
+                    ? { opacity: 1, filter: "blur(0px)" }
+                    : {
+                        opacity,
+                        filter: blur,
+                    }
             }
-            className="inline-block will-change-transform"
+            className="inline-block"
         >
             {word}&nbsp;
         </motion.span>
@@ -203,23 +170,27 @@ function InlineImage({
     rotate = 0,
     reduceMotion,
 }) {
-    const start = (index / total) * 0.55;
-    const end = Math.min(start + 0.12, 0.65);
+    const [start, end] = getAnimationRange(index, total);
 
     const opacity = useTransform(progress, [start, end], [0.35, 1]);
-    const scale = useTransform(progress, [start, end], [0.9, 1]);
+    const scale = useTransform(progress, [start, end], [0.85, 1]);
     const blur = useTransform(
         progress,
         [start, end],
-        ["blur(3px)", "blur(0px)"]
+        ["blur(5px)", "blur(0px)"]
     );
 
     return (
         <motion.span
             style={
                 reduceMotion
-                    ? { rotate: `${rotate}deg` }
-                    : { opacity, scale, filter: blur, rotate: `${rotate}deg` }
+                    ? { rotate: `${rotate} deg` }
+                    : {
+                        opacity,
+                        scale,
+                        filter: blur,
+                        rotate: `${rotate} deg`,
+                    }
             }
             className="relative mx-[0.1em] inline-block h-[0.76em] w-[1.12em] translate-y-[0.06em] overflow-hidden rounded-[0.15em] border border-neutral-300/70 align-baseline shadow-sm sm:mx-[0.13em] sm:rounded-[0.18em]"
         >
@@ -231,28 +202,5 @@ function InlineImage({
                 className="object-cover"
             />
         </motion.span>
-    );
-}
-
-function Stat({ number, label, accent }) {
-    return (
-        <div className="min-w-0">
-            <div className="flex items-start">
-                <span className="font-['Outfit'] text-6xl font-semibold leading-[0.95] tracking-[-0.07em] text-neutral-950 sm:text-7xl md:text-8xl lg:text-[6rem]">
-                    {number}
-                </span>
-
-                <span
-                    className="ml-1 text-3xl font-semibold leading-none sm:text-4xl md:text-5xl"
-                    style={{ color: accent }}
-                >
-                    +
-                </span>
-            </div>
-
-            <p className="mt-3 text-[11px] font-medium tracking-wide text-neutral-500 sm:mt-4 sm:text-sm">
-                {label}
-            </p>
-        </div>
     );
 }

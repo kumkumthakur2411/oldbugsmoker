@@ -1,8 +1,9 @@
+
 "use client";
 
-import { useRef, useState, useEffect } from "react";
+import { useRef, useState, useEffect, useCallback } from "react";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
 
 const TESTIMONIALS = [
   {
@@ -11,7 +12,7 @@ const TESTIMONIALS = [
     quote:
       "Por lejos el mejor servicio que me salvó la vida mental y física. Ya no hay forma de volver a quien era.",
     avatar: "/testimonials/alex.jpg",
-    heightClass: "h-[300px] sm:h-[320px] md:h-[340px]",
+    heightClass: "h-[260px] sm:h-[320px] md:h-[340px]",
   },
   {
     id: "2",
@@ -19,7 +20,7 @@ const TESTIMONIALS = [
     quote:
       "No solo es un espacio o servicio con un grupo de amigos con los que ahora no paro de hacer planes. Con su hogar en las clases.",
     avatar: "/testimonials/camila.jpg",
-    heightClass: "h-[210px] sm:h-[225px] md:h-[240px]",
+    heightClass: "h-[190px] sm:h-[225px] md:h-[240px]",
   },
   {
     id: "3",
@@ -27,7 +28,7 @@ const TESTIMONIALS = [
     quote:
       "Lo que más destaco es la calidad de la gente, verdaderamente se siente como una familia. Mi proceso ha sido increíble en cada etapa.",
     avatar: "/testimonials/esteban.jpg",
-    heightClass: "h-[295px] sm:h-[315px] md:h-[335px]",
+    heightClass: "h-[255px] sm:h-[315px] md:h-[335px]",
   },
   {
     id: "4",
@@ -35,7 +36,7 @@ const TESTIMONIALS = [
     quote:
       "Una experiencia que supera cualquier expectativa. La dedicación, el cuidado en cada detalle y la vibra hacen que cada día cuente.",
     avatar: "/testimonials/sofia.jpg",
-    heightClass: "h-[215px] sm:h-[230px] md:h-[245px]",
+    heightClass: "h-[195px] sm:h-[230px] md:h-[245px]",
   },
   {
     id: "5",
@@ -43,7 +44,7 @@ const TESTIMONIALS = [
     quote:
       "BugSmoker turned our loose vision into an unforgettable brand world. Every detail has bite, character, and pure creative clarity.",
     avatar: "/testimonials/mateo.jpg",
-    heightClass: "h-[310px] sm:h-[330px] md:h-[350px]",
+    heightClass: "h-[270px] sm:h-[330px] md:h-[350px]",
   },
   {
     id: "6",
@@ -51,158 +52,235 @@ const TESTIMONIALS = [
     quote:
       "Working with them felt like adding an electric extra brain to our team. Fast, thoughtful, and always pushing the work somewhere more interesting.",
     avatar: "/testimonials/alex.jpg",
-    heightClass: "h-[220px] sm:h-[235px] md:h-[250px]",
+    heightClass: "h-[200px] sm:h-[235px] md:h-[250px]",
   },
 ];
 
 export default function TestimonialsSection() {
   const scrollRef = useRef(null);
+  const cardRefs = useRef([]);
+
   const [canScrollLeft, setCanScrollLeft] = useState(false);
   const [canScrollRight, setCanScrollRight] = useState(true);
+  const [activeIndex, setActiveIndex] = useState(0);
   const [isDragging, setIsDragging] = useState(false);
-  const [startX, setStartX] = useState(0);
-  const [scrollLeftState, setScrollLeftState] = useState(0);
 
-  const checkScroll = () => {
-    if (!scrollRef.current) return;
-    const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-    setCanScrollLeft(scrollLeft > 10);
-    setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
-  };
+  const dragRef = useRef({
+    startX: 0,
+    startScrollLeft: 0,
+    moved: false,
+    active: false,
+  });
 
-  useEffect(() => {
-    checkScroll();
-    window.addEventListener("resize", checkScroll);
-    return () => window.removeEventListener("resize", checkScroll);
+  const checkScroll = useCallback(() => {
+    const container = scrollRef.current;
+    if (!container) return;
+
+    const { scrollLeft, scrollWidth, clientWidth } = container;
+
+    setCanScrollLeft(scrollLeft > 5);
+    setCanScrollRight(
+      scrollLeft < scrollWidth - clientWidth - 5
+    );
+
+    const center = scrollLeft + clientWidth / 2;
+    let closestIndex = 0;
+    let closestDistance = Infinity;
+
+    cardRefs.current.forEach((card, index) => {
+      if (!card) return;
+
+      const cardCenter = card.offsetLeft + card.offsetWidth / 2;
+      const distance = Math.abs(cardCenter - center);
+
+      if (distance < closestDistance) {
+        closestDistance = distance;
+        closestIndex = index;
+      }
+    });
+
+    setActiveIndex(closestIndex);
   }, []);
 
-  const scrollByAmount = (direction) => {
-    if (!scrollRef.current) return;
-    const cardWidth = scrollRef.current.children[0]?.offsetWidth || 380;
-    const scrollAmount = (cardWidth + 24) * direction;
-    scrollRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
-  };
+  useEffect(() => {
+    const container = scrollRef.current;
+    if (!container) return;
 
-  // Drag to scroll functionality
-  const handleMouseDown = (e) => {
-    if (!scrollRef.current) return;
-    setIsDragging(true);
-    setStartX(e.pageX - scrollRef.current.offsetLeft);
-    setScrollLeftState(scrollRef.current.scrollLeft);
-  };
-
-  const handleMouseMove = (e) => {
-    if (!isDragging || !scrollRef.current) return;
-    e.preventDefault();
-    const x = e.pageX - scrollRef.current.offsetLeft;
-    const walk = (x - startX) * 1.3;
-    scrollRef.current.scrollLeft = scrollLeftState - walk;
     checkScroll();
+
+    const observer = new ResizeObserver(checkScroll);
+    observer.observe(container);
+
+    return () => observer.disconnect();
+  }, [checkScroll]);
+
+  const scrollToCard = (index) => {
+    const container = scrollRef.current;
+    const card = cardRefs.current[index];
+
+    if (!container || !card) return;
+
+    const target =
+      card.offsetLeft -
+      (container.clientWidth - card.offsetWidth) / 2;
+
+    container.scrollTo({
+      left: target,
+      behavior: "smooth",
+    });
   };
 
-  const handleMouseUpOrLeave = () => {
+  const scrollByAmount = (direction) => {
+    const nextIndex = Math.max(
+      0,
+      Math.min(
+        TESTIMONIALS.length - 1,
+        activeIndex + direction
+      )
+    );
+
+    scrollToCard(nextIndex);
+  };
+
+  const handleMouseDown = (event) => {
+    if (event.button !== 0 || !scrollRef.current) return;
+
+    dragRef.current = {
+      startX: event.pageX,
+      startScrollLeft: scrollRef.current.scrollLeft,
+      moved: false,
+      active: true,
+    };
+
+    setIsDragging(true);
+  };
+
+  const handleMouseMove = (event) => {
+    const drag = dragRef.current;
+    const container = scrollRef.current;
+
+    if (!drag.active || !container) return;
+
+    const distance = event.pageX - drag.startX;
+
+    if (Math.abs(distance) > 4) {
+      drag.moved = true;
+    }
+
+    if (drag.moved) {
+      event.preventDefault();
+      container.scrollLeft =
+        drag.startScrollLeft - distance;
+    }
+  };
+
+  const stopDragging = () => {
+    dragRef.current.active = false;
     setIsDragging(false);
   };
 
   return (
-    <section className="relative w-full bg-white text-[#1a1a1a] py-16 sm:py-24 md:py-28 overflow-hidden select-none">
-      <div className="max-w-[1500px] mx-auto px-6 sm:px-10 md:px-14 lg:px-16">
+    <section className="relative w-full overflow-hidden bg-white py-14 text-[#181818] sm:py-20 md:py-28">
+      <div className="mx-auto max-w-[1500px] px-5 sm:px-10 md:px-14 lg:px-16">
 
-        {/* Header with Title and subtle Navigation buttons */}
-        <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-10 sm:mb-14 md:mb-16">
-          <h2 className="font-['Outfit'] text-[28px] xs:text-[34px] sm:text-[40px] md:text-[46px] lg:text-[50px] font-semibold text-[#181818] tracking-[-0.03em] leading-[1.12]">
-            Opiniones reales de
-            <br />
-            quienes ya lo viven
-          </h2>
+        {/* Header */}
+        <div className="mb-8 flex items-end justify-between gap-4 sm:mb-12 md:mb-14">
+          <div>
 
-          {/* Navigation Controls */}
-          <div className="hidden sm:flex items-center gap-2.5 pb-1">
-            <button
-              onClick={() => scrollByAmount(-1)}
-              disabled={!canScrollLeft}
-              aria-label="Previous testimonials"
-              className={`w-10 h-10 rounded-full border border-black/15 flex items-center justify-center transition-all duration-200 ${canScrollLeft
-                ? "text-black/80 hover:bg-[#181818] hover:text-white hover:border-[#181818] active:scale-95 cursor-pointer"
-                : "text-black/20 border-black/10 cursor-not-allowed opacity-40"
-                }`}
-            >
-              <ChevronLeft size={18} strokeWidth={2.2} />
-            </button>
-            <button
-              onClick={() => scrollByAmount(1)}
-              disabled={!canScrollRight}
-              aria-label="Next testimonials"
-              className={`w-10 h-10 rounded-full border border-black/15 flex items-center justify-center transition-all duration-200 ${canScrollRight
-                ? "text-black/80 hover:bg-[#181818] hover:text-white hover:border-[#181818] active:scale-95 cursor-pointer"
-                : "text-black/20 border-black/10 cursor-not-allowed opacity-40"
-                }`}
-            >
-              <ChevronRight size={18} strokeWidth={2.2} />
-            </button>
+
+            <h2 className="font-['Outfit'] text-[clamp(1.8rem,7vw,3.2rem)] font-semibold leading-[1.02] tracking-[-0.06em]">
+              Good people.
+              <br />
+              <span className="text-neutral-400">
+                Real experiences.
+              </span>
+            </h2>
           </div>
+
+
         </div>
 
-        {/* Carousel / Cards Track */}
-        {/* Negative right margin allows the peek effect where cards extend gracefully to the edge */}
+        {/* Staggered testimonial cards */}
         <div
           ref={scrollRef}
           onScroll={checkScroll}
           onMouseDown={handleMouseDown}
           onMouseMove={handleMouseMove}
-          onMouseUp={handleMouseUpOrLeave}
-          onMouseLeave={handleMouseUpOrLeave}
-          className={`flex items-end gap-4 sm:gap-5 md:gap-6 overflow-x-auto scrollbar-none pb-4 pt-8 -mr-6 sm:-mr-10 md:-mr-14 lg:-mr-16 pr-6 sm:pr-10 md:pr-14 lg:pr-16 ${isDragging ? "cursor-grabbing scroll-auto" : "cursor-grab"
+          onMouseUp={stopDragging}
+          onMouseLeave={stopDragging}
+          onClickCapture={(event) => {
+            if (dragRef.current.moved) {
+              event.preventDefault();
+              event.stopPropagation();
+              dragRef.current.moved = false;
+            }
+          }}
+          className={`-mx-5 flex items-end gap-3 overflow-x-auto px-5 pb-5 pt-8 sm:mx-0 sm:gap-5 sm:pb-6 sm:pt-8 md:gap-6 ${isDragging ? "cursor-grabbing" : "cursor-grab"
             }`}
           style={{
             scrollbarWidth: "none",
             msOverflowStyle: "none",
             WebkitOverflowScrolling: "touch",
+            scrollSnapType: "x mandatory",
           }}
         >
-          {TESTIMONIALS.map((item) => (
-            <div
+          {TESTIMONIALS.map((item, index) => (
+            <article
               key={item.id}
-              className={`group relative flex-shrink-0 w-[290px] xs:w-[330px] sm:w-[370px] md:w-[400px] lg:w-[415px] ${item.heightClass} bg-[#736e4e] rounded-[4px] sm:rounded-[6px] p-6 sm:p-7 md:p-8 flex flex-col justify-between transition-transform duration-300 hover:-translate-y-1.5 shadow-[0_12px_28px_rgba(0,0,0,0.06)]`}
+              ref={(element) => {
+                cardRefs.current[index] = element;
+              }}
+              className={`group relative flex w-[78vw] max-w-[310px] shrink-0 flex-col justify-between overflow-hidden rounded-[4px] bg-[#736e4e] p-5 shadow-[0_12px_28px_rgba(0,0,0,0.06)] transition-transform duration-300 hover:-translate-y-1.5 sm:w-[370px] sm:max-w-none sm:p-7 md:w-[400px] md:p-8 ${item.heightClass}`}
+              style={{
+                scrollSnapAlign: "start",
+              }}
             >
-              {/* Top Section: Avatar on left + Quote on right */}
-              <div className="flex items-start gap-3.5 sm:gap-4">
-                {/* Circular Avatar */}
-                <div className="relative w-10 h-10 sm:w-11 sm:h-11 rounded-full overflow-hidden shrink-0 border border-white/20 bg-neutral-800 shadow-sm">
-                  <Image
-                    src={item.avatar}
-                    alt={item.name}
-                    fill
-                    sizes="48px"
-                    className="object-cover object-center grayscale contrast-110"
-                  />
+              {/* Decorative quote */}
+              <div className="pointer-events-none absolute -right-2 -top-4 opacity-[0.08]">
+                <Quote
+                  size={90}
+                  strokeWidth={1.2}
+                  className="text-white"
+                />
+              </div>
+
+              {/* Avatar and quote */}
+              <div className="relative z-10">
+                <div className="mb-4 flex items-center gap-3 sm:mb-6">
+                  <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full border border-white/30 bg-black/20 sm:h-11 sm:w-11">
+                    <Image
+                      src={item.avatar}
+                      alt={item.name}
+                      fill
+                      sizes="44px"
+                      className="object-cover object-center"
+                    />
+                  </div>
+
+                  <div>
+                    <p className="font-['Outfit'] text-sm font-semibold text-white sm:text-[15px]">
+                      {item.name}
+                    </p>
+
+                    <p className="mt-0.5 font-mono text-[8px] uppercase tracking-[0.12em] text-white/55 sm:text-[9px]">
+                      Client experience
+                    </p>
+                  </div>
                 </div>
 
-                {/* Testimonial Quote */}
-                <p className="font-['Outfit'] sm:font-['Inter'] text-[13px] sm:text-[14px] md:text-[14.5px] leading-[1.48] sm:leading-[1.5] text-[#edebe3] font-normal tracking-[-0.01em]">
-                  {item.quote}
+                <p className="font-['Outfit'] text-[13px] leading-[1.6] tracking-[-0.01em] text-[#f3f0e7] sm:text-[15px] sm:leading-[1.7]">
+                  “{item.quote}”
                 </p>
               </div>
 
-              {/* Bottom Section: Author Name */}
-              <div className="pt-4">
-                <span className="font-['Outfit'] text-[13px] sm:text-[14px] font-medium tracking-tight text-[#e5e2d6]">
-                  {item.name}
-                </span>
-              </div>
-            </div>
+
+
+              {/* Hover accent */}
+              <div className="absolute bottom-0 left-0 h-[3px] w-0 bg-[#ff5a1f] transition-all duration-500 group-hover:w-full" />
+            </article>
           ))}
         </div>
 
-        {/* Mobile Swipe Indicators / Dots */}
-        <div className="flex sm:hidden items-center justify-center gap-1.5 mt-6">
-          {TESTIMONIALS.map((_, i) => (
-            <span
-              key={i}
-              className="w-1.5 h-1.5 rounded-full bg-black/20"
-            />
-          ))}
-        </div>
 
       </div>
     </section>
