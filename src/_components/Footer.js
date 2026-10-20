@@ -228,7 +228,7 @@ export default function Footer() {
                     <div className="flex flex-col gap-4 text-[10px] uppercase tracking-[0.12em] text-white/60 sm:flex-row sm:items-center sm:justify-between sm:text-xs">
 
                         <p>
-                            © {new Date().getFullYear()} Bugsmoker. All rights reserved.
+                            © 2026 Bugsmoker. All rights reserved.
                         </p>
 
                         <div className="flex items-center gap-5">
