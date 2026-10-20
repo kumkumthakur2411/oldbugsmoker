@@ -3,6 +3,7 @@
 import React from "react";
 import Image from "next/image";
 import Link from "next/link";
+import { ArrowUpRight } from "lucide-react";
 
 export default function Hero() {
     return (<>
@@ -59,10 +60,10 @@ export default function Hero() {
 
             </div>
         </section>
-        <div className="w-full ">
-            <div className="relative w-full  xl:h-[720px] 
+        <div className="w-full">
+            <div className="relative w-full h-[460px] sm:h-[540px] md:h-[620px] lg:h-[680px] xl:h-[720px] 
                     overflow-hidden shadow-2xl shadow-black/10 
-                    border border-neutral-200/80 bg-neutral-100 group">
+                    border-y sm:border border-neutral-200/80 bg-neutral-900 group">
                 <Image
                     src="/home/new1.png"
                     alt="Bugsmoker Hero Banner"
@@ -71,6 +72,40 @@ export default function Hero() {
                     sizes="(max-width: 1400px) 100vw, 1400px"
                     className="object-cover object-center transition-transform duration-1000 ease-out group-hover:scale-[1.02]"
                 />
+
+                {/* Dark Cinematic Overlay */}
+                <div className="absolute inset-0 bg-black/55 backdrop-blur-[0.5px] transition-colors duration-500 z-10" />
+
+                {/* Content Layer Over Banner */}
+                <div className="relative z-20 h-full w-full flex flex-col items-center justify-center text-center px-6 sm:px-10 md:px-16 max-w-4xl mx-auto">
+                    {/* Brand Pill Badge */}
+
+
+                    {/* Bold Headline */}
+                    <h2 className="font-['Outfit'] font-bold text-3xl sm:text-4xl md:text-5xl lg:text-6xl text-white tracking-tight leading-[1.06] max-w-3xl">
+                        Crafting chaotic digital worlds that people actually remember.
+                    </h2>
+
+                    {/* Subtitle / Description */}
+                    {/* <p className="mt-4 sm:mt-5 text-sm sm:text-base md:text-lg text-white/80 max-w-xl font-['Outfit'] sm:font-['Inter'] leading-[1.6] font-normal">
+                        We fuse unconventional aesthetics with razor-sharp execution to build bold digital experiences that stand out in the noise.
+                    </p> */}
+
+                    {/* CTA Button */}
+                    <div className="mt-7 sm:mt-9">
+                        <Link
+                            href="#services"
+                            className="group/btn inline-flex items-center gap-2.5 px-8 py-3.5 rounded-full bg-white text-black text-xs sm:text-sm font-semibold tracking-wide transition-all duration-300 hover:bg-[#ff5a1f] hover:text-white hover:shadow-xl hover:shadow-[#ff5a1f]/25 active:scale-95 cursor-pointer select-none"
+                        >
+                            <span>Contact Us</span>
+                            <ArrowUpRight
+                                size={16}
+                                strokeWidth={2.4}
+                                className="transition-transform duration-300 group-hover/btn:-translate-y-0.5 group-hover/btn:translate-x-0.5"
+                            />
+                        </Link>
+                    </div>
+                </div>
             </div>
         </div>
     </>

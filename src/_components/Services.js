@@ -4,6 +4,7 @@ import React, { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useScroll, useTransform } from "framer-motion";
+import { ArrowUpRight } from "lucide-react";
 
 const SERVICES_DATA = [
     {
@@ -144,7 +145,7 @@ export default function Services() {
 
                         {/* Right Column: Vertically Scrolling Service Cards (2.5 visible at any time) */}
                         <div className="lg:col-span-6 h-full flex justify-end items-center overflow-hidden relative pt-8 pb-4">
-                            
+
                             {/* Mask container showing 2 full cards and 1 half card */}
                             <div
                                 ref={maskContainerRef}
@@ -159,10 +160,10 @@ export default function Services() {
                                         <Link
                                             key={service.id}
                                             href={`/service/${service.serviceSlug || service.href}`}
-                                            className="group block bg-white rounded-2xl sm:rounded-[1.75rem] p-3 sm:p-3.5 shadow-2xl transition-all duration-500 hover:shadow-black/30 hover:-translate-y-1 cursor-pointer select-none border border-neutral-100"
+                                            className="group block bg-white  p-3 sm:p-3.5 shadow-2xl transition-all duration-500 hover:shadow-black/30 hover:-translate-y-1 cursor-pointer select-none border border-neutral-100"
                                         >
                                             {/* Card Image Container */}
-                                            <div className="relative w-full aspect-[16/11] rounded-xl sm:rounded-2xl overflow-hidden bg-neutral-100">
+                                            <div className="relative w-full aspect-[16/11]  overflow-hidden bg-neutral-100">
                                                 <Image
                                                     src={service.src}
                                                     alt={service.alt}
@@ -178,7 +179,11 @@ export default function Services() {
                                                     {service.title}
                                                 </h3>
                                                 <span className="font-mono text-xs sm:text-sm text-neutral-400 font-medium">
-                                                    0{service.id}
+                                                    <ArrowUpRight
+                                                        size={13}
+                                                        className="text-[#ff5a1f] transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                                                        strokeWidth={2.5}
+                                                    />
                                                 </span>
                                             </div>
                                         </Link>

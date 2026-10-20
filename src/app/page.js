@@ -3,7 +3,9 @@ import Hero from "../_components/Hero";
 import Content from "../_components/Content";
 import Services from "../_components/Services";
 import Project from "../_components/Project";
-
+import Blog from "../_components/Blog";
+import TestimonialsSection from "@/_components/TestimonialsSection";
+import Footer from "../_components/Footer";
 export default function Home() {
   return (
     <>
@@ -11,7 +13,11 @@ export default function Home() {
       <Hero />
       <Content />
       <Services />
+
+      <TestimonialsSection />
       <Project />
+      <Blog />
+      <Footer />
     </>
   );
 }
