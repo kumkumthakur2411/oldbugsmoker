@@ -96,6 +96,9 @@ function MobileScrollFlippingCard({ service, index, totalCards, progress, isActi
         isBase ? [1, 1] : [0, 0, 1, 1]
     );
 
+    const zIndex = (index + 1) * 10;
+    const zClass = index === 0 ? "z-[10]" : index === 1 ? "z-[20]" : index === 2 ? "z-[30]" : index === 3 ? "z-[40]" : "z-[50]";
+
     return (
         <motion.div
             style={{
@@ -104,13 +107,12 @@ function MobileScrollFlippingCard({ service, index, totalCards, progress, isActi
                 rotate,
                 rotateX,
                 opacity,
-                zIndex: layout.zIndex,
+                zIndex,
                 transformOrigin: "center center",
-                transformStyle: "preserve-3d",
                 WebkitBackfaceVisibility: "hidden",
                 backfaceVisibility: "hidden",
             }}
-            className={`absolute inset-0 will-change-transform ${
+            className={`absolute inset-0 will-change-transform ${zClass} ${
                 isActive ? "pointer-events-auto" : "pointer-events-none"
             }`}
         >
@@ -316,7 +318,6 @@ export default function Services() {
                                 style={{
                                     perspective: 1000,
                                     perspectiveOrigin: "center 70%",
-                                    transformStyle: "preserve-3d",
                                 }}
                             >
                                 {SERVICES_DATA.map((service, index) => (
