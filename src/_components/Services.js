@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useRef, useState, useEffect, useMemo } from "react";
+import React, { useRef, useState, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
 import {
@@ -55,83 +55,58 @@ const SERVICES_DATA = [
     },
 ];
 
-function getSmoothTransformConfig(index) {
-    if (index === 0) {
-        return {
-            y: { input: [0, 0.16, 0.36, 0.56, 1], output: [0, 0, -8, -15, -15] },
-            scale: { input: [0, 0.16, 0.36, 0.56, 1], output: [1, 1, 0.96, 0.92, 0.92] },
-            rotateX: { input: [0, 1], output: [0, 0] },
-            rotateZ: { input: [0, 1], output: [0, 0] },
-            opacity: { input: [0, 1], output: [1, 1] },
-            overlayOpacity: { input: [0, 0.16, 0.36, 0.56, 1], output: [0, 0, 0.32, 0.6, 0.6] },
-        };
-    }
-
-    if (index === 1) {
-        return {
-            y: { input: [0, 0.16, 0.36, 0.56, 0.76, 1], output: [90, 90, 0, -8, -15, -15] },
-            scale: { input: [0, 0.16, 0.36, 0.56, 0.76, 1], output: [0.94, 0.94, 1, 0.96, 0.92, 0.92] },
-            rotateX: { input: [0, 0.16, 0.36, 1], output: [32, 32, 0, 0] },
-            rotateZ: { input: [0, 0.16, 0.36, 1], output: [-1.5, -1.5, 1, 1] },
-            opacity: { input: [0, 0.16, 0.22, 1], output: [0, 0, 1, 1] },
-            overlayOpacity: { input: [0, 0.36, 0.56, 0.76, 1], output: [0, 0, 0.32, 0.6, 0.6] },
-        };
-    }
-
-    if (index === 2) {
-        return {
-            y: { input: [0, 0.36, 0.56, 0.76, 0.94, 1], output: [90, 90, 0, -8, -15, -15] },
-            scale: { input: [0, 0.36, 0.56, 0.76, 0.94, 1], output: [0.94, 0.94, 1, 0.96, 0.92, 0.92] },
-            rotateX: { input: [0, 0.36, 0.56, 1], output: [32, 32, 0, 0] },
-            rotateZ: { input: [0, 0.36, 0.56, 1], output: [1.5, 1.5, -1, -1] },
-            opacity: { input: [0, 0.36, 0.42, 1], output: [0, 0, 1, 1] },
-            overlayOpacity: { input: [0, 0.56, 0.76, 0.94, 1], output: [0, 0, 0.32, 0.6, 0.6] },
-        };
-    }
-
-    if (index === 3) {
-        return {
-            y: { input: [0, 0.56, 0.76, 0.94, 1], output: [90, 90, 0, -8, -8] },
-            scale: { input: [0, 0.56, 0.76, 0.94, 1], output: [0.94, 0.94, 1, 0.96, 0.96] },
-            rotateX: { input: [0, 0.56, 0.76, 1], output: [32, 32, 0, 0] },
-            rotateZ: { input: [0, 0.56, 0.76, 1], output: [-1.5, -1.5, 1, 1] },
-            opacity: { input: [0, 0.56, 0.62, 1], output: [0, 0, 1, 1] },
-            overlayOpacity: { input: [0, 0.76, 0.94, 1], output: [0, 0, 0.32, 0.32] },
-        };
-    }
-
-    // index === 4 (final card)
-    return {
-        y: { input: [0, 0.76, 0.94, 1], output: [90, 90, 0, 0] },
-        scale: { input: [0, 0.76, 0.94, 1], output: [0.94, 0.94, 1, 1] },
-        rotateX: { input: [0, 0.76, 0.94, 1], output: [32, 32, 0, 0] },
-        rotateZ: { input: [0, 0.76, 0.94, 1], output: [1.5, 1.5, 0, 0] },
-        opacity: { input: [0, 0.76, 0.82, 1], output: [0, 0, 1, 1] },
-        overlayOpacity: { input: [0, 1], output: [0, 0] },
-    };
-}
+// Fanned offset so every previous card's corners and edges remain clearly visible
+const STACK_LAYOUT = [
+    { targetRotate: -2.5, targetX: -5, targetY: 8, zIndex: 10 },
+    { targetRotate: 3.5, targetX: 5, targetY: 4, zIndex: 20 },
+    { targetRotate: -3.5, targetX: -5, targetY: 0, zIndex: 30 },
+    { targetRotate: 3.0, targetX: 4, targetY: -4, zIndex: 40 },
+    { targetRotate: 0, targetX: 0, targetY: -8, zIndex: 50 },
+];
 
 function MobileScrollFlippingCard({ service, index, totalCards, progress, isActive }) {
-    const config = useMemo(() => getSmoothTransformConfig(index), [index]);
+    const layout = STACK_LAYOUT[index];
 
-    const y = useTransform(progress, config.y.input, config.y.output);
-    const scale = useTransform(progress, config.scale.input, config.scale.output);
-    const rotateX = useTransform(progress, config.rotateX.input, config.rotateX.output);
-    const rotateZ = useTransform(progress, config.rotateZ.input, config.rotateZ.output);
-    const opacity = useTransform(progress, config.opacity.input, config.opacity.output);
-    const overlayOpacity = useTransform(progress, config.overlayOpacity.input, config.overlayOpacity.output);
+    // Card 0 starts already in place. Cards 1..4 enter from completely off-screen bottom (y: 850px).
+    const isBase = index === 0;
+    const enterStart = isBase ? 0 : 0.05 + (index - 1) * 0.20;
+    const enterEnd = isBase ? 0 : enterStart + 0.19;
+
+    const y = useTransform(
+        progress,
+        isBase ? [0, 1] : [0, enterStart, enterEnd, 1],
+        isBase ? [layout.targetY, layout.targetY] : [850, 850, layout.targetY, layout.targetY]
+    );
+
+    const rotate = useTransform(
+        progress,
+        isBase ? [0, 1] : [0, enterStart, enterEnd, 1],
+        isBase ? [layout.targetRotate, layout.targetRotate] : [0, 0, layout.targetRotate, layout.targetRotate]
+    );
+
+    const rotateX = useTransform(
+        progress,
+        isBase ? [0, 1] : [0, enterStart, enterEnd, 1],
+        isBase ? [0, 0] : [22, 22, 0, 0]
+    );
+
+    const opacity = useTransform(
+        progress,
+        isBase ? [0, 1] : [0, enterStart, enterStart + 0.03, 1],
+        isBase ? [1, 1] : [0, 0, 1, 1]
+    );
 
     return (
         <motion.div
             style={{
                 y,
-                scale,
+                x: layout.targetX,
+                rotate,
                 rotateX,
-                rotateZ,
                 opacity,
-                transformOrigin: "bottom center",
+                zIndex: layout.zIndex,
+                transformOrigin: "center center",
                 transformStyle: "preserve-3d",
-                zIndex: 10 + index * 10,
                 WebkitBackfaceVisibility: "hidden",
                 backfaceVisibility: "hidden",
             }}
@@ -141,7 +116,7 @@ function MobileScrollFlippingCard({ service, index, totalCards, progress, isActi
         >
             <Link
                 href={`/service/${service.serviceSlug || service.href}`}
-                className="group relative block w-full overflow-hidden border border-black/10 bg-white p-2.5 shadow-[0_16px_40px_rgba(0,0,0,0.3)] transition-shadow duration-300 sm:p-3"
+                className="group relative block w-full overflow-hidden border border-black/15 bg-white p-2.5 shadow-[0_14px_35px_rgba(0,0,0,0.35)] transition-shadow duration-300 sm:p-3"
             >
                 {/* Image */}
                 <div className="relative aspect-[16/10] w-full overflow-hidden bg-neutral-200">
@@ -158,12 +133,12 @@ function MobileScrollFlippingCard({ service, index, totalCards, progress, isActi
                     <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/15 to-transparent" />
 
                     {/* Large image number */}
-                    <span className="absolute -bottom-3 left-2 font-['Outfit'] text-[80px] font-bold leading-none tracking-[-0.09em] text-white/80 select-none sm:text-[95px]">
+                    <span className="absolute -bottom-3 left-2 font-['Outfit'] text-[80px] font-bold leading-none tracking-[-0.09em] text-white/85 select-none sm:text-[95px]">
                         0{index + 1}
                     </span>
 
                     {/* Top pill */}
-                    <span className="absolute right-2.5 top-2.5 flex items-center gap-1.5 rounded-full bg-black/60 px-2.5 py-1 font-mono text-[9px] uppercase tracking-wider text-white/85 backdrop-blur-sm sm:right-3 sm:top-3">
+                    <span className="absolute right-2.5 top-2.5 flex items-center gap-1.5 rounded-full bg-black/65 px-2.5 py-1 font-mono text-[9px] uppercase tracking-wider text-white/90 backdrop-blur-sm sm:right-3 sm:top-3">
                         <span className="h-1.5 w-1.5 rounded-full bg-[#ff5a1f]" />
                         0{index + 1} / 0{totalCards}
                     </span>
@@ -187,12 +162,6 @@ function MobileScrollFlippingCard({ service, index, totalCards, progress, isActi
 
                 {/* Bottom accent */}
                 <div className="absolute bottom-0 left-0 h-[3px] w-full bg-[#ff5a1f]" />
-
-                {/* Depth darkening overlay when stacked behind */}
-                <motion.div
-                    style={{ opacity: overlayOpacity }}
-                    className="pointer-events-none absolute inset-0 z-30 bg-black/65"
-                />
             </Link>
         </motion.div>
     );
@@ -214,7 +183,7 @@ export default function Services() {
 
     // Smooth scroll interpolation with spring physics to guarantee 60/120fps fluid motion
     const smoothProgress = useSpring(scrollYProgress, {
-        stiffness: 80,
+        stiffness: 85,
         damping: 24,
         mass: 0.35,
         restDelta: 0.0001,
@@ -223,10 +192,10 @@ export default function Services() {
     // Only trigger React state updates when the card index actually changes (prevents scroll jank)
     useMotionValueEvent(smoothProgress, "change", (latest) => {
         let nextIndex = 0;
-        if (latest >= 0.76) nextIndex = 4;
-        else if (latest >= 0.56) nextIndex = 3;
-        else if (latest >= 0.36) nextIndex = 2;
-        else if (latest >= 0.16) nextIndex = 1;
+        if (latest >= 0.75) nextIndex = 4;
+        else if (latest >= 0.55) nextIndex = 3;
+        else if (latest >= 0.35) nextIndex = 2;
+        else if (latest >= 0.15) nextIndex = 1;
 
         if (nextIndex !== activeIndexRef.current) {
             activeIndexRef.current = nextIndex;
@@ -246,7 +215,7 @@ export default function Services() {
 
         if (scrollableDistance <= 0) return;
 
-        const targets = [0.05, 0.26, 0.46, 0.66, 0.86];
+        const targets = [0.04, 0.25, 0.45, 0.65, 0.85];
         const targetProgress = targets[cardIndex] ?? 0;
 
         window.scrollTo({
@@ -320,7 +289,7 @@ export default function Services() {
                 {/* Main Content */}
                 <div className="relative z-10 mx-auto flex h-full w-full max-w-[1400px] flex-col px-5 pb-4 pt-[max(1.25rem,env(safe-area-inset-top))] sm:px-8 md:px-12 md:py-8 lg:px-16">
 
-                    {/* MOBILE VIEW (< md): Scroll-Driven 3D Flipping Card Stack */}
+                    {/* MOBILE VIEW (< md): Scroll-Driven Bottom-Rising Stacking Cards */}
                     <div className="flex md:hidden flex-1 flex-col justify-between py-1">
                         {/* Header */}
                         <div className="flex flex-col items-start pt-1 sm:pt-3">
@@ -340,7 +309,7 @@ export default function Services() {
                             </p>
                         </div>
 
-                        {/* Card Deck Area with Smooth 3D Perspective */}
+                        {/* Card Deck Area with Fanned Corners */}
                         <div className="relative mx-auto my-auto flex w-full max-w-[350px] items-center justify-center py-2">
                             <div
                                 className="relative h-[290px] w-full sm:h-[330px]"
