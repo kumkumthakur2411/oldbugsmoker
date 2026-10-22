@@ -13,7 +13,7 @@ if (typeof window !== "undefined") {
 
 const SHOW_INDICES = [
     2, 4, 5, 8, 10, 11, 13, 16, 17, 19,
-    22, 24, 25, 28, 33, 35, 37,
+    22, 24, 25, 28, 33, 35, 37, 45, 49, 56, 58
 ];
 
 export default function Hero() {
@@ -48,7 +48,7 @@ export default function Hero() {
                 setGridConfig({
                     cols: 10,
                     rowHeight: 90,
-                    tileCount: 48,
+                    tileCount: 60,
                 });
             }
         };
@@ -178,17 +178,17 @@ export default function Hero() {
         <>
             <section
                 ref={heroRef}
-                className="relative isolate w-full  bg-white text-black"
+                className="relative isolate w-full bg-white text-black lg:min-h-screen xl:min-h-[105vh] lg:flex lg:flex-col lg:justify-end"
             >
                 {/* Heading and description */}
-                <div className="relative z-30 bg-transparent ">
-                    <div className="px-5 pb-10 pt-7 sm:px-8 sm:pb-14 sm:pt-9 md:px-12 lg:px-16">
+                <div className="relative z-30 bg-transparent w-full">
+                    <div className="px-5 pb-10 pt-7 sm:px-8 sm:pb-14 sm:pt-9 md:px-12 lg:px-16 lg:pb-20 lg:pt-14 xl:pb-24">
                         <div className="mx-auto max-w-[1400px]">
-                            <div className="mt-[50vh] sm:mt-64">
+                            <div className="mt-[50vh] sm:mt-64 md:mt-72 lg:mt-[44vh] xl:mt-[48vh]">
                                 <div className="grid grid-cols-1 items-end gap-8 lg:grid-cols-12 lg:gap-10">
                                     <div className="min-w-0 lg:col-span-7">
                                         <h1 className="break-words font-['Outfit'] text-[clamp(3.5rem,12vw,5rem)] font-bold leading-[0.83] tracking-[-0.075em] sm:text-7xl md:text-8xl lg:text-[6.5rem] xl:text-[7.8rem]">
-                                            We're
+                                            We&apos;re
                                             <br />
                                             Bugsmoker
                                         </h1>
@@ -222,13 +222,9 @@ export default function Hero() {
                 </div>
 
                 {/* Mosaic image grid */}
-
-                {/* Mosaic image grid */}
                 <div
                     ref={gridRef}
-                    className="pointer-events-none absolute inset-x-0 top-0 z-20
-        h-[50vh] 
-        sm:h-[50vh]"
+                    className="pointer-events-none absolute inset-x-0 top-0 z-20 h-[70vh] sm:h-[50vh] lg:h-[62vh] xl:h-[68vh]"
                 >
                     <div
                         className="absolute inset-0 grid
