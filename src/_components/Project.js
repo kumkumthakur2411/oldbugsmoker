@@ -127,7 +127,7 @@ export default function Project() {
                             <div className="w-[46%] sm:w-[44%] md:w-[42%] lg:w-[46%] xl:w-[42%] mr-2 sm:mr-6 lg:mr-8">
                                 <div className="group relative w-full aspect-[3/4] overflow-hidden bg-neutral-200/80 shadow-[0_4px_20px_rgba(0,0,0,0.05)] transition-all duration-700 ease-out hover:shadow-[0_8px_30px_rgba(0,0,0,0.09)]">
                                     <Image
-                                        src="/project/lookbook-2.jpg"
+                                        src="/image.png"
                                         alt="Sunlit aesthetic relaxation on linen"
                                         fill
                                         sizes="(max-width: 768px) 45vw, 300px"
@@ -146,7 +146,7 @@ export default function Project() {
                         {/* Large Hero Portrait Photo */}
                         <div className="group relative w-full max-w-[420px] sm:max-w-[480px] md:max-w-[520px] lg:max-w-[560px] xl:max-w-[590px] aspect-[4/5] overflow-hidden bg-neutral-200/80 shadow-[0_6px_28px_rgba(0,0,0,0.06)] transition-all duration-700 ease-out hover:shadow-[0_12px_40px_rgba(0,0,0,0.1)]">
                             <Image
-                                src="/project/lookbook-3.jpg"
+                                src="/image.png"
                                 alt="Smiling woman in white activewear sitting cross-legged"
                                 fill
                                 priority

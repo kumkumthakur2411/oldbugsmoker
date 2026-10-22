@@ -1,10 +1,16 @@
 "use client";
 
-import React, { useRef, useState, useEffect } from "react";
+import React, { useRef, useState, useEffect, useMemo } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { ArrowUpRight, ArrowLeft, ArrowRight, MoveLeft, MoveRight } from "lucide-react";
+import {
+    motion,
+    useScroll,
+    useTransform,
+    useSpring,
+    useMotionValueEvent,
+} from "framer-motion";
+import { ArrowUpRight } from "lucide-react";
 
 const SERVICES_DATA = [
     {
@@ -49,214 +55,148 @@ const SERVICES_DATA = [
     },
 ];
 
+function getSmoothTransformConfig(index) {
+    if (index === 0) {
+        return {
+            y: { input: [0, 0.16, 0.36, 0.56, 1], output: [0, 0, -8, -15, -15] },
+            scale: { input: [0, 0.16, 0.36, 0.56, 1], output: [1, 1, 0.96, 0.92, 0.92] },
+            rotateX: { input: [0, 1], output: [0, 0] },
+            rotateZ: { input: [0, 1], output: [0, 0] },
+            opacity: { input: [0, 1], output: [1, 1] },
+            overlayOpacity: { input: [0, 0.16, 0.36, 0.56, 1], output: [0, 0, 0.32, 0.6, 0.6] },
+        };
+    }
 
+    if (index === 1) {
+        return {
+            y: { input: [0, 0.16, 0.36, 0.56, 0.76, 1], output: [90, 90, 0, -8, -15, -15] },
+            scale: { input: [0, 0.16, 0.36, 0.56, 0.76, 1], output: [0.94, 0.94, 1, 0.96, 0.92, 0.92] },
+            rotateX: { input: [0, 0.16, 0.36, 1], output: [32, 32, 0, 0] },
+            rotateZ: { input: [0, 0.16, 0.36, 1], output: [-1.5, -1.5, 1, 1] },
+            opacity: { input: [0, 0.16, 0.22, 1], output: [0, 0, 1, 1] },
+            overlayOpacity: { input: [0, 0.36, 0.56, 0.76, 1], output: [0, 0, 0.32, 0.6, 0.6] },
+        };
+    }
 
+    if (index === 2) {
+        return {
+            y: { input: [0, 0.36, 0.56, 0.76, 0.94, 1], output: [90, 90, 0, -8, -15, -15] },
+            scale: { input: [0, 0.36, 0.56, 0.76, 0.94, 1], output: [0.94, 0.94, 1, 0.96, 0.92, 0.92] },
+            rotateX: { input: [0, 0.36, 0.56, 1], output: [32, 32, 0, 0] },
+            rotateZ: { input: [0, 0.36, 0.56, 1], output: [1.5, 1.5, -1, -1] },
+            opacity: { input: [0, 0.36, 0.42, 1], output: [0, 0, 1, 1] },
+            overlayOpacity: { input: [0, 0.56, 0.76, 0.94, 1], output: [0, 0, 0.32, 0.6, 0.6] },
+        };
+    }
 
-function MobileStackedServicesDeck({ services }) {
-    const [deck, setDeck] = useState(services);
-    const [direction, setDirection] = useState(1);
+    if (index === 3) {
+        return {
+            y: { input: [0, 0.56, 0.76, 0.94, 1], output: [90, 90, 0, -8, -8] },
+            scale: { input: [0, 0.56, 0.76, 0.94, 1], output: [0.94, 0.94, 1, 0.96, 0.96] },
+            rotateX: { input: [0, 0.56, 0.76, 1], output: [32, 32, 0, 0] },
+            rotateZ: { input: [0, 0.56, 0.76, 1], output: [-1.5, -1.5, 1, 1] },
+            opacity: { input: [0, 0.56, 0.62, 1], output: [0, 0, 1, 1] },
+            overlayOpacity: { input: [0, 0.76, 0.94, 1], output: [0, 0, 0.32, 0.32] },
+        };
+    }
 
-    useEffect(() => {
-        setDeck(services);
-    }, [services]);
-
-    if (!deck?.length) return null;
-
-    const activeService = deck[0];
-    const activeIndex = services.findIndex(
-        (service) => service.id === activeService.id
-    );
-
-    const handleSwipe = (nextDirection = 1) => {
-        if (deck.length < 2) return;
-
-        setDirection(nextDirection);
-
-        setDeck((previous) => {
-            if (nextDirection === 1) {
-                return [...previous.slice(1), previous[0]];
-            }
-
-            return [
-                previous[previous.length - 1],
-                ...previous.slice(0, -1),
-            ];
-        });
+    // index === 4 (final card)
+    return {
+        y: { input: [0, 0.76, 0.94, 1], output: [90, 90, 0, 0] },
+        scale: { input: [0, 0.76, 0.94, 1], output: [0.94, 0.94, 1, 1] },
+        rotateX: { input: [0, 0.76, 0.94, 1], output: [32, 32, 0, 0] },
+        rotateZ: { input: [0, 0.76, 0.94, 1], output: [1.5, 1.5, 0, 0] },
+        opacity: { input: [0, 0.76, 0.82, 1], output: [0, 0, 1, 1] },
+        overlayOpacity: { input: [0, 1], output: [0, 0] },
     };
-
-    const visibleCards = deck.slice(0, Math.min(3, deck.length));
-
-    return (
-        <div className="w-full overflow-hidden px-4 pb-8 pt-6 sm:px-6">
-
-
-            {/* Stacked cards */}
-            <div className="relative mx-auto w-full max-w-[390px]">
-                <div className="relative h-[390px] w-full sm:h-[420px]">
-                    {visibleCards
-                        .map((service, index) => {
-                            const isFront = index === 0;
-                            const originalIndex = services.findIndex(
-                                (item) => item.id === service.id
-                            );
-
-                            return (
-                                <motion.div
-                                    key={service.id}
-                                    layout
-                                    drag={isFront && deck.length > 1 ? "x" : false}
-                                    dragConstraints={{
-                                        left: 0,
-                                        right: 0,
-                                    }}
-                                    dragElastic={0.85}
-                                    onDragEnd={(event, info) => {
-                                        if (
-                                            info.offset.x > 65 ||
-                                            info.velocity.x > 450
-                                        ) {
-                                            handleSwipe(-1);
-                                        } else if (
-                                            info.offset.x < -65 ||
-                                            info.velocity.x < -450
-                                        ) {
-                                            handleSwipe(1);
-                                        }
-                                    }}
-                                    animate={{
-                                        y: index * -13,
-                                        scale: 1 - index * 0.045,
-                                        rotate: isFront ? 0 : index === 1 ? 2 : -3,
-                                        opacity: 1 - index * 0.16,
-                                        zIndex: 30 - index,
-                                    }}
-                                    transition={{
-                                        type: "spring",
-                                        stiffness: 300,
-                                        damping: 27,
-                                    }}
-                                    whileDrag={
-                                        isFront
-                                            ? {
-                                                rotate: direction === 1 ? 3 : -3,
-                                                scale: 1.02,
-                                                cursor: "grabbing",
-                                            }
-                                            : undefined
-                                    }
-                                    className={`absolute inset-x-0 bottom-0 ${isFront
-                                        ? "cursor-grab active:cursor-grabbing"
-                                        : "pointer-events-none"
-                                        }`}
-                                    style={{
-                                        transformOrigin: "bottom center",
-                                        touchAction: isFront ? "pan-y" : "auto",
-                                    }}
-                                >
-                                    <div className="relative overflow-hidden border border-black/10 bg-white p-2.5 shadow-[0_20px_60px_rgba(0,0,0,0.12)] sm:p-3">
-                                        {/* Image */}
-                                        <div className="relative aspect-[4/3] w-full overflow-hidden bg-neutral-200">
-                                            <Image
-                                                src={service.src}
-                                                alt={service.alt}
-                                                fill
-                                                priority={isFront}
-                                                sizes="(max-width: 640px) 92vw, 390px"
-                                                draggable={false}
-                                                className="pointer-events-none object-cover"
-                                            />
-
-                                            <div className="absolute inset-0 bg-gradient-to-t from-black/45 via-transparent to-black/10" />
-
-
-
-                                            {/* Large image number */}
-                                            <span className="absolute bottom-[-15px] left-2 font-['Outfit'] text-[100px] font-bold leading-none tracking-[-0.09em] text-white/75">
-                                                {String(originalIndex + 1).padStart(2, "0")}
-                                            </span>
-
-
-                                        </div>
-
-                                        {/* Card details */}
-                                        <div className="flex items-center justify-between gap-3 px-1 pb-1 pt-4">
-                                            <div className="min-w-0">
-
-
-                                                <h3 className="font-['Outfit'] text-xl font-semibold leading-tight tracking-[-0.05em] text-neutral-950 sm:text-2xl">
-                                                    {service.title}
-                                                </h3>
-                                            </div>
-
-                                            {isFront ? (
-                                                <Link
-                                                    href={`/service/${service.serviceSlug || service.href}`}
-                                                    aria-label={`Explore ${service.title}`}
-                                                    onPointerDown={(event) =>
-                                                        event.stopPropagation()
-                                                    }
-                                                    className="flex h-11 w-11 shrink-0 items-center justify-center bg-[#ff5a1f] text-white transition-colors hover:bg-black active:scale-95"
-                                                >
-                                                    <ArrowUpRight
-                                                        size={21}
-                                                        strokeWidth={1.8}
-                                                    />
-                                                </Link>
-                                            ) : (
-                                                <span className="flex h-10 w-10 shrink-0 items-center justify-center border border-neutral-200 text-neutral-400">
-                                                    <ArrowUpRight size={19} />
-                                                </span>
-                                            )}
-                                        </div>
-
-                                        {/* Orange bottom accent */}
-                                        <div
-                                            className={`absolute bottom-0 left-0 h-[3px] bg-[#ff5a1f] transition-all duration-500 ${isFront ? "w-full" : "w-0"
-                                                }`}
-                                        />
-                                    </div>
-                                </motion.div>
-                            );
-                        })
-                        .reverse()}
-                </div>
-
-
-
-                {/* Progress indicator */}
-                <div className="mt-5 flex gap-1.5">
-                    {services.map((service, index) => (
-                        <button
-                            key={service.id}
-                            type="button"
-                            aria-label={`Go to ${service.title}`}
-                            onClick={() => {
-                                const targetIndex = deck.findIndex(
-                                    (item) => item.id === service.id
-                                );
-
-                                if (targetIndex < 0) return;
-
-                                setDirection(1);
-                                setDeck((previous) => [
-                                    ...previous.slice(targetIndex),
-                                    ...previous.slice(0, targetIndex),
-                                ]);
-                            }}
-                            className={`h-[3px] flex-1 transition-colors duration-300 ${index === activeIndex
-                                ? "bg-[#ff5a1f]"
-                                : "bg-neutral-200"
-                                }`}
-                        />
-                    ))}
-                </div>
-            </div>
-        </div>
-    );
 }
 
+function MobileScrollFlippingCard({ service, index, totalCards, progress, isActive }) {
+    const config = useMemo(() => getSmoothTransformConfig(index), [index]);
 
+    const y = useTransform(progress, config.y.input, config.y.output);
+    const scale = useTransform(progress, config.scale.input, config.scale.output);
+    const rotateX = useTransform(progress, config.rotateX.input, config.rotateX.output);
+    const rotateZ = useTransform(progress, config.rotateZ.input, config.rotateZ.output);
+    const opacity = useTransform(progress, config.opacity.input, config.opacity.output);
+    const overlayOpacity = useTransform(progress, config.overlayOpacity.input, config.overlayOpacity.output);
 
+    return (
+        <motion.div
+            style={{
+                y,
+                scale,
+                rotateX,
+                rotateZ,
+                opacity,
+                transformOrigin: "bottom center",
+                transformStyle: "preserve-3d",
+                zIndex: 10 + index * 10,
+                WebkitBackfaceVisibility: "hidden",
+                backfaceVisibility: "hidden",
+            }}
+            className={`absolute inset-0 will-change-transform ${
+                isActive ? "pointer-events-auto" : "pointer-events-none"
+            }`}
+        >
+            <Link
+                href={`/service/${service.serviceSlug || service.href}`}
+                className="group relative block w-full overflow-hidden border border-black/10 bg-white p-2.5 shadow-[0_16px_40px_rgba(0,0,0,0.3)] transition-shadow duration-300 sm:p-3"
+            >
+                {/* Image */}
+                <div className="relative aspect-[16/10] w-full overflow-hidden bg-neutral-200">
+                    <Image
+                        src={service.src}
+                        alt={service.alt}
+                        fill
+                        priority={index === 0}
+                        sizes="(max-width: 640px) 90vw, 360px"
+                        draggable={false}
+                        className="pointer-events-none object-cover transition-transform duration-500 group-hover:scale-105"
+                    />
+
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-black/15 to-transparent" />
+
+                    {/* Large image number */}
+                    <span className="absolute -bottom-3 left-2 font-['Outfit'] text-[80px] font-bold leading-none tracking-[-0.09em] text-white/80 select-none sm:text-[95px]">
+                        0{index + 1}
+                    </span>
+
+                    {/* Top pill */}
+                    <span className="absolute right-2.5 top-2.5 flex items-center gap-1.5 rounded-full bg-black/60 px-2.5 py-1 font-mono text-[9px] uppercase tracking-wider text-white/85 backdrop-blur-sm sm:right-3 sm:top-3">
+                        <span className="h-1.5 w-1.5 rounded-full bg-[#ff5a1f]" />
+                        0{index + 1} / 0{totalCards}
+                    </span>
+                </div>
+
+                {/* Card details */}
+                <div className="flex items-center justify-between gap-3 px-1 pb-1 pt-3 sm:pt-3.5">
+                    <div className="min-w-0">
+                        <p className="font-mono text-[9px] uppercase tracking-[0.16em] text-neutral-400">
+                            Bugsmoker Service
+                        </p>
+                        <h3 className="font-['Outfit'] text-lg font-semibold leading-tight tracking-[-0.04em] text-neutral-950 sm:text-xl">
+                            {service.title}
+                        </h3>
+                    </div>
+
+                    <div className="flex h-10 w-10 shrink-0 items-center justify-center bg-[#ff5a1f] text-white shadow-sm transition-transform active:scale-95 group-hover:bg-neutral-950 sm:h-11 sm:w-11">
+                        <ArrowUpRight size={20} strokeWidth={1.9} />
+                    </div>
+                </div>
+
+                {/* Bottom accent */}
+                <div className="absolute bottom-0 left-0 h-[3px] w-full bg-[#ff5a1f]" />
+
+                {/* Depth darkening overlay when stacked behind */}
+                <motion.div
+                    style={{ opacity: overlayOpacity }}
+                    className="pointer-events-none absolute inset-0 z-30 bg-black/65"
+                />
+            </Link>
+        </motion.div>
+    );
+}
 
 export default function Services() {
     const containerRef = useRef(null);
@@ -264,11 +204,56 @@ export default function Services() {
     const cardsWrapperRef = useRef(null);
 
     const [maxScrollDistance, setMaxScrollDistance] = useState(0);
+    const [activeCardIndex, setActiveCardIndex] = useState(0);
+    const activeIndexRef = useRef(0);
 
     const { scrollYProgress } = useScroll({
         target: containerRef,
         offset: ["start start", "end end"],
     });
+
+    // Smooth scroll interpolation with spring physics to guarantee 60/120fps fluid motion
+    const smoothProgress = useSpring(scrollYProgress, {
+        stiffness: 80,
+        damping: 24,
+        mass: 0.35,
+        restDelta: 0.0001,
+    });
+
+    // Only trigger React state updates when the card index actually changes (prevents scroll jank)
+    useMotionValueEvent(smoothProgress, "change", (latest) => {
+        let nextIndex = 0;
+        if (latest >= 0.76) nextIndex = 4;
+        else if (latest >= 0.56) nextIndex = 3;
+        else if (latest >= 0.36) nextIndex = 2;
+        else if (latest >= 0.16) nextIndex = 1;
+
+        if (nextIndex !== activeIndexRef.current) {
+            activeIndexRef.current = nextIndex;
+            setActiveCardIndex(nextIndex);
+        }
+    });
+
+    const scrollToCard = (cardIndex) => {
+        if (!containerRef.current) return;
+
+        const rect = containerRef.current.getBoundingClientRect();
+        const scrollTop = window.scrollY || document.documentElement.scrollTop;
+        const containerTop = rect.top + scrollTop;
+        const containerHeight = containerRef.current.offsetHeight;
+        const windowHeight = window.innerHeight;
+        const scrollableDistance = containerHeight - windowHeight;
+
+        if (scrollableDistance <= 0) return;
+
+        const targets = [0.05, 0.26, 0.46, 0.66, 0.86];
+        const targetProgress = targets[cardIndex] ?? 0;
+
+        window.scrollTo({
+            top: containerTop + targetProgress * scrollableDistance,
+            behavior: "smooth",
+        });
+    };
 
     useEffect(() => {
         const calculateScroll = () => {
@@ -311,10 +296,10 @@ export default function Services() {
     return (
         <section
             ref={containerRef}
-            className="relative min-h-[100svh] w-full overflow-clip bg-neutral-950 md:h-[280vh]"
+            className="relative h-[360vh] w-full overflow-clip bg-neutral-950 md:h-[280vh]"
         >
             {/* Background Container */}
-            <div className="relative md:sticky md:top-0 flex min-h-[100svh] w-full flex-col overflow-hidden md:h-screen md:flex-row md:items-center">
+            <div className="sticky top-0 flex h-[100svh] w-full flex-col justify-between overflow-hidden md:h-screen md:flex-row md:items-center">
 
                 {/* Background Image */}
                 <div className="absolute inset-0 z-0">
@@ -327,16 +312,96 @@ export default function Services() {
                         className="object-cover object-center"
                     />
 
-                    <div className="absolute inset-0 bg-black/45" />
+                    <div className="absolute inset-0 bg-black/55" />
 
-                    <div className="absolute inset-0 bg-gradient-to-b from-black/50 via-black/15 to-black/70 md:bg-gradient-to-r md:from-black/70 md:via-black/35 md:to-black/10" />
+                    <div className="absolute inset-0 bg-gradient-to-b from-black/60 via-black/20 to-black/80 md:bg-gradient-to-r md:from-black/75 md:via-black/40 md:to-black/15" />
                 </div>
 
                 {/* Main Content */}
-                <div className="relative z-10 mx-auto flex h-full w-full max-w-[1400px] flex-col px-5 pb-6 pt-[max(2rem,env(safe-area-inset-top))] sm:px-8 md:px-12 md:py-8 lg:px-16">
+                <div className="relative z-10 mx-auto flex h-full w-full max-w-[1400px] flex-col px-5 pb-4 pt-[max(1.25rem,env(safe-area-inset-top))] sm:px-8 md:px-12 md:py-8 lg:px-16">
 
-                    <div className="grid min-h-0 flex-1 grid-cols-1 gap-6 md:grid-cols-12 md:items-center md:gap-8 lg:gap-14">
+                    {/* MOBILE VIEW (< md): Scroll-Driven 3D Flipping Card Stack */}
+                    <div className="flex md:hidden flex-1 flex-col justify-between py-1">
+                        {/* Header */}
+                        <div className="flex flex-col items-start pt-1 sm:pt-3">
+                            <span className="mb-2 flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.2em] text-white/60">
+                                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#ff5a1f]" />
+                                What we bring to the table
+                            </span>
 
+                            <h2 className="font-['Outfit'] text-[clamp(1.85rem,7.8vw,2.75rem)] font-medium leading-[1.0] tracking-[-0.05em] text-white">
+                                Where style
+                                <br />
+                                meets function<span className="text-[#ff5a1f]">.</span>
+                            </h2>
+
+                            <p className="mt-1.5 hidden text-xs leading-relaxed text-white/60 sm:block max-w-[340px]">
+                                Thoughtful design. Smart technology. Digital experiences that move your business forward.
+                            </p>
+                        </div>
+
+                        {/* Card Deck Area with Smooth 3D Perspective */}
+                        <div className="relative mx-auto my-auto flex w-full max-w-[350px] items-center justify-center py-2">
+                            <div
+                                className="relative h-[290px] w-full sm:h-[330px]"
+                                style={{
+                                    perspective: 1000,
+                                    perspectiveOrigin: "center 70%",
+                                    transformStyle: "preserve-3d",
+                                }}
+                            >
+                                {SERVICES_DATA.map((service, index) => (
+                                    <MobileScrollFlippingCard
+                                        key={service.id}
+                                        service={service}
+                                        index={index}
+                                        totalCards={SERVICES_DATA.length}
+                                        progress={smoothProgress}
+                                        isActive={index === activeCardIndex}
+                                    />
+                                ))}
+                            </div>
+                        </div>
+
+                        {/* Bottom Indicator & Nav */}
+                        <div className="flex w-full items-center justify-between border-t border-white/15 pb-2 pt-2.5 sm:pb-3">
+                            <div className="flex items-center gap-2.5">
+                                <span className="font-mono text-[11px] font-semibold tracking-wider text-[#ff5a1f]">
+                                    0{activeCardIndex + 1}
+                                    <span className="text-white/40 font-normal"> / 0{SERVICES_DATA.length}</span>
+                                </span>
+
+                                <div className="flex items-center gap-1.5">
+                                    {SERVICES_DATA.map((s, i) => (
+                                        <button
+                                            key={s.id}
+                                            type="button"
+                                            aria-label={`Go to ${s.title}`}
+                                            onClick={() => scrollToCard(i)}
+                                            className={`h-1 rounded-full transition-all duration-300 ${
+                                                i === activeCardIndex
+                                                    ? "w-5 bg-[#ff5a1f]"
+                                                    : i < activeCardIndex
+                                                    ? "w-2 bg-white/60"
+                                                    : "w-2 bg-white/20"
+                                            }`}
+                                        />
+                                    ))}
+                                </div>
+                            </div>
+
+                            <Link
+                                href="/services"
+                                className="flex items-center gap-1.5 font-mono text-[10px] uppercase tracking-[0.16em] text-white/70 transition-colors hover:text-[#ff5a1f]"
+                            >
+                                <span>All Services</span>
+                                <ArrowUpRight size={13} className="text-[#ff5a1f]" />
+                            </Link>
+                        </div>
+                    </div>
+
+                    {/* DESKTOP VIEW (>= md): 2-Column Grid with Scroll-Driven Masked Cards */}
+                    <div className="hidden md:grid min-h-0 flex-1 grid-cols-12 items-center gap-8 lg:gap-14">
                         <div className="relative z-20 flex flex-col items-start justify-center text-white md:col-span-6">
                             <span className="mb-5 flex items-center gap-2 font-mono text-[9px] uppercase tracking-[0.18em] text-white/55 sm:mb-7 sm:text-[10px] sm:tracking-[0.22em]">
                                 <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#ff5a1f]" />
@@ -372,16 +437,9 @@ export default function Services() {
                             </Link>
                         </div>
 
-                        {/* Right: Service Cards Area */}
+                        {/* Right: Desktop Service Cards Area */}
                         <div className="relative min-h-0 w-full md:col-span-6">
-
-                            {/* Mobile View (< 768px): Swipeable Stacked Deck */}
-                            <div className="block md:hidden w-full">
-                                <MobileStackedServicesDeck services={SERVICES_DATA} />
-                            </div>
-
-                            {/* Desktop View (>= 768px): Scroll-Driven Masked Cards */}
-                            <div className="hidden md:flex w-full items-center justify-end overflow-hidden">
+                            <div className="flex w-full items-center justify-end overflow-hidden">
                                 <div
                                     ref={maskContainerRef}
                                     className="relative h-full min-h-0 w-full max-w-[400px] overflow-hidden md:h-[84vh] md:max-h-none lg:max-w-[420px]"
@@ -392,7 +450,6 @@ export default function Services() {
                                         className="flex w-full flex-col gap-4 pb-4 md:gap-5"
                                     >
                                         {SERVICES_DATA.map((service, index) => (
-
                                             <Link
                                                 key={service.id}
                                                 href={`/service/${service.serviceSlug || service.href}`}
@@ -416,9 +473,6 @@ export default function Services() {
                                                         {String(index + 1).padStart(2, "0")}
                                                     </span>
 
-                                                    {/* Top label */}
-
-
                                                     {/* Floating arrow */}
                                                     <span className="absolute right-3 top-3 flex h-11 w-11 items-center justify-center rounded-full bg-[#ff5a1f] text-white transition-transform duration-500 group-hover:rotate-45 sm:right-4 sm:top-4 sm:h-12 sm:w-12">
                                                         <ArrowUpRight size={21} strokeWidth={1.7} />
@@ -428,10 +482,6 @@ export default function Services() {
                                                 {/* Footer */}
                                                 <div className="flex items-end justify-between gap-3 px-1 pb-1 pt-5 sm:px-2 sm:pt-6">
                                                     <div className="min-w-0">
-                                                        {/* <p className="mb-2 font-mono text-[9px] uppercase tracking-[0.18em] text-neutral-500 transition-colors duration-300 group-hover:text-black/60">
-                                                            Bugsmoker Studio / {String(index + 1).padStart(2, "0")}
-                                                        </p> */}
-
                                                         <h3 className="font-['Outfit'] text-xl font-semibold leading-[1.05] tracking-[-0.055em] text-neutral-950 transition-transform duration-300 group-hover:translate-x-1 sm:text-2xl md:text-[28px]">
                                                             {service.title}
                                                         </h3>
@@ -445,17 +495,21 @@ export default function Services() {
                                                 {/* Bottom accent */}
                                                 <div className="absolute bottom-0 left-0 h-1 w-0 bg-black transition-all duration-500 group-hover:w-full" />
                                             </Link>
-
-
                                         ))}
                                     </motion.div>
                                 </div>
                             </div>
                         </div>
-
                     </div>
 
-
+                    {/* Bottom Indicator for Desktop */}
+                    <div className="relative z-20 mt-3 hidden md:flex shrink-0 items-center justify-between border-t border-white/20 pt-3 text-[9px] uppercase tracking-[0.18em] text-white/55 sm:pt-4 sm:text-[10px] md:mt-5">
+                        <span>Bugsmoker Studio</span>
+                        <span className="flex items-center gap-2">
+                            Scroll to explore
+                            <span className="text-[#ff5a1f]">↓</span>
+                        </span>
+                    </div>
 
                 </div>
             </div>
