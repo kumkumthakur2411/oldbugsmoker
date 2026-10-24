@@ -40,13 +40,11 @@ const FEATURES = [
         pos: "center bottom",
     },
 ];
-
 const STATS = [
     { value: 60, suffix: "+", label: "sites and apps shipped" },
     { value: 98, suffix: "", label: "average Lighthouse score" },
     { value: 3, suffix: "x", label: "typical lift in engagement" },
 ];
-
 const PROBLEMS = [
     {
         title: "Your site loads slowly",
@@ -65,7 +63,6 @@ const PROBLEMS = [
         text: "Good work stays hidden when search engines can't read it.",
     },
 ];
-
 const SOLUTIONS = [
     {
         fixes: "Slow loading",
@@ -88,7 +85,32 @@ const SOLUTIONS = [
         text: "Semantic markup, fast pages and clear metadata give you a solid base to rank from.",
     },
 ];
-
+const PARAGRAPHS = [
+    {
+        title: "Built to be found",
+        text: "A beautiful website only works if people can find it. We plan keywords, page structure and internal links before design begins, so every page has a clear job and a clear audience searching for it. A beautiful website only works if people can find it. We plan keywords, page structure and internal links before design begins, so every page has a clear job and a clear audience searching for it.",
+    },
+    {
+        title: "Content that earns attention",
+        text: "Search engines reward pages that answer real questions. We write and structure content around what your customers actually ask, in plain language, with headings and summaries that make answers easy to scan. A beautiful website only works if people can find it. We plan keywords, page structure and internal links before design begins, so every page has a clear job and a clear audience searching for it.",
+    },
+    {
+        title: "Speed is a ranking signal",
+        text: "Slow pages lose visitors and rankings. We compress media, split code and render on the server, aiming for strong Core Web Vitals so your site feels instant on both fast and slow connections. A beautiful website only works if people can find it. We plan keywords, page structure and internal links before design begins, so every page has a clear job and a clear audience searching for it.",
+    },
+    {
+        title: "Structure search engines can read",
+        text: "Clean semantic HTML, descriptive metadata, structured data and sensible URLs help crawlers understand each page. It also makes your site more accessible to people using assistive technology. A beautiful website only works if people can find it. We plan keywords, page structure and internal links before design begins, so every page has a clear job and a clear audience searching for it.",
+    },
+    {
+        title: "Mobile-first, always",
+        text: "Most searches now happen on phones, and search engines index the mobile version first. Every layout we build is designed and tested on small screens before it is scaled up to desktop. A beautiful website only works if people can find it. We plan keywords, page structure and internal links before design begins, so every page has a clear job and a clear audience searching for it.",
+    },
+    {
+        title: "Measured, then improved",
+        text: "Launch is the start of the work. We set up analytics and search tracking, watch what visitors do, and refine pages over time so traffic and enquiries keep growing instead of flattening out. A beautiful website only works if people can find it. We plan keywords, page structure and internal links before design begins, so every page has a clear job and a clear audience searching for it.",
+    },
+];
 const FAQS = [
     {
         q: "How long does a web development project take?",
@@ -152,6 +174,7 @@ export default function WebDevSections() {
     const root = useRef(null);
     const featRef = useRef(null);
     const trackRef = useRef(null);
+    const paraRef = useRef(null);
     const [open, setOpen] = useState(0);
     const panels = useRef([]);
 
@@ -181,6 +204,59 @@ export default function WebDevSections() {
                             invalidateOnRefresh: true,
                         },
                     });
+                }
+            );
+            /* Paragraph section: one pinned screen, paragraphs swap on scroll */
+            mm.add(
+                "(min-width: 1024px) and (prefers-reduced-motion: no-preference)",
+                () => {
+                    const items = gsap.utils.toArray(".para-item");
+                    const nav = gsap.utils.toArray(".para-nav");
+                    const n = items.length;
+                    if (!n) return;
+
+                    gsap.set(items, { autoAlpha: 0, y: 60 });
+                    gsap.set(items[0], { autoAlpha: 1, y: 0 });
+                    gsap.set(nav, { opacity: 0.35 });
+                    gsap.set(nav[0], { opacity: 1 });
+
+                    const tl = gsap.timeline({
+                        defaults: { ease: "power2.inOut" },
+                        scrollTrigger: {
+                            trigger: paraRef.current,
+                            start: "top top",
+                            end: "+=" + n * 45 + "%",
+                            pin: true,
+                            scrub: 0.6,
+                            invalidateOnRefresh: true,
+                        },
+                    });
+
+                    /* spacer so the timeline spans the whole scroll distance */
+                    tl.to({}, { duration: n - 0.5 }, 0);
+                    tl.fromTo(
+                        ".para-bar",
+                        { scaleY: 1 / n },
+                        { scaleY: 1, ease: "none", duration: n - 0.5 },
+                        0
+                    );
+
+                    for (let i = 1; i < n; i++) {
+                        const t = i - 1 + 0.6;
+                        tl.to(
+                            items[i - 1],
+                            { autoAlpha: 0, y: -60, duration: 0.4 },
+                            t
+                        )
+                            .to(nav[i - 1], { opacity: 0.35, duration: 0.3 }, t)
+                            .fromTo(
+                                items[i],
+                                { autoAlpha: 0, y: 60 },
+                                { autoAlpha: 1, y: 0, duration: 0.4 },
+                                t + 0.1
+                            )
+                            .to(nav[i], { opacity: 1, duration: 0.3 }, t + 0.1);
+                    }
                 }
             );
 
@@ -517,7 +593,51 @@ export default function WebDevSections() {
                     </div>
                 </div>
             </section>
+            <section
+                ref={paraRef}
+                className="w-full  px-5 py-16 text-black sm:px-8 md:px-12 lg:flex lg:h-screen lg:items-center lg:px-16 lg:py-0"
+            >
+                <div className="mx-auto grid w-full max-w-[1400px] gap-12 lg:grid-cols-12 lg:gap-16">
+                    {/* Left: heading + progress list (desktop) */}
+                    <div className="lg:col-span-5">
+                        <h2 className="text-5xl font-bold leading-[0.95] tracking-[-0.05em] sm:text-6xl lg:text-7xl">
+                            Content and SEO that works together
+                        </h2>
 
+                        <div className="relative mt-12 hidden lg:block">
+                            <span className="absolute left-0 top-0 h-full w-[3px] bg-black/20" />
+                            <span className="para-bar absolute left-0 top-0 h-full w-[3px] origin-top bg-black" />
+                            <ul className="flex flex-col gap-3 pl-6">
+                                {PARAGRAPHS.map((p) => (
+                                    <li
+                                        key={p.title}
+                                        className="para-nav text-lg font-semibold tracking-[-0.02em]"
+                                    >
+                                        {p.title}
+                                    </li>
+                                ))}
+                            </ul>
+                        </div>
+                    </div>
+
+                    {/* Right: paragraphs */}
+                    <div className="relative flex flex-col gap-10 lg:col-span-7 lg:block lg:h-[56vh] lg:gap-0">
+                        {PARAGRAPHS.map((p) => (
+                            <div
+                                key={p.title}
+                                className="para-item border-t border-black/30 pt-6 lg:absolute lg:inset-0 lg:flex lg:flex-col lg:justify-center lg:border-0 lg:pt-0"
+                            >
+                                <h3 className="text-2xl font-bold tracking-[-0.03em] lg:hidden">
+                                    {p.title}
+                                </h3>
+                                <p className="mt-3 max-w-2xl text-base font-medium leading-[1.6] sm:text-lg lg:mt-0 lg:text-[1.75rem] lg:leading-[1.35] lg:tracking-[-0.02em]">
+                                    {p.text}
+                                </p>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+            </section>
             {/* ---------------- FAQ ---------------- */}
             <section className="w-full bg-neutral-50 px-5 py-24 text-black sm:px-8 md:px-12 lg:px-16 lg:py-36">
                 <div className="mx-auto grid max-w-[1400px] gap-12 lg:grid-cols-12 lg:gap-16">
@@ -578,3 +698,10 @@ export default function WebDevSections() {
         </div>
     );
 }
+
+
+
+
+
+
+
