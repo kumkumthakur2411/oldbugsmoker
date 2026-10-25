@@ -9,11 +9,11 @@ const CONTENT_DATA = {
     EN: {
         badge: "MONOGRAPH / ARCHIVE NO. 04",
         titleLines: [
-            "BUGSMOKER",
-            "FOREVER",
-            "CHANGED",
-            "OUR SENSE OF",
-            "SPACE & FORM",
+            "Bugsmoker",
+            "forever",
+            "changed",
+            "our sense of",
+            "space & form",
         ],
         subtitle:
             "IF YOU LOOK INTO OUR ARCHIVED INSTALLATIONS OR WITNESS OUR EXHIBITIONS ACROSS THE WORLD, YOU WILL SEE A LIVING KALEIDOSCOPE OF PERSPECTIVES.",
@@ -50,11 +50,11 @@ const CONTENT_DATA = {
     RU: {
         badge: "МОНОГРАФИЯ / АРХИВ № 04",
         titleLines: [
-            "IPHONE",
-            "НАВСЕГДА",
-            "ИЗМЕНИЛ",
-            "МИР",
-            "ФОТОГРАФИИ",
+            "iPhone",
+            "навсегда",
+            "изменил",
+            "мир",
+            "фотографии",
         ],
         subtitle:
             "ЕСЛИ ВЫ ПОСМОТРИТЕ НА МОИ СТАРЫЕ ФОТОГРАФИИ ИЛИ ЖЕ НА СНИМКИ ЛЮБЫХ ДРУГИХ ФОТОГРАФОВ, КОТОРЫЕ СНИМАЛИ НА УЛИЦЕ, ВЫ УВИДИТЕ ЦЕЛЫЙ КАЛЕЙДОСКОП ВЗГЛЯДОВ.",
@@ -117,99 +117,148 @@ export default function Aboutus() {
     return (
         <section
             id="about"
-            className="relative w-full text-[#0d0d0d] font-['Outfit',sans-serif] "
+            className="relative w-full text-[#0d0d0d] font-['Outfit',sans-serif] pt-14 sm:pt-16 md:pt-20 pb-0"
         >
-            <div className="absolute inset-0 pointer-events-none opacity-40 mix-blend-multiply  " />
-            <div className="relative z-10 w-full  mx-auto px-4 sm:px-8 md:px-12 lg:px-16">
-                <div className=" p-6 sm:p-10 md:p-14 lg:p-16">
+            <div className="absolute inset-0 pointer-events-none opacity-40 mix-blend-multiply" />
+            <div className="relative z-10 w-full mx-auto px-4 sm:px-8 md:px-12 lg:px-16">
+                <div className="px-4 sm:px-8 md:px-12 lg:px-14 py-0">
 
-                    <div className="relative mb-12 sm:mb-16">
-                        {/* Opening Giant Quotation Mark */}
-                        <div className="flex items-start gap-3 sm:gap-4">
-                            <span className="text-4xl sm:text-6xl md:text-7xl font-serif font-black leading-none select-none text-black -mt-1 sm:-mt-2">
-                                “
-                            </span>
-
-                            {/* Huge Stacked Uppercase Headline */}
-                            <div className="flex flex-col">
-                                {t.titleLines.map((line, idx) => (
-                                    <h2
-                                        key={idx}
-                                        className="text-3xl sm:text-5xl md:text-6xl lg:text-7xl font-black uppercase tracking-[-0.03em] leading-[0.88] text-black"
+                    {/* Centered Editorial Statement with Inline Image Badges */}
+                    <div className="relative my-0 max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto px-2 sm:px-4 text-center">
+                        <h2 className="font-['Outfit'] text-[clamp(2.2rem,5.5vw,5rem)] font-bold leading-[1.12] tracking-[-0.035em] text-[#0d0d0d] text-center">
+                            {lang === "RU" ? (
+                                <>
+                                    iPhone{" "}
+                                    <span
+                                        onClick={() => setActiveImage("/home/1.png")}
+                                        className="group inline-flex relative align-middle -mt-1 mx-1 sm:mx-2 h-[0.9em] w-[1.4em] sm:h-[0.92em] sm:w-[1.48em] rounded-lg sm:rounded-xl overflow-hidden shadow-md border border-black/15 cursor-pointer transition-transform duration-300 hover:scale-110 hover:-rotate-3 active:scale-95"
+                                        title="Frame 01"
                                     >
-                                        {line}
-                                    </h2>
-                                ))}
-                            </div>
-                        </div>
-
-                        {/* Sub-Headline in Crisp Spaced Uppercase */}
-                        <p className="mt-8 sm:mt-10 text-[11px] sm:text-[13px] md:text-[14px] uppercase font-bold tracking-[0.06em] leading-[1.45] text-black/85 max-w-[700px]">
-                            {t.subtitle}
-                        </p>
-
-                        {/* Stepped / Narrow Editorial Body Paragraph */}
-                        <div className="mt-6 sm:mt-8 max-w-[520px] mx-auto text-center space-y-2 sm:space-y-3">
-                            {t.storyParagraphs.map((para, pIdx) => (
-                                <p
-                                    key={pIdx}
-                                    className="text-[10px] sm:text-[11.5px] leading-[1.65] text-black/75 tracking-tight font-normal"
-                                >
-                                    {para}
-                                </p>
-                            ))}
-                        </div>
+                                        <Image
+                                            src="/home/1.webp"
+                                            alt="Archive frame 01"
+                                            fill
+                                            sizes="120px"
+                                            className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                                        />
+                                    </span>{" "}
+                                    навсегда изменил<br className="hidden sm:inline" />{" "}
+                                    наш мир{" "}
+                                    <span
+                                        onClick={() => setActiveImage("/home/new1.png")}
+                                        className="group inline-flex relative align-middle -mt-1 mx-1 sm:mx-2 h-[0.9em] w-[1.4em] sm:h-[0.92em] sm:w-[1.48em] rounded-lg sm:rounded-xl overflow-hidden shadow-md border border-black/15 cursor-pointer transition-transform duration-300 hover:scale-110 hover:rotate-3 active:scale-95"
+                                        title="Frame 02"
+                                    >
+                                        <Image
+                                            src="/home/new1.webp"
+                                            alt="Archive frame 02"
+                                            fill
+                                            sizes="120px"
+                                            className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                                        />
+                                    </span>{" "}
+                                    фотографии.<br className="hidden md:inline" />{" "}
+                                    Создаем смелые миры{" "}
+                                    <span
+                                        onClick={() => setActiveImage("/home/new2.png")}
+                                        className="group inline-flex relative align-middle -mt-1 mx-1 sm:mx-2 h-[0.9em] w-[1.4em] sm:h-[0.92em] sm:w-[1.48em] rounded-lg sm:rounded-xl overflow-hidden shadow-md border border-black/15 cursor-pointer transition-transform duration-300 hover:scale-110 hover:-rotate-2 active:scale-95"
+                                        title="Frame 03"
+                                    >
+                                        <Image
+                                            src="/home/new2.png"
+                                            alt="Archive frame 03"
+                                            fill
+                                            sizes="120px"
+                                            className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                                        />
+                                    </span>{" "}
+                                    с аналоговой душой{" "}
+                                    <span
+                                        onClick={() => setActiveImage("/home/hero.png")}
+                                        className="group inline-flex relative align-middle -mt-1 mx-1 sm:mx-2 h-[0.9em] w-[1.4em] sm:h-[0.92em] sm:w-[1.48em] rounded-lg sm:rounded-xl overflow-hidden shadow-md border border-black/15 cursor-pointer transition-transform duration-300 hover:scale-110 hover:rotate-3 active:scale-95"
+                                        title="Principal work"
+                                    >
+                                        <Image
+                                            src="/home/hero.png"
+                                            alt="Principal work"
+                                            fill
+                                            sizes="120px"
+                                            className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                                        />
+                                    </span>{" "}
+                                    —<br className="hidden sm:inline" />{" "}
+                                    ведь кому нужна скука?
+                                </>
+                            ) : (
+                                <>
+                                    Bugsmoker{" "}
+                                    <span
+                                        onClick={() => setActiveImage("/home/1.png")}
+                                        className="group inline-flex relative align-middle -mt-1 mx-1 sm:mx-2 h-[0.9em] w-[1.4em] sm:h-[0.92em] sm:w-[1.48em] rounded-lg sm:rounded-xl overflow-hidden shadow-md border border-black/15 cursor-pointer transition-transform duration-300 hover:scale-110 hover:-rotate-3 active:scale-95"
+                                        title="Archive frame 01 - CRT floral installation at dusk"
+                                    >
+                                        <Image
+                                            src="/home/1.webp"
+                                            alt="Archive frame 01 - CRT floral installation at dusk"
+                                            fill
+                                            sizes="120px"
+                                            className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                                        />
+                                    </span>{" "}
+                                    forever changed<br className="hidden sm:inline" />{" "}
+                                    our sense of{" "}
+                                    <span
+                                        onClick={() => setActiveImage("/home/new1.png")}
+                                        className="group inline-flex relative align-middle -mt-1 mx-1 sm:mx-2 h-[0.9em] w-[1.4em] sm:h-[0.92em] sm:w-[1.48em] rounded-lg sm:rounded-xl overflow-hidden shadow-md border border-black/15 cursor-pointer transition-transform duration-300 hover:scale-110 hover:rotate-3 active:scale-95"
+                                        title="Archive frame 02 - Botanical spatial study"
+                                    >
+                                        <Image
+                                            src="/home/new1.webp"
+                                            alt="Archive frame 02 - Botanical spatial study"
+                                            fill
+                                            sizes="120px"
+                                            className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                                        />
+                                    </span>{" "}
+                                    space &amp; form.<br className="hidden md:inline" />{" "}
+                                    Building bold digital worlds{" "}
+                                    <span
+                                        onClick={() => setActiveImage("/home/new2.png")}
+                                        className="group inline-flex relative align-middle -mt-1 mx-1 sm:mx-2 h-[0.9em] w-[1.4em] sm:h-[0.92em] sm:w-[1.48em] rounded-lg sm:rounded-xl overflow-hidden shadow-md border border-black/15 cursor-pointer transition-transform duration-300 hover:scale-110 hover:-rotate-2 active:scale-95"
+                                        title="Archive frame 03 - Analog light frequencies"
+                                    >
+                                        <Image
+                                            src="/home/new2.png"
+                                            alt="Archive frame 03 - Analog light frequencies"
+                                            fill
+                                            sizes="120px"
+                                            className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                                        />
+                                    </span>{" "}
+                                    with analog soul{" "}
+                                    <span
+                                        onClick={() => setActiveImage("/home/hero.png")}
+                                        className="group inline-flex relative align-middle -mt-1 mx-1 sm:mx-2 h-[0.9em] w-[1.4em] sm:h-[0.92em] sm:w-[1.48em] rounded-lg sm:rounded-xl overflow-hidden shadow-md border border-black/15 cursor-pointer transition-transform duration-300 hover:scale-110 hover:rotate-3 active:scale-95"
+                                        title="Curated spatial installation"
+                                    >
+                                        <Image
+                                            src="/home/hero.png"
+                                            alt="Curated spatial installation"
+                                            fill
+                                            sizes="120px"
+                                            className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                                        />
+                                    </span>{" "}
+                                    —<br className="hidden sm:inline" />{" "}
+                                    because who wants boring, right?
+                                </>
+                            )}
+                        </h2>
                     </div>
 
-                    <div className="mb-12 sm:mb-16">
-                        {/* 3 Horizontal Photos Side-by-Side */}
-                        <div className="grid grid-cols-3 gap-2 sm:gap-3">
-                            {TRIPTYCH_IMAGES.map((img, idx) => (
-                                <div
-                                    key={idx}
-                                    onClick={() => setActiveImage(img.src)}
-                                    className="group relative aspect-[16/10] overflow-hidden bg-black/10 cursor-pointer border border-black/10 shadow-xs transition-all duration-300 hover:shadow-md"
-                                >
-                                    <Image
-                                        src={img.src}
-                                        alt={img.alt}
-                                        fill
-                                        sizes="(max-width: 768px) 33vw, 240px"
-                                        className="object-cover object-center grayscale contrast-[1.12] brightness-[0.98] transition-all duration-500 group-hover:scale-105 group-hover:grayscale-0"
-                                    />
-                                    {/* Subtle frame sheen */}
-                                    <div className="absolute inset-0 bg-black/5 opacity-0 group-hover:opacity-100 transition-opacity flex items-center justify-center">
-                                        <span className="p-1 rounded bg-black/70 text-white text-[9px] backdrop-blur-xs flex items-center gap-1">
-                                            <ZoomIn size={10} />
-                                        </span>
-                                    </div>
-                                    {/* Frame metadata label in tiny text */}
-                                    <span className="absolute bottom-1 right-1 text-[7px] sm:text-[8px] font-mono tracking-wider bg-white/90 text-black px-1 py-0.2 rounded-xs select-none">
-                                        {img.label}
-                                    </span>
-                                </div>
-                            ))}
-                        </div>
-
-                        {/* Offset / Right-Aligned Bold Graphic Subtitle */}
-                        <div className="mt-6 sm:mt-8 flex justify-end">
-                            <div className="text-right">
-                                {t.offsetQuote.map((line, qIdx) => (
-                                    <h3
-                                        key={qIdx}
-                                        className="text-2xl sm:text-4xl md:text-5xl font-black uppercase tracking-[-0.02em] leading-[0.95] text-black"
-                                    >
-                                        {line}
-                                    </h3>
-                                ))}
-                            </div>
-                        </div>
-                    </div>
-
-
-                    <div className="mb-12 sm:mb-16">
+                    {/* Featured Image Spread (Removed per user request) */}
+                    {/* <div className="mb-12 sm:mb-16">
                         <div className="grid grid-cols-12 gap-3 sm:gap-4 items-end">
-                            {/* Large Featured Image (occupying ~9 of 12 columns = 75%) */}
                             <div
                                 onClick={() => setActiveImage("/home/hero.png")}
                                 className="col-span-9 sm:col-span-9 relative aspect-[4/3] bg-black/10 overflow-hidden border border-black/15 shadow-xs group cursor-pointer"
@@ -228,9 +277,7 @@ export default function Aboutus() {
                                 </div>
                             </div>
 
-                            {/* Right Side Column: Negative space + Bottom Mini Thumbnail */}
                             <div className="col-span-3 sm:col-span-3 flex flex-col justify-end">
-                                {/* Editorial Micro-Label */}
                                 <div className="mb-2 text-right">
                                     <p className="text-[7px] sm:text-[9px] uppercase tracking-wider font-bold text-black/80 leading-tight">
                                         {t.mainFeatureTag}
@@ -240,7 +287,6 @@ export default function Aboutus() {
                                     </p>
                                 </div>
 
-                                {/* Small Contact Sheet Thumbnail with Border */}
                                 <div
                                     onClick={() => setActiveImage("/home/5.png")}
                                     className="relative aspect-[3/4] bg-black/10 overflow-hidden border border-black/20 shadow-xs cursor-pointer group"
@@ -256,26 +302,25 @@ export default function Aboutus() {
                                 </div>
                             </div>
                         </div>
-                    </div>
+                    </div> */}
 
-                    <div className="mb-12 sm:mb-16">
-                        {/* Bold Headline Across Spread */}
+                    {/* Bold Headline Across Spread & Narrative Fine-Print Paragraph (Removed per user request) */}
+                    {/* <div className="mb-12 sm:mb-16">
                         <h3 className="text-xl sm:text-2xl md:text-3xl lg:text-[34px] font-black uppercase tracking-[-0.02em] leading-[1.12] text-black text-center sm:text-left">
                             {t.secondTitle}
                         </h3>
 
-                        {/* Narrative Fine-Print Paragraph */}
                         <div className="mt-6 sm:mt-8 max-w-[620px] mx-auto text-center sm:text-left">
                             <p className="text-[10.5px] sm:text-[12px] leading-[1.7] text-black/75 tracking-tight font-normal">
                                 {t.secondParagraph}
                             </p>
                         </div>
-                    </div>
+                    </div> */}
 
 
-                    <div className="pt-6 border-t border-black/15">
+                    {/* Archival Metrics & Thumbnail (Removed so Portfolio flows directly after statement) */}
+                    {/* <div className="pt-6 border-t border-black/15">
                         <div className="grid grid-cols-12 gap-4 sm:gap-6 items-center">
-                            {/* Left Column: Portrait Thumbnail Photo */}
                             <div
                                 onClick={() => setActiveImage("/home/3.png")}
                                 className="col-span-4 sm:col-span-3 relative aspect-[3/4] bg-black/10 overflow-hidden border border-black/15 shadow-xs cursor-pointer group"
@@ -292,7 +337,6 @@ export default function Aboutus() {
                                 </span>
                             </div>
 
-                            {/* Right Column: Giant Minimalist Swiss Metric Numbers */}
                             <div className="col-span-8 sm:col-span-9 grid grid-cols-2 gap-4 sm:gap-8">
                                 {t.stats.map((stat, sIdx) => (
                                     <div key={sIdx} className="flex flex-col">
@@ -312,9 +356,7 @@ export default function Aboutus() {
                                 ))}
                             </div>
                         </div>
-
-
-                    </div>
+                    </div> */}
                 </div>
             </div>
 

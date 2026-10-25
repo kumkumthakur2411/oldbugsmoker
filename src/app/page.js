@@ -7,18 +7,26 @@ import Blog from "../_components/Blog";
 import TestimonialsSection from "@/_components/TestimonialsSection";
 import Footer from "../_components/Footer";
 import Aboutus from "@/_components/Aboutus";
+import Portfolio from "@/_components/Portfolio";
+import Technologies from "@/_components/Technologies";
+import CtaSection from "@/_components/CtaSection";
+
 export default function Home() {
   return (
     <>
       <Navbar />
       <Hero />
-      <Content />
+      {/* <Content /> */}
       <Services />
       <Aboutus />
+      <Portfolio />
+      <Technologies />
+      <CtaSection />
       <TestimonialsSection />
-      <Project />
+      {/* <Project /> */}
       <Blog />
       <Footer />
     </>
   );
 }
+ 

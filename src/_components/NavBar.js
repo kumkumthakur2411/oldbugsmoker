@@ -84,36 +84,36 @@ const Navbar = ({ isLoaded: propIsLoaded }) => {
 
   return (
     <>
-      {/* Desktop Header */}
+      {/* Header */}
       <header
         ref={navRef}
-        className="absolute top-0 left-0 right-0 z-40 w-full h-[50vh] px-6 sm:px-10 
-        md:px-14 lg:px-16 pt-6 md:pt-8 text-[11px] font-semibold uppercase 
+        className="pointer-events-none absolute top-0 left-0 right-0 z-40 w-full h-auto px-4 sm:px-8 
+        md:px-14 lg:px-16 pt-4 sm:pt-6 md:pt-8 text-[10px] sm:text-[11px] font-semibold uppercase 
         tracking-wide transition-colors duration-300 text-[#18181b]"
       >
-        <div className="w-full max-w-[1400px] mx-auto flex items-start justify-between">
-          <div>
+        <div className="pointer-events-auto w-full max-w-[1400px] mx-auto flex items-start justify-between gap-2 sm:gap-4">
+          <div className="text-[9.5px] sm:text-[11px] leading-[1.25]">
             <p>We make</p>
             <p>
-              Tech <span className="line-through">easy</span>
+              Tech <span className="line-through text-neutral-400">easy</span>
             </p>
             <p>Beautiful</p>
           </div>
 
-          <div className="flex flex-col">
-            <Link href="/services">Services</Link>
-            <Link href="/blog">Our Blogs</Link>
-            <Link href="/aboutus">About us</Link>
+          <div className="flex flex-col text-[10px] sm:text-[11px] space-y-0.5 sm:space-y-1">
+            <Link href="/services" className="transition-colors hover:text-[#ff5a1f]">Services</Link>
+            <Link href="/blog" className="transition-colors hover:text-[#ff5a1f]">Our Blogs</Link>
+            <Link href="/aboutus" className="transition-colors hover:text-[#ff5a1f]">About us</Link>
           </div>
 
-          <div>
+          <div className="text-[10px] sm:text-[11px]">
             <Link
               href="/contactus"
-              className="group inline-flex items-center gap-1 transition-opacity hover:opacity-80"
+              className="group inline-flex items-center gap-1 transition-opacity hover:opacity-80 font-bold"
             >
               <span>Contact us</span>
               <ArrowUpRight
-                size={13}
+                size={12}
                 className="text-[#ff5a1f] transition-transform duration-200 group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
                 strokeWidth={2.5}
               />
