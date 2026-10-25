@@ -14,8 +14,8 @@ const inter = Inter({
 });
 
 export const metadata = {
-  title: "Interior Design",
-  description: "We specialize in creating timeless interiors that blend functionality with aesthetic beauty.",
+  title: "Bugsmoker — Digital Engineering & Creative Studio",
+  description: "We combine thoughtful design and reliable technology to build bold digital worlds, standout websites, and smarter software.",
 };
 
 export default function RootLayout({ children }) {
