@@ -180,15 +180,21 @@ export default function TestimonialsSection() {
   };
 
   return (
-    <section className="relative w-full overflow-hidden bg-white py-14 text-[#181818] sm:py-20 md:py-28">
-      <div className="mx-auto max-w-[1500px] px-5 sm:px-10 md:px-14 lg:px-16">
-
+    <section
+      id="testimonials"
+      className="relative w-full overflow-hidden bg-white text-[rgb(36,36,36)] font-['Outfit',sans-serif] pt-10 sm:pt-12 md:pt-14 pb-8 sm:pb-10 md:pb-12 select-none"
+    >
+      <div className="relative z-10 w-full px-1 sm:px-2 lg:px-3">
         {/* Header */}
-        <div className="mb-8 flex items-end justify-between gap-4 sm:mb-12 md:mb-14">
+        <div className="flex items-end justify-between gap-6 pb-4 sm:pb-6 mb-5 sm:mb-6 md:mb-7">
           <div>
-
-
-            <h2 className="font-['Outfit'] text-[clamp(1.8rem,7vw,3.2rem)] font-semibold leading-[1.02] tracking-[-0.06em]">
+            <div className="flex items-center gap-2 mb-2">
+              <span className="h-2 w-2 rounded-full bg-[#ff5a1f]" />
+              <span className="font-mono text-[11px] sm:text-xs uppercase tracking-[0.22em] text-[rgb(36,36,36)]/60 font-semibold">
+                TESTIMONIALS // VOICES &amp; EXPERIENCES
+              </span>
+            </div>
+            <h2 className="font-['Outfit'] text-[clamp(1.8rem,7vw,3.2rem)] font-semibold leading-[1.02] tracking-[-0.06em] text-[rgb(36,36,36)]">
               Good people.
               <br />
               <span className="text-neutral-400">
@@ -197,10 +203,32 @@ export default function TestimonialsSection() {
             </h2>
           </div>
 
-
+          {/* Navigation Controls on Right */}
+          <div className="flex items-center gap-2">
+            <button
+              onClick={() => {
+                if (scrollRef.current) scrollRef.current.scrollBy({ left: -380, behavior: "smooth" });
+              }}
+              className="group inline-flex h-9 w-9 sm:h-10 sm:w-10 cursor-pointer items-center justify-center rounded-full border border-black/20 bg-white text-black shadow-xs transition-all duration-200 hover:border-[#ff5a1f] hover:bg-[#ff5a1f] hover:text-white active:scale-95"
+              aria-label="Previous testimonial"
+            >
+              <ChevronLeft size={16} strokeWidth={2.2} />
+            </button>
+            <button
+              onClick={() => {
+                if (scrollRef.current) scrollRef.current.scrollBy({ left: 380, behavior: "smooth" });
+              }}
+              className="group inline-flex h-9 w-9 sm:h-10 sm:w-10 cursor-pointer items-center justify-center rounded-full border border-black/20 bg-white text-black shadow-xs transition-all duration-200 hover:border-[#ff5a1f] hover:bg-[#ff5a1f] hover:text-white active:scale-95"
+              aria-label="Next testimonial"
+            >
+              <ChevronRight size={16} strokeWidth={2.2} />
+            </button>
+          </div>
         </div>
+      </div>
 
-        {/* Staggered testimonial cards */}
+      {/* Staggered testimonial cards */}
+      <div className="w-full relative">
         <div
           ref={scrollRef}
           onScroll={checkScroll}
@@ -215,7 +243,7 @@ export default function TestimonialsSection() {
               dragRef.current.moved = false;
             }
           }}
-          className={`-mx-5 flex items-end gap-3 overflow-x-auto px-5 pb-5 pt-8 sm:mx-0 sm:gap-5 sm:pb-6 sm:pt-8 md:gap-6 ${isDragging ? "cursor-grabbing" : "cursor-grab"
+          className={`flex items-end gap-3 sm:gap-5 md:gap-6 overflow-x-auto px-1 sm:px-2 lg:px-3 pt-2 pb-2 select-none scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden ${isDragging ? "cursor-grabbing" : "cursor-grab"
             }`}
           style={{
             scrollbarWidth: "none",
@@ -273,15 +301,11 @@ export default function TestimonialsSection() {
                 </p>
               </div>
 
-
-
               {/* Hover accent */}
               <div className="absolute bottom-0 left-0 h-[3px] w-0 bg-[#ff5a1f] transition-all duration-500 group-hover:w-full" />
             </article>
           ))}
         </div>
-
-
       </div>
     </section>
   );

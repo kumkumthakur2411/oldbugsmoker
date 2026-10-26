@@ -117,15 +117,18 @@ export default function Aboutus() {
     return (
         <section
             id="about"
-            className="relative w-full text-[#0d0d0d] font-['Outfit',sans-serif] pt-14 sm:pt-16 md:pt-20 pb-0"
+            className="relative w-full text-[rgb(36,36,36)] font-['Outfit',sans-serif] py-12 sm:py-14 md:py-16"
         >
             <div className="absolute inset-0 pointer-events-none opacity-40 mix-blend-multiply" />
-            <div className="relative z-10 w-full mx-auto px-4 sm:px-8 md:px-12 lg:px-16">
-                <div className="px-4 sm:px-8 md:px-12 lg:px-14 py-0">
+            <div className="relative z-10 w-full mx-auto px-2 sm:px-4 md:px-6 lg:px-8">
+                <div className="px-0 py-0">
 
                     {/* Centered Editorial Statement with Inline Image Badges */}
-                    <div className="relative my-0 max-w-5xl lg:max-w-6xl xl:max-w-7xl mx-auto px-2 sm:px-4 text-center">
-                        <h2 className="font-['Outfit'] text-[clamp(2.2rem,5.5vw,5rem)] font-bold leading-[1.12] tracking-[-0.035em] text-[#0d0d0d] text-center">
+                    <div className="relative my-0 max-w-[1700px] 2xl:max-w-[1850px] mx-auto px-1 sm:px-2 text-center">
+                        <h2
+                            style={{ color: "rgb(36, 36, 36)" }}
+                            className="font-['Outfit'] text-[clamp(2.5rem,6.5vw,5.5rem)] font-bold leading-[0.92] sm:leading-[0.88] tracking-[-0.035em] text-[rgb(36,36,36)] text-center space-y-0.5 sm:space-y-1"
+                        >
                             {lang === "RU" ? (
                                 <>
                                     iPhone{" "}
@@ -191,66 +194,94 @@ export default function Aboutus() {
                                 </>
                             ) : (
                                 <>
-                                    Bugsmoker{" "}
-                                    <span
-                                        onClick={() => setActiveImage("/home/1.png")}
-                                        className="group inline-flex relative align-middle -mt-1 mx-1 sm:mx-2 h-[0.9em] w-[1.4em] sm:h-[0.92em] sm:w-[1.48em] rounded-lg sm:rounded-xl overflow-hidden shadow-md border border-black/15 cursor-pointer transition-transform duration-300 hover:scale-110 hover:-rotate-3 active:scale-95"
-                                        title="Archive frame 01 - CRT floral installation at dusk"
-                                    >
-                                        <Image
-                                            src="/home/1.webp"
-                                            alt="Archive frame 01 - CRT floral installation at dusk"
-                                            fill
-                                            sizes="120px"
-                                            className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
-                                        />
-                                    </span>{" "}
-                                    forever changed<br className="hidden sm:inline" />{" "}
-                                    our sense of{" "}
-                                    <span
-                                        onClick={() => setActiveImage("/home/new1.png")}
-                                        className="group inline-flex relative align-middle -mt-1 mx-1 sm:mx-2 h-[0.9em] w-[1.4em] sm:h-[0.92em] sm:w-[1.48em] rounded-lg sm:rounded-xl overflow-hidden shadow-md border border-black/15 cursor-pointer transition-transform duration-300 hover:scale-110 hover:rotate-3 active:scale-95"
-                                        title="Archive frame 02 - Botanical spatial study"
-                                    >
-                                        <Image
-                                            src="/home/new1.webp"
-                                            alt="Archive frame 02 - Botanical spatial study"
-                                            fill
-                                            sizes="120px"
-                                            className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
-                                        />
-                                    </span>{" "}
-                                    space &amp; form.<br className="hidden md:inline" />{" "}
-                                    Building bold digital worlds{" "}
-                                    <span
-                                        onClick={() => setActiveImage("/home/new2.png")}
-                                        className="group inline-flex relative align-middle -mt-1 mx-1 sm:mx-2 h-[0.9em] w-[1.4em] sm:h-[0.92em] sm:w-[1.48em] rounded-lg sm:rounded-xl overflow-hidden shadow-md border border-black/15 cursor-pointer transition-transform duration-300 hover:scale-110 hover:-rotate-2 active:scale-95"
-                                        title="Archive frame 03 - Analog light frequencies"
-                                    >
-                                        <Image
-                                            src="/home/new2.png"
-                                            alt="Archive frame 03 - Analog light frequencies"
-                                            fill
-                                            sizes="120px"
-                                            className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
-                                        />
-                                    </span>{" "}
-                                    with analog soul{" "}
-                                    <span
-                                        onClick={() => setActiveImage("/home/hero.png")}
-                                        className="group inline-flex relative align-middle -mt-1 mx-1 sm:mx-2 h-[0.9em] w-[1.4em] sm:h-[0.92em] sm:w-[1.48em] rounded-lg sm:rounded-xl overflow-hidden shadow-md border border-black/15 cursor-pointer transition-transform duration-300 hover:scale-110 hover:rotate-3 active:scale-95"
-                                        title="Curated spatial installation"
-                                    >
-                                        <Image
-                                            src="/home/hero.png"
-                                            alt="Curated spatial installation"
-                                            fill
-                                            sizes="120px"
-                                            className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
-                                        />
-                                    </span>{" "}
-                                    —<br className="hidden sm:inline" />{" "}
-                                    because who wants boring, right?
+                                    {/* Line 1 */}
+                                    <span className="block sm:whitespace-nowrap">
+                                        We&apos;re all about making chaotic
+                                    </span>
+
+                                    {/* Line 2 */}
+                                    <span className="block sm:whitespace-nowrap">
+                                        digital{" "}
+                                        <span
+                                            onClick={() => setActiveImage("/pre/1.png")}
+                                            className="group inline-flex relative align-middle -mt-1 mx-1 sm:mx-2 h-[0.9em] w-[1.4em] sm:h-[0.92em] sm:w-[1.48em] rounded-lg sm:rounded-xl overflow-hidden shadow-md border border-black/15 cursor-pointer transition-transform duration-300 hover:scale-110 hover:-rotate-3 active:scale-95"
+                                            title="Chaotic Digital"
+                                        >
+                                            <Image
+                                                src="/pre/1.png"
+                                                alt="Chaotic Digital"
+                                                fill
+                                                sizes="120px"
+                                                className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                                            />
+                                        </span>{" "}
+                                        stuff that actually
+                                    </span>
+
+                                    {/* Line 3 */}
+                                    <span className="block sm:whitespace-nowrap">
+                                        works for you.
+                                    </span>
+
+                                    {/* Line 4 */}
+                                    <span className="block sm:whitespace-nowrap">
+                                        And honestly, we like to keep
+                                    </span>
+
+                                    {/* Line 5 */}
+                                    <span className="block sm:whitespace-nowrap">
+                                        things{" "}
+                                        <span
+                                            onClick={() => setActiveImage("/pre/2.png")}
+                                            className="group inline-flex relative align-middle -mt-1 mx-1 sm:mx-2 h-[0.9em] w-[1.4em] sm:h-[0.92em] sm:w-[1.48em] rounded-lg sm:rounded-xl overflow-hidden shadow-md border border-black/15 cursor-pointer transition-transform duration-300 hover:scale-110 hover:rotate-3 active:scale-95"
+                                            title="Pink flame"
+                                        >
+                                            <Image
+                                                src="/pre/2.png"
+                                                alt="Pink flame"
+                                                fill
+                                                sizes="120px"
+                                                className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                                            />
+                                        </span>{" "}
+                                        light and reckless{" "}
+                                        <span
+                                            onClick={() => setActiveImage("/pre/3.png")}
+                                            className="group inline-flex relative align-middle -mt-1 mx-1 sm:mx-2 h-[0.9em] w-[1.4em] sm:h-[0.92em] sm:w-[1.48em] rounded-lg sm:rounded-xl overflow-hidden shadow-md border border-black/15 cursor-pointer transition-transform duration-300 hover:scale-110 hover:-rotate-2 active:scale-95"
+                                            title="Reckless fun"
+                                        >
+                                            <Image
+                                                src="/pre/3.png"
+                                                alt="Reckless fun"
+                                                fill
+                                                sizes="120px"
+                                                className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                                            />
+                                        </span>
+                                    </span>
+
+                                    {/* Line 6 */}
+                                    <span className="block sm:whitespace-nowrap">
+                                        fun—because who wants{" "}
+                                        <span
+                                            onClick={() => setActiveImage("/pre/4.png")}
+                                            className="group inline-flex relative align-middle -mt-1 mx-1 sm:mx-2 h-[0.9em] w-[1.4em] sm:h-[0.92em] sm:w-[1.48em] rounded-lg sm:rounded-xl overflow-hidden shadow-md border border-black/15 cursor-pointer transition-transform duration-300 hover:scale-110 hover:rotate-3 active:scale-95"
+                                            title="Who wants boring"
+                                        >
+                                            <Image
+                                                src="/pre/4.png"
+                                                alt="Who wants boring"
+                                                fill
+                                                sizes="120px"
+                                                className="object-cover object-center transition-transform duration-500 group-hover:scale-105"
+                                            />
+                                        </span>
+                                    </span>
+
+                                    {/* Line 7 */}
+                                    <span className="block sm:whitespace-nowrap">
+                                        boring, right?
+                                    </span>
                                 </>
                             )}
                         </h2>

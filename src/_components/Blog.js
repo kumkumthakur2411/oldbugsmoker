@@ -161,31 +161,37 @@ export default function Blog({
     return (
         <section
             id="blog-section"
-            className="relative w-full overflow-hidden bg-white/90 py-16 text-[#181818] sm:py-20 md:py-28"
+            className="relative w-full overflow-hidden bg-white text-[rgb(36,36,36)] font-['Outfit',sans-serif] pt-8 sm:pt-10 md:pt-12 pb-10 sm:pb-12 md:pb-14 select-none"
         >
-            <div className="mx-auto max-w-[1600px] px-5 sm:px-8 md:px-12 lg:px-16">
+            <div className="relative z-10 w-full px-1 sm:px-2 lg:px-3">
                 {/* Section header */}
-                <div className="">
-                    <div className="mb-10 flex flex-col gap-7 sm:mb-14 md:mb-16 md:flex-row md:items-end md:justify-between md:gap-10">
-                        <div className="max-w-[900px]">
-
-
-                            <h2 className="font-['Outfit'] text-[clamp(1.8rem,7vw,3.2rem)] font-semibold leading-[1.02] tracking-[-0.06em]">
-                                {headline || (
-                                    <>
-                                        At {brand}, design isn&apos;t just
-                                        decoration.
-                                        <span className="mt-1 block text-neutral-400">
-                                            It&apos;s a tool for connection.
-                                        </span>
-                                    </>
-                                )}
-                            </h2>
+                <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 pb-4 sm:pb-6 mb-5 sm:mb-6 md:mb-7">
+                    <div>
+                        <div className="flex items-center gap-2 mb-2">
+                            <span className="h-2 w-2 rounded-full bg-[#ff5a1f]" />
+                            <span className="font-mono text-[11px] sm:text-xs uppercase tracking-[0.22em] text-[rgb(36,36,36)]/60 font-semibold">
+                                JOURNAL // ESSAYS &amp; PERSPECTIVES
+                            </span>
                         </div>
+                        <h2 className="font-['Outfit'] text-[clamp(1.8rem,7vw,3.2rem)] font-semibold leading-[1.02] tracking-[-0.06em] text-[rgb(36,36,36)]">
+                            {headline || (
+                                <>
+                                    At {brand}, design isn&apos;t just decoration.
+                                    <br />
+                                    <span className="text-neutral-400">
+                                        It&apos;s a tool for connection.
+                                    </span>
+                                </>
+                            )}
+                        </h2>
+                    </div>
 
-                        <p className="max-w-[300px] text-sm leading-6 text-neutral-500 md:mb-1 md:text-[13px]">
-                            A closer look at the ideas, experiments, and
-                            details behind the work we create.
+                    <div className="sm:text-right shrink-0 max-w-[320px]">
+                        <p className="font-mono text-xs text-[rgb(36,36,36)]/50 uppercase tracking-widest">
+                            [ FIELD NOTES &amp; EXPERIMENTS ]
+                        </p>
+                        <p className="mt-1 text-xs sm:text-[13px] leading-5 text-neutral-500">
+                            A closer look at the ideas, experiments, and details behind the work we create.
                         </p>
                     </div>
                 </div>
@@ -209,7 +215,7 @@ export default function Blog({
                                         fill
                                         sizes="(max-width: 1024px) 50vw, 25vw"
                                         priority={index < 2}
-                                        className="object-cover"
+                                        className="object-cover grayscale brightness-[1.15] contrast-95"
                                     />
                                 </div>
 
@@ -273,7 +279,7 @@ export default function Blog({
                     <div
                         ref={mobileScrollRef}
                         onScroll={handleMobileScroll}
-                        className="-mx-5 flex snap-x snap-mandatory gap-4 overflow-x-auto px-5 pb-3 pt-1"
+                        className="flex snap-x snap-mandatory gap-4 overflow-x-auto pb-3 pt-1"
                         style={{
                             scrollbarWidth: "none",
                             msOverflowStyle: "none",
@@ -319,7 +325,7 @@ export default function Blog({
                                                 fill
                                                 sizes="82vw"
                                                 priority={index === 0}
-                                                className="object-cover"
+                                                className="object-cover grayscale brightness-[1.15] contrast-95"
                                             />
                                         </div>
 
@@ -392,12 +398,7 @@ export default function Blog({
 
 
                 </div>
-
-                {/* Bottom divider */}
-                <div className="mt-14  sm:mt-16 md:mt-20" />
             </div>
-
-
         </section>
     );
 }

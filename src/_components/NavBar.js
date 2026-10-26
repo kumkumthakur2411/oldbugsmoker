@@ -89,7 +89,7 @@ const Navbar = ({ isLoaded: propIsLoaded }) => {
         ref={navRef}
         className="pointer-events-none absolute top-0 left-0 right-0 z-40 w-full h-auto px-4 sm:px-8 
         md:px-14 lg:px-16 pt-4 sm:pt-6 md:pt-8 text-[10px] sm:text-[11px] font-semibold uppercase 
-        tracking-wide transition-colors duration-300 text-[#18181b]"
+        tracking-wide transition-colors duration-300 text-[rgb(36,36,36)]"
       >
         <div className="pointer-events-auto w-full max-w-[1400px] mx-auto flex items-start justify-between gap-2 sm:gap-4">
           <div className="text-[9.5px] sm:text-[11px] leading-[1.25]">

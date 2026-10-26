@@ -90,7 +90,8 @@ const SERVICES_DATA = [
 function ServiceCardItem({ i, service, total, progress, range, targetScale }) {
     // Dynamic scale as subsequent cards stack over this card
     const scale = useTransform(progress, range, [1, targetScale]);
-    const brightness = useTransform(progress, range, [1, Math.max(0.68, targetScale - 0.2)]);
+    // Dynamic overlay dimming as subsequent cards stack over this card (hardware accelerated)
+    const stackDimOpacity = useTransform(progress, range, [0, 0.4]);
 
     // Cascading top reveal: each card docks slightly lower showing top edge of previous cards
     const topOffset = `${i * 14}px`;
@@ -105,24 +106,29 @@ function ServiceCardItem({ i, service, total, progress, range, targetScale }) {
             <motion.div
                 style={{
                     scale,
-                    filter: `brightness(${brightness})`,
                     top: topOffset,
                 }}
-                className="card-inner pointer-events-auto relative h-[68svh] min-h-[440px] max-h-[740px] w-full overflow-hidden border-y border-neutral-200/80 bg-neutral-900 shadow-2xl shadow-black/30 sm:h-[560px] sm:min-h-[480px] sm:rounded-xl sm:border md:h-[620px] lg:h-[680px] lg:rounded-2xl xl:h-[720px]"
+                className="card-inner pointer-events-auto relative h-[68svh] min-h-[440px] max-h-[740px] w-full overflow-hidden border-y border-neutral-200/80 bg-neutral-900 shadow-2xl shadow-black/30 sm:h-[560px] sm:min-h-[480px] sm:rounded-xl sm:border md:h-[620px] lg:h-[680px] lg:rounded-2xl xl:h-[720px] will-change-transform transform-gpu"
             >
-                {/* Background Image: Lightweight WebP (~90KB) loaded with priority for instant rendering */}
+                {/* Background Image: Served unoptimized directly as lightweight WebP (~90KB) for instant zero-lag desktop rendering */}
                 <Image
                     src={service.src}
                     alt={service.alt}
                     fill
-                    sizes="100vw"
+                    unoptimized={true}
                     priority={true}
-                    loading="eager"
-                    className="object-cover object-center grayscale brightness-115 contrast-95 transition-transform duration-1000 ease-out group-hover:scale-[1.02]"
+                    sizes="100vw"
+                    className="object-cover object-center grayscale brightness-[1.15] contrast-95 transition-transform duration-1000 ease-out group-hover:scale-[1.02] pointer-events-none select-none"
                 />
 
-                {/* Dark overlay */}
-                <div className="absolute inset-0 z-10 bg-black/35 backdrop-blur-[0.5px]" />
+                {/* Base Dark Overlay */}
+                <div className="absolute inset-0 z-10 bg-black/40 pointer-events-none" />
+
+                {/* Stacking Dim Overlay: smoothly darkens underneath as subsequent cards stack */}
+                <motion.div
+                    style={{ opacity: stackDimOpacity }}
+                    className="absolute inset-0 z-15 bg-black pointer-events-none"
+                />
 
                 {/* Content Area */}
                 <div className="relative z-20 flex h-full w-full flex-col justify-between p-6 sm:p-9 md:p-12 lg:p-14 text-center items-center">
@@ -219,7 +225,7 @@ export default function Services() {
         <section
             id="services"
             ref={containerRef}
-            className="relative w-full bg-white text-black pt-4 pb-0 sm:pt-6 sm:pb-0"
+            className="relative w-full bg-white text-[rgb(36,36,36)] pt-4 pb-0 sm:pt-6 sm:pb-0"
         >
             {/* Stacking Cards Track: each card has an equal 100svh track in document flow */}
             <div className="relative w-full">

@@ -155,18 +155,18 @@ export default function Technologies() {
     return (
         <section
             id="technologies"
-            className="relative w-full bg-[#fbfbfb] text-[#0d0d0d] font-['Outfit',sans-serif] py-14 sm:py-20 md:py-24 overflow-hidden border-t border-black/10 select-none"
+            className="relative w-full bg-white text-[rgb(36,36,36)] font-['Outfit',sans-serif] pt-10 sm:pt-12 md:pt-14 pb-10 sm:pb-12 md:pb-14 overflow-hidden select-none"
         >
-            <div className="relative z-10 max-w-[1440px] mx-auto px-4 sm:px-8 md:px-12 lg:px-16 mb-8 sm:mb-12">
+            <div className="relative z-10 w-full px-1 sm:px-2 lg:px-3 mb-5 sm:mb-6 md:mb-7">
                 <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-4">
                     <div>
                         <div className="flex items-center gap-2 mb-2">
                             <span className="h-2 w-2 rounded-full bg-[#ff5a1f]" />
-                            <span className="font-mono text-[11px] sm:text-xs uppercase tracking-[0.22em] text-black/60 font-semibold">
+                            <span className="font-mono text-[11px] sm:text-xs uppercase tracking-[0.22em] text-[rgb(36,36,36)]/60 font-semibold">
                                 CORE ARCHITECTURE // ECOSYSTEM
                             </span>
                         </div>
-                        <h2 className="font-['Outfit'] text-[clamp(1.8rem,7vw,3.2rem)] font-semibold leading-[1.02] tracking-[-0.06em] text-black">
+                        <h2 className="font-['Outfit'] text-[clamp(1.8rem,7vw,3.2rem)] font-semibold leading-[1.02] tracking-[-0.06em] text-[rgb(36,36,36)]">
                             Technologies.
                             <br />
                             <span className="text-neutral-400">
@@ -175,7 +175,7 @@ export default function Technologies() {
                         </h2>
                     </div>
 
-                    <p className="font-mono text-xs text-black/50 uppercase tracking-widest sm:text-right">
+                    <p className="font-mono text-xs text-[rgb(36,36,36)]/50 uppercase tracking-widest sm:text-right">
                         [ BATTLE-TESTED MODERN STACK ]
                     </p>
                 </div>
@@ -184,8 +184,8 @@ export default function Technologies() {
             {/* Two-Row Infinite Marquee Container */}
             <div className="relative w-full overflow-hidden flex flex-col gap-3.5 sm:gap-4 md:gap-5 py-2">
                 {/* Soft gradient edge fade masks */}
-                <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-16 sm:w-32 lg:w-44 bg-gradient-to-r from-[#fbfbfb] via-[#fbfbfb]/90 to-transparent z-10" />
-                <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 sm:w-32 lg:w-44 bg-gradient-to-l from-[#fbfbfb] via-[#fbfbfb]/90 to-transparent z-10" />
+                <div className="pointer-events-none absolute left-0 top-0 bottom-0 w-16 sm:w-32 lg:w-44 bg-gradient-to-r from-white via-white/90 to-transparent z-10" />
+                <div className="pointer-events-none absolute right-0 top-0 bottom-0 w-16 sm:w-32 lg:w-44 bg-gradient-to-l from-white via-white/90 to-transparent z-10" />
 
                 {/* Row 1: Left to Right Marquee */}
                 <motion.div

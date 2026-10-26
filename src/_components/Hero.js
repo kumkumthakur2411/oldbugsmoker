@@ -191,7 +191,7 @@ export default function Hero() {
         <>
             <section
                 ref={heroRef}
-                className="relative isolate flex min-h-[100svh] w-full flex-col justify-end bg-white text-black"
+                className="relative isolate flex min-h-[100svh] w-full flex-col justify-end bg-white text-[rgb(36,36,36)]"
             >
                 {/* Heading and description */}
                 <div className="pointer-events-none relative z-30 w-full bg-transparent">
@@ -309,9 +309,10 @@ export default function Hero() {
                         src="/home/new1.png"
                         alt="Bugsmoker Hero Banner"
                         fill
+                        unoptimized={true}
                         priority
                         sizes="100vw"
-                        className="object-cover object-center grayscale brightness-115 contrast-95 transition-transform duration-1000 ease-out group-hover:scale-[1.02]"
+                        className="object-cover object-center grayscale brightness-[1.15] contrast-95 transition-transform duration-1000 ease-out group-hover:scale-[1.02]"
                     />
 
                     <div className="absolute inset-0 z-10 bg-black/35 backdrop-blur-[0.5px]" />

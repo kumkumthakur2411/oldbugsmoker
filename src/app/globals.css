@@ -3,7 +3,7 @@
 
 :root {
   --background: #ffffff;
-  --foreground: #111111;
+  --foreground: rgb(36, 36, 36);
   --font-outfit: "Outfit", sans-serif;
   --font-inter: "Inter", sans-serif;
 }
@@ -15,8 +15,13 @@
 
 body {
   background: var(--background);
-  color: var(--foreground);
+  color: rgb(36, 36, 36);
   font-family: var(--font-outfit), var(--font-inter), -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+}
+
+/* Ensure black text uses rgb(36, 36, 36) */
+.text-black {
+  color: rgb(36, 36, 36);
 }

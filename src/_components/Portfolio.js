@@ -1,10 +1,10 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import { motion, AnimatePresence } from "framer-motion";
-import { ArrowUpRight, X, Sparkles, Layers, Code2, MoveRight } from "lucide-react";
+import { motion, AnimatePresence, useScroll, useTransform } from "framer-motion";
+import { ArrowUpRight, X, Sparkles, Layers, Code2 } from "lucide-react";
 
 const PROJECTS_DATA = [
     {
@@ -66,152 +66,136 @@ const PROJECTS_DATA = [
 ];
 
 export default function Portfolio() {
-    const [activeId, setActiveId] = useState("01");
+    const sectionRef = useRef(null);
+    const trackRef = useRef(null);
     const [modalProject, setModalProject] = useState(null);
+    const [maxScroll, setMaxScroll] = useState(0);
+
+    // Dynamically calculate horizontal distance to slide
+    useEffect(() => {
+        const updateScrollDistance = () => {
+            if (trackRef.current) {
+                const totalWidth = trackRef.current.scrollWidth;
+                const windowWidth = window.innerWidth;
+                const rightPadding = windowWidth >= 1024 ? 24 : 16;
+                setMaxScroll(Math.max(0, totalWidth - windowWidth + rightPadding));
+            }
+        };
+
+        updateScrollDistance();
+        window.addEventListener("resize", updateScrollDistance);
+        const timer = setTimeout(updateScrollDistance, 300);
+        return () => {
+            window.removeEventListener("resize", updateScrollDistance);
+            clearTimeout(timer);
+        };
+    }, []);
+
+    // Link vertical scroll of pinned section to horizontal movement
+    const { scrollYProgress } = useScroll({
+        target: sectionRef,
+        offset: ["start start", "end end"],
+    });
+
+    const x = useTransform(scrollYProgress, [0, 1], [0, -maxScroll]);
 
     return (
         <section
             id="portfolio"
-            className="relative w-full bg-[#fbfbfb] text-[#0d0d0d] font-['Outfit',sans-serif] px-4 sm:px-8 md:px-12 lg:px-16 pt-14 sm:pt-16 md:pt-20 pb-14 sm:pb-20 md:pb-24 select-none overflow-hidden"
+            ref={sectionRef}
+            className="relative w-full h-[280vh] bg-white text-[rgb(36,36,36)] font-['Outfit',sans-serif] select-none"
         >
-            <div className="relative z-10 max-w-[1440px] mx-auto">
+            {/* Sticky Viewport Container */}
+            <div className="sticky top-0 h-screen w-full flex flex-col justify-center overflow-hidden py-4 sm:py-6">
                 {/* Header Section */}
-                <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 pb-6 sm:pb-8 mb-8 sm:mb-12 border-b border-black/10">
-                    <div>
-                        <div className="flex items-center gap-2 mb-2">
-                            <span className="h-2 w-2 rounded-full bg-[#ff5a1f] animate-pulse" />
-                            <span className="font-mono text-[11px] sm:text-xs uppercase tracking-[0.22em] text-black/60 font-semibold">
-                                PORTFOLIO // 04 SELECTED ARCHIVES
-                            </span>
+                <div className="relative z-10 w-full px-1 sm:px-2 lg:px-3 mb-5 sm:mb-6 md:mb-7">
+                    <div className="flex items-end justify-between gap-6">
+                        <div>
+                            <div className="flex items-center gap-2 mb-2">
+                                <span className="h-2 w-2 rounded-full bg-[#ff5a1f]" />
+                                <span className="font-mono text-[11px] sm:text-xs uppercase tracking-[0.22em] text-[rgb(36,36,36)]/60 font-semibold">
+                                    PORTFOLIO // SELECTED ARCHIVES
+                                </span>
+                            </div>
+                            <h2 className="font-['Outfit'] text-[clamp(1.8rem,7vw,3.2rem)] font-semibold leading-[1.02] tracking-[-0.06em] text-[rgb(36,36,36)]">
+                                Work that alters.
+                                <br />
+                                <span className="text-neutral-400">
+                                    Perception.
+                                </span>
+                            </h2>
                         </div>
-                        <h2 className="font-['Outfit'] text-[clamp(1.8rem,7vw,3.2rem)] font-semibold leading-[1.02] tracking-[-0.06em] text-black">
-                            Work that alters.
-                            <br />
-                            <span className="text-neutral-400">
-                                Perception.
-                            </span>
-                        </h2>
+
+                        {/* View All Button on Top Right */}
+                        <div>
+                            <Link
+                                href="/portfolio"
+                                className="group inline-flex cursor-pointer select-none items-center justify-center gap-2 rounded-full border border-black/20 bg-white px-5 py-2.5 sm:px-6 sm:py-3 text-xs sm:text-sm font-semibold tracking-wide text-black shadow-xs transition-all duration-300 hover:bg-[#ff5a1f] hover:border-[#ff5a1f] hover:text-white hover:shadow-md hover:shadow-[#ff5a1f]/20 active:scale-95"
+                            >
+                                <span className="transition-colors">View All</span>
+                                <ArrowUpRight
+                                    size={15}
+                                    strokeWidth={2.2}
+                                    className="text-black transition-all duration-200 group-hover:text-white group-hover:-translate-y-0.5 group-hover:translate-x-0.5"
+                                />
+                            </Link>
+                        </div>
                     </div>
-
-
                 </div>
 
-                {/* ============================================================== */}
-                {/* HORIZONTAL EXPANDING ACCORDION CARDS SLIDER                     */}
-                {/* ============================================================== */}
-                <div className="flex gap-2.5 sm:gap-4 md:gap-5 w-full h-[460px] sm:h-[500px] md:h-[540px] lg:h-[560px] items-stretch">
-                    {PROJECTS_DATA.map((project) => {
-                        const isActive = activeId === project.id;
-
-                        return (
-                            <motion.div
+                {/* Horizontal Sliding Cards Track */}
+                <div className="w-full relative overflow-hidden">
+                    <motion.div
+                        ref={trackRef}
+                        style={{ x }}
+                        className="flex gap-5 sm:gap-6 px-1 sm:px-2 lg:px-3 will-change-transform"
+                    >
+                        {PROJECTS_DATA.map((project, idx) => (
+                            <div
                                 key={project.id}
-                                layout
-                                onClick={() => setActiveId(project.id)}
-                                onMouseEnter={() => setActiveId(project.id)}
-                                transition={{ duration: 0.6, ease: [0.25, 1, 0.5, 1] }}
-                                className={`relative rounded-2xl sm:rounded-3xl md:rounded-[28px] overflow-hidden cursor-pointer shadow-[0_8px_30px_rgba(0,0,0,0.08)] border border-black/10 transition-all duration-500 ${
-                                    isActive
-                                        ? "flex-[4] sm:flex-[4.5] md:flex-[5] shadow-[0_16px_40px_rgba(0,0,0,0.18)]"
-                                        : "flex-1 hover:brightness-105"
-                                }`}
+                                onClick={() => setModalProject(project)}
+                                className="flex-shrink-0 relative w-[86vw] sm:w-[70vw] md:w-[58vw] lg:w-[50vw] xl:w-[740px] 2xl:w-[800px] h-[460px] sm:h-[500px] md:h-[540px] lg:h-[560px] max-h-[62vh] rounded-xl sm:rounded-xl lg:rounded-2xl overflow-hidden group shadow-[0_12px_40px_rgba(0,0,0,0.08)] border border-black/10 select-none bg-neutral-900 cursor-pointer"
                             >
-                                {/* Background Image with zoom on active */}
+                                {/* Monochrome Background Image with Zoom on Hover */}
                                 <Image
                                     src={project.image}
                                     alt={project.title}
                                     fill
-                                    sizes="(max-width: 768px) 100vw, 800px"
-                                    className={`object-cover object-center transition-all duration-700 ease-out ${
-                                        isActive
-                                            ? "scale-105 brightness-100 contrast-[1.04]"
-                                            : "scale-100 grayscale-[40%] brightness-90 hover:grayscale-0"
-                                    }`}
+                                    unoptimized={true}
+                                    sizes="(max-width: 768px) 90vw, 800px"
+                                    className="object-cover object-center grayscale brightness-[1.15] contrast-95 transition-transform duration-700 ease-out group-hover:scale-105 pointer-events-none"
                                 />
 
-                                {/* Subtle Dark Vignette & Overlays */}
-                                <div
-                                    className={`absolute inset-0 transition-opacity duration-500 ${
-                                        isActive
-                                            ? "bg-gradient-to-t from-black/85 via-black/20 to-transparent"
-                                            : "bg-black/35 hover:bg-black/20"
-                                    }`}
-                                />
+                                {/* Deep Cinematic Vignette */}
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-transparent transition-opacity duration-500 group-hover:from-black/95 pointer-events-none" />
 
-                                {/* ========================================================== */}
-                                {/* COLLAPSED SLAT VIEW (Slender pillar with vertical rotated title) */}
-                                {/* ========================================================== */}
-                                {!isActive && (
-                                    <div className="absolute inset-0 flex flex-col justify-between items-center py-6 sm:py-8 px-2 pointer-events-none">
-                                        {/* Top Index Number */}
-                                        <span className="font-mono text-xs sm:text-sm font-bold text-white/80 bg-black/40 backdrop-blur-md px-2 py-1 rounded-full border border-white/10">
-                                            {project.id}
-                                        </span>
+                                {/* Top Bar on Card */}
+                                <div className="absolute top-0 left-0 right-0 p-5 sm:p-7 flex items-center justify-between pointer-events-none z-10">
+                                    <span className="font-mono text-xs uppercase tracking-widest text-white/70">
+                                        CASE 0{idx + 1}
+                                    </span>
 
-                                        {/* Vertical Rotated Project Title */}
-                                        <div className="my-auto [writing-mode:vertical-rl] rotate-180 flex items-center justify-center">
-                                            <span className="text-sm sm:text-base font-bold uppercase tracking-widest text-white whitespace-nowrap">
-                                                {project.title}
-                                            </span>
-                                        </div>
+                                    <span className="px-3.5 py-1.5 rounded-full bg-white/95 backdrop-blur-md text-xs font-mono font-bold text-black shadow-md">
+                                        {project.id} / 04
+                                    </span>
+                                </div>
 
-                                        {/* Bottom Arrow Indicator */}
-                                        <div className="h-7 w-7 rounded-full bg-white/20 backdrop-blur-md flex items-center justify-center text-white">
-                                            <ArrowUpRight size={14} />
-                                        </div>
-                                    </div>
-                                )}
+                                {/* Bottom Content Area */}
+                                <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-8 z-10 flex flex-col justify-end text-white pointer-events-none">
+                                    <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-white leading-tight drop-shadow-md">
+                                        {project.title}
+                                    </h3>
 
-                                {/* ========================================================== */}
-                                {/* EXPANDED ACTIVE CARD CONTENT (Glassmorphic bottom overlay) */}
-                                {/* ========================================================== */}
-                                <AnimatePresence>
-                                    {isActive && (
-                                        <motion.div
-                                            initial={{ opacity: 0, y: 20 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            exit={{ opacity: 0, y: 15 }}
-                                            transition={{ duration: 0.45, delay: 0.1 }}
-                                            className="absolute inset-0 flex flex-col justify-between p-4 sm:p-6 md:p-8"
-                                        >
-                                            {/* Top Bar on Active Card */}
-                                            <div className="flex items-center justify-between">
-                                                <span className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-black/60 backdrop-blur-md text-xs font-mono uppercase tracking-wider text-white border border-white/15 shadow-md">
-                                                    <span className="h-1.5 w-1.5 rounded-full bg-[#ff5a1f]" />
-                                                    <span>{project.category}</span>
-                                                </span>
-
-                                                <span className="px-3 py-1 rounded-full bg-white/95 backdrop-blur-md text-xs font-mono font-bold text-black shadow-md">
-                                                    {project.id} / 04
-                                                </span>
-                                            </div>
-
-                                            {/* Bottom Floating Glassmorphism Card */}
-                                            <div className="rounded-xl sm:rounded-2xl bg-black/65 backdrop-blur-md border border-white/20 p-4 sm:p-6 text-white shadow-2xl">
-                                                <div className="flex items-center gap-2 text-xs font-mono uppercase tracking-wider text-white/65 mb-1.5">
-                                                    <span>{project.client}</span>
-                                                    <span>•</span>
-                                                    <span>{project.metrics}</span>
-                                                </div>
-
-                                                <h3 className="text-2xl sm:text-3xl md:text-4xl font-bold tracking-tight text-white leading-tight">
-                                                    {project.title}
-                                                </h3>
-
-                                                <p className="mt-2 text-xs sm:text-sm text-white/80 line-clamp-2 leading-relaxed max-w-2xl">
-                                                    {project.tagline}
-                                                </p>
-                                            </div>
-                                        </motion.div>
-                                    )}
-                                </AnimatePresence>
-                            </motion.div>
-                        );
-                    })}
+                                    <p className="mt-2 text-xs sm:text-sm md:text-base text-white/85 line-clamp-2 leading-relaxed max-w-xl drop-shadow">
+                                        {project.tagline}
+                                    </p>
+                                </div>
+                            </div>
+                        ))}
+                    </motion.div>
                 </div>
-
-
             </div>
+
 
             {/* ============================================================== */}
             {/* FULLSCREEN CASE STUDY MODAL                                    */}
@@ -261,7 +245,8 @@ export default function Portfolio() {
                                         src={modalProject.image}
                                         alt={modalProject.title}
                                         fill
-                                        className="object-cover"
+                                        unoptimized={true}
+                                        className="object-cover grayscale brightness-[1.15] contrast-95"
                                         priority
                                     />
                                     <div className="absolute top-3 left-3">

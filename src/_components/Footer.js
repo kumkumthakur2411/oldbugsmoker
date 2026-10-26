@@ -126,27 +126,27 @@ function FooterLinks({ title, links }) {
 
 export default function Footer() {
     return (
-        <footer className="relative isolate overflow-hidden bg-[#171b13] text-white">
+        <footer className="relative isolate overflow-hidden bg-black text-white">
             {/* Background */}
             <div
-                className="absolute inset-0 -z-20 bg-cover bg-center bg-no-repeat"
+                className="absolute inset-0 -z-20 bg-cover bg-center bg-no-repeat grayscale brightness-90 contrast-110"
                 style={{ backgroundImage: "url('/footer.png')" }}
             />
 
-            <div className="absolute inset-0 -z-10 bg-gradient-to-r from-[#10130f]/85 via-[#10130f]/65 to-[#10130f]/40" />
+            <div className="absolute inset-0 -z-10 bg-gradient-to-r from-black/85 via-black/65 to-black/45" />
 
-            <div className="absolute inset-x-0 bottom-0 -z-10 h-[75%] bg-gradient-to-t from-[#10130f]/90 via-[#10130f]/35 to-transparent" />
+            <div className="absolute inset-x-0 bottom-0 -z-10 h-[75%] bg-gradient-to-t from-black/95 via-black/40 to-transparent" />
 
-            <div className="mx-auto flex min-h-[680px] max-w-[1800px] flex-col justify-between px-6 pb-6 pt-12 sm:px-10 sm:pt-16 lg:min-h-[760px] lg:px-16 lg:pt-20">
+            <div className="mx-auto flex min-h-[580px] max-w-[1800px] flex-col justify-between px-4 sm:px-8 lg:px-12 pt-10 sm:pt-12 md:pt-14 pb-6 sm:pb-8">
                 {/* Desktop + Mobile Brand */}
-                <div className="grid grid-cols-1 gap-10 pt-8 sm:pt-12 lg:grid-cols-12 lg:gap-8 lg:pt-20">
+                <div className="grid grid-cols-1 gap-10 lg:grid-cols-12 lg:gap-8">
                     <div className="lg:col-span-5">
                         <Link
                             href="/"
                             aria-label="Bugsmoker home"
                             className="inline-block"
                         >
-                            <span className="block text-[clamp(2.8rem,6vw,7.5rem)] font-bold leading-[0.8] tracking-[-0.085em] text-[#f5f1df]">
+                            <span className="block text-[clamp(2.8rem,6vw,7.5rem)] font-bold leading-[0.8] tracking-[-0.085em] text-white">
                                 bugsmoker
                             </span>
                         </Link>
