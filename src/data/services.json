@@ -1,0 +1,1066 @@
+{
+  "services": {
+    "web-development": {
+      "id": "web-development",
+      "slug": "web-development",
+      "metadata": {
+        "title": "Web Development | Bugsmoker",
+        "description": "We craft high-performance, bespoke websites and scalable web applications engineered to elevate your brand."
+      },
+      "hero": {
+        "title": "web <br /> development",
+        "titlePlain": "Web Development",
+        "image": "/home/1.png",
+        "imageAlt": "Web Development - Bugsmoker",
+        "description": "We craft high-performance, bespoke websites and scalable web applications engineered to elevate your brand. From fluid interactive animations to robust full-stack engineering and search optimization, we transform complex technical challenges into seamless digital experiences that captivate modern audiences, accelerate user engagement, and drive measurable, sustainable commercial growth for your company."
+      },
+      "featured": {
+        "heading": "What we build under web development",
+        "subheading": "Four things we do every week. Scroll sideways through them.",
+        "items": [
+          {
+            "title": "Bespoke websites",
+            "text": "Designed from a blank page around your brand, never a template.",
+            "img": "/home/1.png",
+            "pos": "center top"
+          },
+          {
+            "title": "Web applications",
+            "text": "Dashboards, portals and tools that stay fast as your users grow.",
+            "img": "/home/new1.png",
+            "pos": "center"
+          },
+          {
+            "title": "Interactive animation",
+            "text": "Scroll, motion and micro-interactions that guide people forward.",
+            "img": "/home/mos.png",
+            "pos": "left center"
+          },
+          {
+            "title": "Search optimization",
+            "text": "Clean markup and quick pages that search engines reward.",
+            "img": "/home/3.png",
+            "pos": "center bottom"
+          }
+        ]
+      },
+      "content": {
+        "quote": "A website is the first conversation you have with a customer. We make sure it is fast, memorable and impossible to scroll past without feeling something.",
+        "image": "/home/new1.png",
+        "imageAlt": "Bugsmoker web development work",
+        "stats": [
+          {
+            "value": 60,
+            "suffix": "+",
+            "label": "sites and apps shipped"
+          },
+          {
+            "value": 98,
+            "suffix": "",
+            "label": "average Lighthouse score"
+          },
+          {
+            "value": 3,
+            "suffix": "x",
+            "label": "typical lift in engagement"
+          }
+        ]
+      },
+      "problem": {
+        "heading": "Most websites quietly lose people.",
+        "items": [
+          {
+            "title": "Your site loads slowly",
+            "text": "Visitors leave before the first screen finishes painting."
+          },
+          {
+            "title": "It looks like everyone else",
+            "text": "A recycled template makes your brand easy to forget."
+          },
+          {
+            "title": "It breaks on phones",
+            "text": "Most of your traffic arrives on a small screen and gets a bad one."
+          },
+          {
+            "title": "Nobody can find it",
+            "text": "Good work stays hidden when search engines can't read it."
+          }
+        ]
+      },
+      "solution": {
+        "heading": "So we fix them at the root.",
+        "subheading": "Each problem above has a matching answer in how we plan, design and build.",
+        "image": "/home/mos.png",
+        "imageAlt": "Bugsmoker web solution",
+        "items": [
+          {
+            "fixes": "Slow loading",
+            "title": "Performance built in from day one",
+            "text": "Optimized images, lean code and server rendering keep every page quick on any connection."
+          },
+          {
+            "fixes": "Generic look",
+            "title": "A design made only for you",
+            "text": "We start from your story and your audience, then build the interface and motion around it."
+          },
+          {
+            "fixes": "Broken on phones",
+            "title": "Designed for the smallest screen first",
+            "text": "Every layout is tested on real devices before it reaches a laptop."
+          },
+          {
+            "fixes": "Hard to find",
+            "title": "Search-ready structure",
+            "text": "Semantic markup, fast pages and clear metadata give you a solid base to rank from."
+          }
+        ]
+      },
+      "paragraphs": {
+        "heading": "Content and SEO that works together",
+        "items": [
+          {
+            "title": "Built to be found",
+            "text": "A beautiful website only works if people can find it. We plan keywords, page structure and internal links before design begins, so every page has a clear job and a clear audience searching for it."
+          },
+          {
+            "title": "Content that earns attention",
+            "text": "Search engines reward pages that answer real questions. We write and structure content around what your customers actually ask, in plain language, with headings and summaries that make answers easy to scan."
+          },
+          {
+            "title": "Speed is a ranking signal",
+            "text": "Slow pages lose visitors and rankings. We compress media, split code and render on the server, aiming for strong Core Web Vitals so your site feels instant on both fast and slow connections."
+          },
+          {
+            "title": "Structure search engines can read",
+            "text": "Clean semantic HTML, descriptive metadata, structured data and sensible URLs help crawlers understand each page. It also makes your site more accessible to people using assistive technology."
+          },
+          {
+            "title": "Mobile-first, always",
+            "text": "Most searches now happen on phones, and search engines index the mobile version first. Every layout we build is designed and tested on small screens before it is scaled up to desktop."
+          },
+          {
+            "title": "Measured, then improved",
+            "text": "Launch is the start of the work. We set up analytics and search tracking, watch what visitors do, and refine pages over time so traffic and enquiries keep growing instead of flattening out."
+          }
+        ]
+      },
+      "faq": {
+        "heading": "Questions we hear a lot",
+        "subheading": "Don't see yours? Tell us about your project and we'll answer it directly.",
+        "contactButtonText": "Contact Us",
+        "contactButtonHref": "#contact",
+        "items": [
+          {
+            "q": "How long does a web development project take?",
+            "a": "A focused marketing site usually takes three to five weeks. Larger web applications run eight to sixteen weeks, depending on features and integrations. You get a timeline before we start."
+          },
+          {
+            "q": "What technologies do you use?",
+            "a": "We build with Next.js and React, animate with GSAP, and pair them with the backend and database that suit your product. We pick tools for the job, not for trends."
+          },
+          {
+            "q": "Will my website work well on mobile?",
+            "a": "Yes. We design and test for phones and tablets first, then scale up to desktop."
+          },
+          {
+            "q": "Do you handle SEO and performance?",
+            "a": "Both are part of every build: clean structure, optimized media, metadata and speed checks before launch."
+          },
+          {
+            "q": "Can you redesign or extend my existing site?",
+            "a": "Yes. We can refresh the design, rebuild it on a faster stack, or add new features to what you already have."
+          },
+          {
+            "q": "What happens after launch?",
+            "a": "We stay on for support and improvements. You can choose a maintenance plan or hand off with full documentation."
+          }
+        ]
+      }
+    },
+    "app-development": {
+      "id": "app-development",
+      "slug": "app-development",
+      "metadata": {
+        "title": "App Development | Bugsmoker",
+        "description": "High-performance iOS and Android mobile apps engineered for fluid 60fps gestures, offline resilience, and seamless scalability."
+      },
+      "hero": {
+        "title": "app <br /> development",
+        "titlePlain": "App Development",
+        "image": "/home/2.png",
+        "imageAlt": "App Development - Bugsmoker",
+        "description": "We build high-performance mobile applications that users love keeping on their home screens. From instant touch responsiveness and offline-first data synchronization to seamless biometric authentication and frictionless checkout flows, our mobile engineers turn ambitious app concepts into buttery-smooth native experiences across iOS and Android."
+      },
+      "featured": {
+        "heading": "What we build under app development",
+        "subheading": "Native and cross-platform mobile products built for retention. Scroll sideways.",
+        "items": [
+          {
+            "title": "iOS & Android Apps",
+            "text": "Cross-platform mobile apps with Flutter and React Native that feel pure native.",
+            "img": "/home/2.png",
+            "pos": "center top"
+          },
+          {
+            "title": "Offline-First Sync",
+            "text": "Local caching and background sync engines so the app works anywhere without signal.",
+            "img": "/home/new2.png",
+            "pos": "center"
+          },
+          {
+            "title": "Micro-Interactions & Haptics",
+            "text": "Tactile feedback, custom spring physics, and fluid gestures that make interactions physical.",
+            "img": "/home/mos.png",
+            "pos": "left center"
+          },
+          {
+            "title": "App Store Launch & ASO",
+            "text": "End-to-end guidance through Apple and Google submission, review policies, and rankings.",
+            "img": "/home/new4.png",
+            "pos": "center bottom"
+          }
+        ]
+      },
+      "content": {
+        "quote": "An app lives directly in your customer's pocket. It must launch in a heartbeat, respect battery life, and make every single tap feel completely effortless.",
+        "image": "/home/new2.png",
+        "imageAlt": "Bugsmoker mobile app engineering",
+        "stats": [
+          {
+            "value": 45,
+            "suffix": "+",
+            "label": "apps deployed to stores"
+          },
+          {
+            "value": 99,
+            "suffix": ".8%",
+            "label": "crash-free session rate"
+          },
+          {
+            "value": 60,
+            "suffix": "fps",
+            "label": "fluid rendering performance"
+          }
+        ]
+      },
+      "problem": {
+        "heading": "Most mobile apps get deleted within days.",
+        "items": [
+          {
+            "title": "Sluggish stutter and jank",
+            "text": "Dropped animation frames and unresponsive buttons immediately drive users away."
+          },
+          {
+            "title": "Battery and cellular drain",
+            "text": "Unoptimized polling, background runaway threads, and bloated asset bundles drain phones quickly."
+          },
+          {
+            "title": "App store rejection loops",
+            "text": "Opaque guideline rejections, missing privacy declarations, and metadata mistakes delay launch for months."
+          },
+          {
+            "title": "Broken offline experience",
+            "text": "The app freezes or throws unhandled error dialogues the second users lose Wi-Fi or cellular reception."
+          }
+        ]
+      },
+      "solution": {
+        "heading": "Engineered for high retention.",
+        "subheading": "We design and build mobile apps that are resilient, tactile, and deeply integrated with hardware.",
+        "image": "/home/servicebg.png",
+        "imageAlt": "Mobile app architecture solutions",
+        "items": [
+          {
+            "fixes": "Sluggish stutter",
+            "title": "60 FPS native rendering pipelines",
+            "text": "We offload expensive calculations from the UI thread so transitions and gestures remain locked at silky 60fps."
+          },
+          {
+            "fixes": "Battery drain",
+            "title": "Smart delta sync and silent push",
+            "text": "We fetch only differential data changes and coordinate background jobs when the device is idle or charging."
+          },
+          {
+            "fixes": "Store rejections",
+            "title": "Strict compliance by design",
+            "text": "We audit store guidelines, accessibility criteria, and privacy manifests before submitting the very first release build."
+          },
+          {
+            "fixes": "Offline failures",
+            "title": "Local SQLite caching with offline queue",
+            "text": "Users can browse and take actions offline; mutations persist locally and reconcile seamlessly upon reconnection."
+          }
+        ]
+      },
+      "paragraphs": {
+        "heading": "Mobile craft from blueprint to store release",
+        "items": [
+          {
+            "title": "Modular clean architecture",
+            "text": "We decouple business logic, state management, and visual components into clean, testable layers. This ensures features can be added, refactored, or swapped without triggering unintended regressions across the app."
+          },
+          {
+            "title": "Gestures tuned to physics",
+            "text": "Touch screens require instant sensory confirmation. We tune interactive drag cards, velocity-based spring dismissals, and subtle haptics so every touch feels satisfyingly tangible and native to the platform."
+          },
+          {
+            "title": "Hardware security and biometrics",
+            "text": "We leverage Apple's Secure Enclave and Android Keystore for cryptographic key storage, paired with biometric Face ID and fingerprint authentication to safeguard personal user data against device interception."
+          },
+          {
+            "title": "Automated CI/CD build distribution",
+            "text": "Every pull request triggers automated unit testing and end-to-end device simulations, generating signed staging builds dispatched directly to your team's TestFlight and Google Play Internal testing groups."
+          },
+          {
+            "title": "Deep platform hardware integration",
+            "text": "From dynamic lock-screen widgets and interactive rich push notifications to background Bluetooth beacons and camera processing, we utilize the full hardware capabilities of modern smartphones."
+          },
+          {
+            "title": "Real-time telemetry and APM",
+            "text": "Detailed crash tracking, breadcrumb telemetry, and user journey analytics allow our engineers to identify and resolve edge-case bugs and dropped frames before users ever report a support ticket."
+          }
+        ]
+      },
+      "faq": {
+        "heading": "Questions about mobile apps",
+        "subheading": "Everything you need to know about building, publishing, and maintaining mobile software.",
+        "contactButtonText": "Contact Us",
+        "contactButtonHref": "#contact",
+        "items": [
+          {
+            "q": "Do you build native apps or cross-platform apps?",
+            "a": "We build primarily with Flutter and React Native because they deliver native 60fps performance from a single codebase, saving you up to 40% in cost. When specialized hardware demands it, we write native Swift or Kotlin modules."
+          },
+          {
+            "q": "How do you handle App Store and Google Play approvals?",
+            "a": "We handle the entire submission journey: developer account setup, bundle identifiers, privacy manifests, rating certificates, review submissions, and direct resolution of Apple or Google feedback."
+          },
+          {
+            "q": "Can our app function when users lose internet?",
+            "a": "Yes. We design with an offline-first architecture using local SQLite or Realm databases that queue updates and seamlessly reconcile state when connectivity returns."
+          },
+          {
+            "q": "How long does it take to develop a custom app?",
+            "a": "A refined MVP typically takes six to ten weeks from design to store submission. Complex enterprise applications with custom backend integrations typically run twelve to twenty weeks."
+          },
+          {
+            "q": "Can you connect the app to our existing web platform or API?",
+            "a": "Absolutely. We integrate with RESTful services, GraphQL endpoints, Supabase, Firebase, and existing bespoke legacy ERP or CRM backends."
+          },
+          {
+            "q": "Who owns the source code and app store accounts?",
+            "a": "You retain 100% full intellectual property and source code ownership, and all apps are published under your company's own official Apple and Google developer accounts."
+          }
+        ]
+      }
+    },
+    "software-development": {
+      "id": "software-development",
+      "slug": "software-development",
+      "metadata": {
+        "title": "Software Development | Bugsmoker",
+        "description": "Enterprise-grade custom software, distributed microservices, scalable cloud APIs, and internal workflow automation platforms."
+      },
+      "hero": {
+        "title": "software <br /> development",
+        "titlePlain": "Software Development",
+        "image": "/home/2.png",
+        "imageAlt": "Software Development - Bugsmoker",
+        "description": "We engineer robust custom software systems, scalable microservices, and mission-critical enterprise platforms built to withstand exponential scale. From complex data processing pipelines and distributed architectures to custom internal tooling and secure third-party integrations, we turn convoluted business workflows into dependable, high-efficiency software engines."
+      },
+      "featured": {
+        "heading": "What we build under software development",
+        "subheading": "Scalable backends, enterprise systems, and custom automation engines. Scroll sideways.",
+        "items": [
+          {
+            "title": "Custom Enterprise SaaS",
+            "text": "Multi-tenant platforms with role-based access control, billing engines, and auditing.",
+            "img": "/home/2.png",
+            "pos": "center top"
+          },
+          {
+            "title": "Distributed Cloud APIs",
+            "text": "High-throughput REST and GraphQL microservices that scale effortlessly under heavy load.",
+            "img": "/home/new1.png",
+            "pos": "center"
+          },
+          {
+            "title": "Workflow Automation Engines",
+            "text": "Custom internal tools and data pipelines that eliminate repetitive manual spreadsheets.",
+            "img": "/home/3.png",
+            "pos": "left center"
+          },
+          {
+            "title": "Legacy Modernization",
+            "text": "Refactoring fragile legacy codebases into modular, test-covered cloud-native services.",
+            "img": "/home/4.png",
+            "pos": "center bottom"
+          }
+        ]
+      },
+      "content": {
+        "quote": "Great software does not just solve a problem today; it creates an architectural foundation that empowers your business to scale ten times larger without breaking.",
+        "image": "/home/new4.png",
+        "imageAlt": "Enterprise software engineering",
+        "stats": [
+          {
+            "value": 120,
+            "suffix": "M+",
+            "label": "monthly API requests served"
+          },
+          {
+            "value": 99,
+            "suffix": ".99%",
+            "label": "system uptime delivered"
+          },
+          {
+            "value": 4,
+            "suffix": "x",
+            "label": "average operational speedup"
+          }
+        ]
+      },
+      "problem": {
+        "heading": "Spaghetti code and brittle architectures hold companies back.",
+        "items": [
+          {
+            "title": "Technical debt bottlenecks",
+            "text": "Shipping a simple feature takes weeks because code is tangled, unverified, and terrifying to touch."
+          },
+          {
+            "title": "Database crashes under load",
+            "text": "Unindexed queries, memory leaks, and connection limits freeze servers during peak business hours."
+          },
+          {
+            "title": "Security and compliance vulnerabilities",
+            "text": "Outdated packages, unencrypted secrets, and flawed authorization logic leave critical customer data exposed."
+          },
+          {
+            "title": "Siloed data and manual work",
+            "text": "Employees spend hours copying CSVs and manually coordinating disconnected third-party software tools."
+          }
+        ]
+      },
+      "solution": {
+        "heading": "Engineered for scale, speed, and safety.",
+        "subheading": "We build clean, test-driven systems that your engineers love maintaining and your business can rely on.",
+        "image": "/home/mos.png",
+        "imageAlt": "Custom software development solutions",
+        "items": [
+          {
+            "fixes": "Technical debt",
+            "title": "Domain-driven modular code",
+            "text": "Strict domain boundaries, automated test suites, and clean documentation make ongoing feature evolution safe and fast."
+          },
+          {
+            "fixes": "Database crashes",
+            "title": "High-efficiency query and cache design",
+            "text": "Connection pooling, Redis caching layers, and optimized database indexes allow backends to effortlessly swallow traffic spikes."
+          },
+          {
+            "fixes": "Security risks",
+            "title": "Zero-trust architecture and audit logs",
+            "text": "Granular role-based access control, automated vulnerability scanning, encrypted data-at-rest, and complete audit trails."
+          },
+          {
+            "fixes": "Siloed data",
+            "title": "Event-driven asynchronous pipelines",
+            "text": "Message queues coordinate real-time data flow between your payment gateways, CRM, inventory, and analytics systems."
+          }
+        ]
+      },
+      "paragraphs": {
+        "heading": "Engineering standards built for enterprise scale",
+        "items": [
+          {
+            "title": "Domain-Driven Design (DDD)",
+            "text": "We model your software around real-world business domains. By speaking the same ubiquitous language as your operations team, we eliminate misunderstandings and ensure code reflects actual operational workflows."
+          },
+          {
+            "title": "Test-driven reliability",
+            "text": "Every mission-critical transaction, calculation, and API call is covered by automated regression suites. Code is continuously verified so updates deploy to production without fear of downtime."
+          },
+          {
+            "title": "Resilient distributed architecture",
+            "text": "We embrace fault tolerance by designing microservices with circuit breakers, retry queues, and graceful degradation so a failure in one service never brings down your entire company."
+          },
+          {
+            "title": "API first and typed contracts",
+            "text": "Whether building internal microservices or public developer APIs, we deliver type-safe contracts with OpenAPI and TypeScript, providing self-documenting endpoints that reduce team friction."
+          },
+          {
+            "title": "Infrastructure as Code (IaC)",
+            "text": "We codify your servers, containers, networks, and databases using Terraform and Docker. Environments are reproducible in minutes with zero configuration drift."
+          },
+          {
+            "title": "Observability and deep telemetry",
+            "text": "Structured JSON logs, distributed request tracing, and OpenTelemetry instrumentation give you deep visibility into every millisecond of system execution across your entire stack."
+          }
+        ]
+      },
+      "faq": {
+        "heading": "Questions about software development",
+        "subheading": "Answers about our architecture, engineering practices, and delivery process.",
+        "contactButtonText": "Contact Us",
+        "contactButtonHref": "#contact",
+        "items": [
+          {
+            "q": "What programming languages and stacks do you specialize in?",
+            "a": "We build robust systems using Node.js/TypeScript, Python, Go, and Rust on the backend, paired with PostgreSQL, Redis, and message queues on AWS, GCP, or bare-metal Kubernetes."
+          },
+          {
+            "q": "Can you modernize our existing legacy monolithic software?",
+            "a": "Yes. We employ the Strangler Fig pattern to progressively migrate critical services off legacy systems into clean, modern architectures without halting your daily business operations."
+          },
+          {
+            "q": "How do you ensure data security and compliance?",
+            "a": "We enforce SOC2 and GDPR best practices: end-to-end data encryption, strict role-based access control (RBAC), sanitized database inputs, and regular automated penetration testing."
+          },
+          {
+            "q": "How are code changes tested and deployed?",
+            "a": "We set up automated CI/CD pipelines with GitHub Actions or GitLab CI. Every change passes linting, unit tests, integration tests, and security scans before hitting zero-downtime deployment stages."
+          },
+          {
+            "q": "Can you integrate with our third-party ERP, CRM, and payment gateways?",
+            "a": "Yes. We regularly build custom connectors for Stripe, Salesforce, SAP, QuickBooks, Shopify, HubSpot, and bespoke legacy internal databases."
+          },
+          {
+            "q": "What kind of ongoing support do you offer for custom software?",
+            "a": "We offer dedicated SLA support tiers providing 24/7 incident response, scheduled security patching, database optimization, and continuous feature roadmapping."
+          }
+        ]
+      }
+    },
+    "hosting-and-tech-support": {
+      "id": "hosting-and-tech-support",
+      "slug": "hosting-and-tech-support",
+      "metadata": {
+        "title": "Hosting & Tech Support | Bugsmoker",
+        "description": "High-availability managed cloud hosting, automated disaster recovery, 24/7 uptime monitoring, and lightning-fast technical support."
+      },
+      "hero": {
+        "title": "hosting & tech <br /> support",
+        "titlePlain": "Hosting and Tech Support",
+        "image": "/home/4.png",
+        "imageAlt": "Hosting and Tech Support - Bugsmoker",
+        "description": "We manage, protect, and continuously optimize your digital infrastructure so your team can focus on growing your business with total peace of mind. From hardened multi-region cloud hosting and automated daily disaster recovery to sub-15-minute emergency tech support and round-the-clock uptime monitoring, we ensure your platforms remain fast, unhackable, and online 24 hours a day, 365 days a year."
+      },
+      "featured": {
+        "heading": "What we provide under hosting & support",
+        "subheading": "Reliable infrastructure management and dedicated technical assistance. Scroll sideways.",
+        "items": [
+          {
+            "title": "Managed Cloud Hosting",
+            "text": "High-speed global edge servers with automated scaling, SSL certificates, and isolated environments.",
+            "img": "/home/4.png",
+            "pos": "center top"
+          },
+          {
+            "title": "24/7/365 Uptime Monitoring",
+            "text": "Synthetic checks pinging your systems every 60 seconds from 18 global locations with instant alerting.",
+            "img": "/home/5.png",
+            "pos": "center"
+          },
+          {
+            "title": "Disaster Recovery & Backups",
+            "text": "Encrypted daily and hourly database snapshots stored off-site with one-click restore capabilities.",
+            "img": "/home/6.png",
+            "pos": "left center"
+          },
+          {
+            "title": "Rapid Emergency Support",
+            "text": "Direct access to senior DevOps and full-stack engineers who resolve production incidents in minutes.",
+            "img": "/home/new1.png",
+            "pos": "center bottom"
+          }
+        ]
+      },
+      "content": {
+        "quote": "Downtime costs more than revenue; it destroys customer trust. We make sure your servers never sleep, your data is never lost, and help is never more than a message away.",
+        "image": "/home/servicebg.png",
+        "imageAlt": "Managed cloud hosting and support infrastructure",
+        "stats": [
+          {
+            "value": 99,
+            "suffix": ".99%",
+            "label": "uptime SLA guarantee"
+          },
+          {
+            "value": 15,
+            "suffix": "m",
+            "label": "average emergency response time"
+          },
+          {
+            "value": 0,
+            "suffix": "",
+            "label": "data loss incidents recorded"
+          }
+        ]
+      },
+      "problem": {
+        "heading": "Servers crash when you least expect them to.",
+        "items": [
+          {
+            "title": "Unnoticed middle-of-the-night outages",
+            "text": "Your site goes down for hours before anyone notices, bleeding revenue and hurting your reputation."
+          },
+          {
+            "title": "Vulnerable unpatched plugins",
+            "text": "Outdated software packages and abandoned server dependencies get breached by automated exploits."
+          },
+          {
+            "title": "Painfully slow generic hosting",
+            "text": "Shared servers squeeze your CPU resources, causing slow page loads during peak business hours."
+          },
+          {
+            "title": "Unresponsive support tickets",
+            "text": "When an urgent issue strikes, you're stuck talking to generic support bots reading script templates."
+          }
+        ]
+      },
+      "solution": {
+        "heading": "Proactive engineering, zero excuses.",
+        "subheading": "We monitor, patch, and optimize before problems turn into client-facing disruptions.",
+        "image": "/home/mos.png",
+        "imageAlt": "DevOps support solutions",
+        "items": [
+          {
+            "fixes": "Unnoticed outages",
+            "title": "Real-time telemetry and pager rotation",
+            "text": "Global heartbeat monitors trigger immediate escalation to our on-call engineers the moment an anomaly is detected."
+          },
+          {
+            "fixes": "Unpatched vulnerabilities",
+            "title": "Automated patching and WAF firewalls",
+            "text": "Cloudflare Enterprise firewalls, DDoS mitigation, and scheduled security patch updates keep threats outside your perimeter."
+          },
+          {
+            "fixes": "Slow server speeds",
+            "title": "Dedicated high-performance edge clusters",
+            "text": "NVMe SSD storage, HTTP/3 protocol support, and intelligent caching give your site near-instant global response times."
+          },
+          {
+            "fixes": "Slow generic support",
+            "title": "Direct communication with real engineers",
+            "text": "No tier-1 call centers. You get a direct private Slack or WhatsApp channel with the engineers who actually built your system."
+          }
+        ]
+      },
+      "paragraphs": {
+        "heading": "Infrastructure built for complete peace of mind",
+        "items": [
+          {
+            "title": "Multi-region edge architecture",
+            "text": "We serve your static assets and dynamic queries from global edge nodes closest to your users, cutting latency down to milliseconds regardless of whether your customer is in London, New York, or Tokyo."
+          },
+          {
+            "title": "Automated rollback and staging",
+            "text": "Every update is deployed to a preview staging environment first. If a production deployment fails health checks, our automated rollback systems revert to the last stable build instantly with zero downtime."
+          },
+          {
+            "title": "Immutable off-site backups",
+            "text": "We retain encrypted snapshots across geographically isolated AWS S3 and GCP storage buckets with write-once-read-many (WORM) policies that protect your database against ransomware attacks."
+          },
+          {
+            "title": "Proactive security audits",
+            "text": "Our DevOps team routinely scans SSL certificates, DNS health, domain expiration dates, dependency vulnerability alerts, and server access logs to resolve risks before they materialize."
+          },
+          {
+            "title": "Database tuning and pruning",
+            "text": "Over time, databases accumulate dead tuples and fragmentation. We perform weekly routine query profiling, index rebalancing, and vacuuming to ensure query speeds stay lightning fast."
+          },
+          {
+            "title": "Dedicated SLA guarantees",
+            "text": "We put our money where our mouth is. Our enterprise service level agreements commit to 99.99% network uptime and guaranteed response windows backed by financial credits."
+          }
+        ]
+      },
+      "faq": {
+        "heading": "Frequently asked hosting & support questions",
+        "subheading": "Clear answers about how we manage your infrastructure and assist your team.",
+        "contactButtonText": "Contact Us",
+        "contactButtonHref": "#contact",
+        "items": [
+          {
+            "q": "What cloud providers do you host our systems on?",
+            "a": "We configure and manage infrastructure across AWS, Google Cloud Platform (GCP), DigitalOcean, and Vercel, matching the exact compliance and performance requirements of your workload."
+          },
+          {
+            "q": "How quickly do you respond when something goes wrong?",
+            "a": "For critical production outages, our on-call team responds in under 15 minutes 24/7/365. For standard support requests and non-urgent inquiries, we respond within two hours during business hours."
+          },
+          {
+            "q": "Can you migrate our existing website or software to your hosting?",
+            "a": "Yes. We handle end-to-end migrations including database exports, asset transfers, DNS cutover, and SSL certificate issuance with zero downtime for your active users."
+          },
+          {
+            "q": "How often are backups taken and where are they stored?",
+            "a": "We perform automated hourly incremental database backups and daily full server snapshots, encrypted with AES-256 and stored offsite in multi-region cold storage."
+          },
+          {
+            "q": "Do we get access to our server and hosting accounts?",
+            "a": "Yes. You maintain full administrative ownership and access credentials. We operate with least-privilege delegation and never lock clients out of their own assets."
+          },
+          {
+            "q": "What does your monthly tech support cover?",
+            "a": "Our monthly support plans cover software updates, security patch installations, uptime monitoring, bug fixes, performance tuning, DNS and email troubleshooting, and ongoing technical advisory."
+          }
+        ]
+      }
+    },
+    "hosting": {
+      "id": "hosting",
+      "slug": "hosting",
+      "metadata": {
+        "title": "Managed Hosting | Bugsmoker",
+        "description": "Enterprise-grade cloud hosting, global edge CDN, and 99.99% uptime guarantees for mission-critical web applications."
+      },
+      "hero": {
+        "title": "managed <br /> hosting",
+        "titlePlain": "Managed Hosting",
+        "image": "/home/4.png",
+        "imageAlt": "Managed Hosting - Bugsmoker",
+        "description": "We deliver ultra-reliable, high-throughput cloud hosting tailored specifically for high-traffic websites and complex web applications. With multi-zone redundancy, automated autoscaling, DDoS shields, and lightning-fast global edge distribution, your platforms stay online, blazingly fast, and completely resilient during any traffic spike."
+      },
+      "featured": {
+        "heading": "What we deliver under managed hosting",
+        "subheading": "Cloud infrastructure built for unyielding performance and stability. Scroll sideways.",
+        "items": [
+          {
+            "title": "Global Edge Caching",
+            "text": "Sub-millisecond asset delivery through hundreds of edge PoPs worldwide.",
+            "img": "/home/4.png",
+            "pos": "center top"
+          },
+          {
+            "title": "Automated Autoscaling",
+            "text": "Dynamic container scaling that effortlessly swallows viral traffic spikes without breaking.",
+            "img": "/home/new1.png",
+            "pos": "center"
+          },
+          {
+            "title": "Enterprise DDoS Mitigation",
+            "text": "Layer 3, 4, and 7 protection that automatically blocks malicious attacks before reaching origin.",
+            "img": "/home/mos.png",
+            "pos": "left center"
+          },
+          {
+            "title": "Automated Backups",
+            "text": "Hourly immutable database snapshots stored in geographically isolated storage vaults.",
+            "img": "/home/2.png",
+            "pos": "center bottom"
+          }
+        ]
+      },
+      "content": {
+        "quote": "Your hosting foundation determines your business ceiling. When your infrastructure is rock-solid, your team never has to worry about servers giving up during critical product launches.",
+        "image": "/home/4.png",
+        "imageAlt": "Bugsmoker cloud hosting infrastructure",
+        "stats": [
+          {
+            "value": 99,
+            "suffix": ".99%",
+            "label": "uptime SLA guarantee"
+          },
+          {
+            "value": 24,
+            "suffix": "/7",
+            "label": "infrastructure monitoring"
+          },
+          {
+            "value": 45,
+            "suffix": "ms",
+            "label": "average global TTFB"
+          }
+        ]
+      },
+      "problem": {
+        "heading": "Cheap hosting silently throttles your business.",
+        "items": [
+          {
+            "title": "Resource throttling during surges",
+            "text": "Shared hosts quietly choke your server CPU when marketing campaigns bring in sudden surges of buyers."
+          },
+          {
+            "title": "Single point of failure",
+            "text": "A hardware failure in a single datacenter knocks out your entire digital presence for half a day."
+          },
+          {
+            "title": "Expired SSL and broken DNS",
+            "text": "Forgotten certificates trigger scary browser warnings that cause customers to bounce in terror."
+          },
+          {
+            "title": "Zero disaster recovery plans",
+            "text": "When a catastrophic database corruption happens, you discover backups haven't run in months."
+          }
+        ]
+      },
+      "solution": {
+        "heading": "Zero downtime architecture.",
+        "subheading": "Modern infrastructure engineered with high availability and redundancy at every layer.",
+        "image": "/home/mos.png",
+        "imageAlt": "Cloud infrastructure solutions",
+        "items": [
+          {
+            "fixes": "Resource throttling",
+            "title": "Dedicated burstable cloud clusters",
+            "text": "Isolated compute resources with elastic auto-scaling ensure your site stays fast whether you have 10 visitors or 100,000."
+          },
+          {
+            "fixes": "Single point of failure",
+            "title": "Multi-region failover",
+            "text": "Traffic automatically routes around outages using geo-distributed health checks and instant DNS failover."
+          },
+          {
+            "fixes": "Expired SSL",
+            "title": "Managed automated certificates",
+            "text": "Zero-touch Let's Encrypt and Cloudflare wildcard SSL certificates that renew automatically with zero human intervention."
+          },
+          {
+            "fixes": "No disaster recovery",
+            "title": "Point-in-time database restoration",
+            "text": "Write-ahead log shipping allows restoring your database to the exact minute before an issue occurred."
+          }
+        ]
+      },
+      "paragraphs": {
+        "heading": "Hosting architecture that never breaks under pressure",
+        "items": [
+          {
+            "title": "Bespoke cloud topology",
+            "text": "We do not believe in one-size-fits-all hosting. We architect your infrastructure on AWS, Google Cloud, or Vercel according to your exact bandwidth, database concurrency, and compliance requirements."
+          },
+          {
+            "title": "HTTP/3 and Brotli compression",
+            "text": "Every request is served over modern HTTP/3 protocols with next-gen Brotli compression, shaving valuable milliseconds off mobile network payloads."
+          },
+          {
+            "title": "Isolated staging sandboxes",
+            "text": "Test every release in an exact replica of your production environment before pushing changes live, ensuring zero unexpected surprises."
+          },
+          {
+            "title": "Web Application Firewall (WAF)",
+            "text": "Custom rate limiting and threat detection rules block credential stuffing, SQL injections, and malicious scrapers before they hit your application layer."
+          },
+          {
+            "title": "Automated health checks",
+            "text": "Synthetic probes test login flows, database health, and API latency every sixty seconds from eighteen continents."
+          },
+          {
+            "title": "Carbon-neutral green compute",
+            "text": "We prioritize datacenters powered by 100% renewable energy, helping your business lower its carbon footprint without sacrificing speed."
+          }
+        ]
+      },
+      "faq": {
+        "heading": "Hosting questions answered",
+        "subheading": "Have a specific hosting question? We are here to help.",
+        "contactButtonText": "Contact Us",
+        "contactButtonHref": "#contact",
+        "items": [
+          {
+            "q": "What happens when our website traffic suddenly spikes?",
+            "a": "Our containerized architecture automatically spawns additional instances in seconds to handle the traffic spike smoothly, scaling back down when demand normalizes."
+          },
+          {
+            "q": "Do you provide SSL certificates and manage DNS?",
+            "a": "Yes. We manage your DNS records, DNSSEC security, and automatic renewal of SSL/TLS certificates."
+          },
+          {
+            "q": "Can you migrate our site from our current host?",
+            "a": "Yes, we handle complete seamless migrations with zero downtime and thorough pre-launch testing."
+          },
+          {
+            "q": "Where are your servers physically located?",
+            "a": "We host systems across major global hubs including North America, Europe, Asia, and Australia, matching your target audience geography."
+          },
+          {
+            "q": "What is your uptime guarantee?",
+            "a": "We guarantee a minimum of 99.99% uptime backed by service level agreements."
+          },
+          {
+            "q": "Can we retain root access if we need it?",
+            "a": "Yes, your team can retain full access and ownership of all underlying infrastructure accounts."
+          }
+        ]
+      }
+    },
+    "tech-support": {
+      "id": "tech-support",
+      "slug": "tech-support",
+      "metadata": {
+        "title": "Technical Support | Bugsmoker",
+        "description": "Round-the-clock technical support, bug fixing, performance optimization, and proactive maintenance by senior software engineers."
+      },
+      "hero": {
+        "title": "technical <br /> support",
+        "titlePlain": "Technical Support",
+        "image": "/home/5.png",
+        "imageAlt": "Technical Support - Bugsmoker",
+        "description": "Keep your digital products in peak operating condition with our dedicated technical support team. From immediate emergency troubleshooting and routine security patch installations to UI bug fixes, API updates, and ongoing speed optimization, we provide dependable engineering support that keeps your operations running without a hitch."
+      },
+      "featured": {
+        "heading": "What we do under technical support",
+        "subheading": "Dedicated engineering support to keep your systems humming. Scroll sideways.",
+        "items": [
+          {
+            "title": "Emergency Bug Fixing",
+            "text": "Rapid diagnosis and resolution of checkout failures, visual glitches, and backend errors.",
+            "img": "/home/5.png",
+            "pos": "center top"
+          },
+          {
+            "title": "Security & Dependency Updates",
+            "text": "Proactive patching of CMS, libraries, and frameworks to block security vulnerabilities.",
+            "img": "/home/new2.png",
+            "pos": "center"
+          },
+          {
+            "title": "Speed & Vitals Optimization",
+            "text": "Continuous audits to ensure Lighthouse scores and Core Web Vitals stay in the green.",
+            "img": "/home/mos.png",
+            "pos": "left center"
+          },
+          {
+            "title": "Direct Engineer Access",
+            "text": "Private Slack or WhatsApp channels directly connecting you to real developers.",
+            "img": "/home/new4.png",
+            "pos": "center bottom"
+          }
+        ]
+      },
+      "content": {
+        "quote": "When your technology works smoothly, your business moves fast. Our technical support gives your team the confidence that expert help is always just seconds away.",
+        "image": "/home/5.png",
+        "imageAlt": "Bugsmoker technical support engineering",
+        "stats": [
+          {
+            "value": 15,
+            "suffix": "m",
+            "label": "average incident response"
+          },
+          {
+            "value": 99,
+            "suffix": "%",
+            "label": "first-day issue resolution"
+          },
+          {
+            "value": 24,
+            "suffix": "/7",
+            "label": "engineer on-call coverage"
+          }
+        ]
+      },
+      "problem": {
+        "heading": "Technology neglected today becomes tomorrow's crisis.",
+        "items": [
+          {
+            "title": "Abandoned software vulnerabilities",
+            "text": "Packages fall out of date until an automated bot exploits a known vulnerability."
+          },
+          {
+            "title": "Broken third-party APIs",
+            "text": "Payment gateways or shipping services silently update APIs, breaking checkout flows without warning."
+          },
+          {
+            "title": "Accumulating UI bugs",
+            "text": "Small layout glitches and broken buttons pile up, driving conversion rates lower every month."
+          },
+          {
+            "title": "Slow and helpless ticket queues",
+            "text": "Submitting a support request feels like shouting into the void when your business is losing money."
+          }
+        ]
+      },
+      "solution": {
+        "heading": "Continuous care by expert engineers.",
+        "subheading": "We don't wait for things to break; we proactively maintain and optimize your stack.",
+        "image": "/home/mos.png",
+        "imageAlt": "Proactive technical support",
+        "items": [
+          {
+            "fixes": "Software vulnerabilities",
+            "title": "Scheduled dependency maintenance",
+            "text": "Weekly dependency auditing and controlled security patch rollouts keep your codebase hardened."
+          },
+          {
+            "fixes": "Broken APIs",
+            "title": "Automated integration monitoring",
+            "text": "Synthetic end-to-end tests monitor payment gateways and external APIs, alerting us immediately upon failure."
+          },
+          {
+            "fixes": "Accumulating UI bugs",
+            "title": "Sprint-based polish and bug squashing",
+            "text": "Dedicated developer hours each month to fix minor visual glitches and keep the user experience polished."
+          },
+          {
+            "fixes": "Slow ticket queues",
+            "title": "Direct developer Slack and WhatsApp channels",
+            "text": "Talk directly to the engineers who write the code, with guaranteed response times in under fifteen minutes."
+          }
+        ]
+      },
+      "paragraphs": {
+        "heading": "Support engineered around your daily workflow",
+        "items": [
+          {
+            "title": "Proactive monitoring over reactive panic",
+            "text": "We monitor your application metrics, server logs, and error telemetry 24 hours a day. In most cases, our on-call team resolves errors before you or your users even notice an anomaly."
+          },
+          {
+            "title": "Guaranteed response SLAs",
+            "text": "We offer tiered Service Level Agreements tailored to your business risk, providing sub-15-minute emergency responses for critical blockers and same-day turnaround for standard requests."
+          },
+          {
+            "title": "Routine database health maintenance",
+            "text": "We run periodic index audits, clean up orphan records, and optimize slow queries to ensure your data access speeds remain razor-sharp month after month."
+          },
+          {
+            "title": "Browser and OS compatibility checks",
+            "text": "Whenever Apple, Google, or Microsoft release major operating system or browser updates, we verify that your layouts, cookies, and authentication flows remain completely unbroken."
+          },
+          {
+            "title": "Transparent monthly reporting",
+            "text": "You receive a clear monthly breakdown detailing every ticket resolved, security patches applied, performance improvements, and uptime statistics."
+          },
+          {
+            "title": "Strategic technical advisory",
+            "text": "Need advice on adding AI features, picking a new payment provider, or optimizing your conversion funnel? Our principal engineers are available for strategic roadmapping."
+          }
+        ]
+      },
+      "faq": {
+        "heading": "Technical support questions",
+        "subheading": "Common questions about how our support retainers and response times work.",
+        "contactButtonText": "Contact Us",
+        "contactButtonHref": "#contact",
+        "items": [
+          {
+            "q": "How fast does your team respond to critical emergencies?",
+            "a": "For critical emergencies that halt customer transactions or bring down platforms, our team responds in under 15 minutes around the clock."
+          },
+          {
+            "q": "Can you support software built by another agency?",
+            "a": "Yes. We perform an initial code audit to understand the architecture, test coverage, and dependencies before taking over ongoing maintenance."
+          },
+          {
+            "q": "How do we submit new requests or bug reports?",
+            "a": "You can ping us directly via private Slack, WhatsApp, email, or your preferred project management tool (Jira, Linear, Trello)."
+          },
+          {
+            "q": "Are unused monthly support hours rolled over?",
+            "a": "Depending on your support tier, unused hours can roll over into future months or be applied toward feature development sprints."
+          },
+          {
+            "q": "Do you provide off-hours and weekend support?",
+            "a": "Yes, our on-call engineers monitor alerts and resolve critical issues 24 hours a day, 7 days a week, 365 days a year."
+          },
+          {
+            "q": "Can we cancel or adjust our support plan as our needs change?",
+            "a": "Yes. Our support agreements are flexible with simple 30-day notice periods and no long-term lock-in."
+          }
+        ]
+      }
+    }
+  }
+}
