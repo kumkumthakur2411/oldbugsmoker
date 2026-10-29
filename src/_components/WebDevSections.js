@@ -462,12 +462,7 @@ export default function WebDevSections() {
                 <div className="w-full py-12 sm:py-16 lg:py-0">
                     <div className="feat-heading mb-6 sm:mb-8 flex flex-col gap-3 px-5 sm:px-8 md:px-12 lg:mb-12 lg:flex-row lg:items-end lg:justify-between lg:px-16">
                         <div>
-                            <div className="mb-2 flex items-center gap-2">
-                                <span className="h-1.5 w-1.5 rounded-full bg-[#ff5a1f]" />
-                                <span className="text-[11px] font-semibold uppercase tracking-widest text-neutral-500 font-['Outfit']">
-                                    Our Core Disciplines
-                                </span>
-                            </div>
+
                             <h2 className="max-w-3xl text-3xl font-bold leading-[1.02] tracking-[-0.04em] sm:text-5xl lg:text-7xl">
                                 What we build under web development
                             </h2>
@@ -614,72 +609,113 @@ export default function WebDevSections() {
 
 
             {/* ---------------- Problem ---------------- */}
-            <section className="w-full bg-black px-5 py-24 text-white sm:px-8 md:px-12 lg:px-16 lg:py-36">
+            <section className="w-full overflow-hidden bg-black px-5 py-16 text-white sm:px-8 sm:py-20 md:px-12 md:py-24 lg:px-16 lg:py-36">
                 <div className="mx-auto max-w-[1400px]">
-                    <h2 className="max-w-4xl text-5xl font-bold leading-[0.95] tracking-[-0.05em] sm:text-6xl lg:text-8xl">
-                        Most websites quietly lose people.
-                    </h2>
+                    {/* Heading */}
+                    <div className="flex items-end justify-between gap-4">
+                        <h2 className="max-w-4xl text-[clamp(2.5rem,8.5vw,5rem)] font-bold leading-[0.94] tracking-[-0.065em] sm:text-6xl md:text-7xl lg:text-8xl">
+                            Most websites quietly{" "}
+                            <span className="text-white/45">lose people.</span>
+                        </h2>
 
-                    <div className="mt-16 lg:mt-24">
-                        {PROBLEMS.map((p) => (
+                        <span className="mb-1 hidden shrink-0 text-xs uppercase tracking-[0.15em] text-white/40 md:block">
+                            The problems
+                            <br />
+                            worth fixing.
+                        </span>
+                    </div>
+
+                    {/* Problem rows */}
+                    <div className="mt-10 sm:mt-14 lg:mt-24">
+                        {PROBLEMS.map((p, i) => (
                             <div
                                 key={p.title}
-                                className="problem-row relative py-8 lg:py-10"
+                                className="problem-row relative py-6 sm:py-8 lg:py-10"
                             >
-                                <div className="grid gap-3 lg:grid-cols-12 lg:items-center lg:gap-10">
-                                    <h3 className="problem-body text-3xl font-semibold tracking-[-0.04em] lg:col-span-6 lg:text-5xl">
-                                        {p.title}
-                                    </h3>
-                                    <p className="problem-body max-w-md text-sm leading-[1.8] text-white/70 md:text-[15px] lg:col-span-5 lg:col-start-8">
+                                <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-12 lg:items-center lg:gap-10">
+                                    {/* Number + title */}
+                                    <div className="flex min-w-0 items-start gap-3 lg:col-span-6 lg:gap-5">
+                                        <span className="problem-body mt-1 shrink-0 text-[10px] font-medium tracking-[0.12em] text-[#ff5a1f] sm:text-xs">
+                                            ({String(i + 1).padStart(2, "0")})
+                                        </span>
+
+                                        <h3 className="problem-body min-w-0 text-[clamp(1.5rem,6.5vw,2.7rem)] font-semibold leading-[1.05] tracking-[-0.055em] sm:text-4xl lg:text-5xl">
+                                            {p.title}
+                                        </h3>
+                                    </div>
+
+                                    {/* Description */}
+                                    <p className="problem-body ml-7 max-w-xl text-[13px] leading-[1.8] text-white/60 sm:ml-8 sm:text-sm sm:leading-[1.85] md:text-[15px] lg:col-span-5 lg:col-start-8 lg:ml-0">
                                         {p.text}
                                     </p>
                                 </div>
+
+                                {/* Divider */}
                                 <span className="absolute inset-x-0 bottom-0 h-px bg-white/15" />
+
                                 <span className="problem-line absolute inset-x-0 bottom-0 h-px origin-left bg-[#ff5a1f]" />
                             </div>
                         ))}
+                    </div>
+
+                    {/* Closing note */}
+                    <div className="mt-7 flex items-center justify-between gap-4 sm:mt-9">
+                        <p className="max-w-[250px] text-xs leading-[1.7] text-white/45 sm:max-w-none sm:text-sm">
+                            Small problems. Lost opportunities. Better solutions.
+                        </p>
+
+                        <span className="flex h-9 w-9 shrink-0 items-center justify-center rounded-full border border-white/20 text-lg text-[#ff5a1f] sm:h-10 sm:w-10">
+                            ↘
+                        </span>
                     </div>
                 </div>
             </section>
 
             {/* ---------------- Solution ---------------- */}
-            <section className="w-full bg-white px-5 py-24 text-black sm:px-8 md:px-12 lg:px-16 lg:py-36">
-                <div className="mx-auto grid max-w-[1400px] gap-12 lg:grid-cols-12 lg:gap-16">
+            <section className="w-full bg-white px-5 py-14 text-black sm:px-8 sm:py-20 md:px-12 lg:px-16 lg:py-24">
+                <div className="mx-auto grid max-w-[1400px] gap-8 lg:grid-cols-12 lg:gap-14">
                     <div className="lg:col-span-5">
-                        <div className="lg:sticky lg:top-28">
-                            <h2 className="text-5xl font-bold leading-[0.95] tracking-[-0.05em] sm:text-6xl lg:text-7xl">
+                        <div className="lg:sticky lg:top-24">
+                            <div className="mb-2 flex items-center gap-2">
+                                <span className="h-1.5 w-1.5 rounded-full bg-[#ff5a1f]" />
+                                <span className="text-[11px] font-semibold uppercase tracking-widest text-neutral-500 font-['Outfit']">
+                                    Strategic Answers
+                                </span>
+                            </div>
+                            <h2 className="text-3xl font-bold leading-[1.02] tracking-[-0.04em] sm:text-4xl lg:text-5xl">
                                 So we fix them at the root.
                             </h2>
-                            <p className="mt-6 max-w-sm text-sm leading-[1.8] text-neutral-600 md:text-[15px]">
+                            <p className="mt-3 max-w-sm text-xs sm:text-sm leading-relaxed text-neutral-600 md:text-[14px]">
                                 Each problem above has a matching answer in
                                 how we plan, design and build.
                             </p>
-                            <div className="relative mt-10 hidden aspect-[4/3] w-full overflow-hidden rounded-2xl bg-neutral-900 lg:block">
+                            <div className="relative mt-6 hidden aspect-[16/10] w-full max-w-[380px] overflow-hidden rounded-xl bg-neutral-900 lg:block shadow-sm">
                                 <Image
                                     src="/home/mos.png"
                                     alt="Bugsmoker solution"
                                     fill
-                                    sizes="40vw"
+                                    sizes="30vw"
                                     className="object-cover"
                                 />
                             </div>
                         </div>
                     </div>
 
-                    <div className="flex flex-col gap-6 lg:col-span-7">
+                    <div className="flex flex-col gap-3.5 sm:gap-4 lg:col-span-7">
                         {SOLUTIONS.map((s) => (
                             <article
                                 key={s.title}
-                                className="solution-card relative overflow-hidden rounded-2xl border border-black/10 bg-white p-7 pl-9 transition-colors duration-300 hover:border-[#ff5a1f] sm:p-9 sm:pl-12"
+                                className="solution-card relative overflow-hidden rounded-xl sm:rounded-2xl border border-black/10 bg-white p-4 pl-6 sm:p-5 sm:pl-7 lg:p-6 lg:pl-8 transition-colors duration-300 hover:border-[#ff5a1f]"
                             >
-                                <span className="solution-bar absolute left-0 top-0 h-full w-1.5 origin-top bg-[#ff5a1f]" />
-                                <p className="text-sm font-medium text-[#ff5a1f]">
-                                    Fixes: {s.fixes.toLowerCase()}
-                                </p>
-                                <h3 className="mt-3 text-2xl font-bold leading-tight tracking-[-0.03em] sm:text-3xl">
+                                <span className="solution-bar absolute left-0 top-0 h-full w-1 sm:w-1.5 origin-top bg-[#ff5a1f]" />
+                                <div className="flex items-center gap-1.5 text-[11px] sm:text-xs font-semibold uppercase tracking-wider text-[#ff5a1f]">
+                                    <span className="h-1.5 w-1.5 rounded-full bg-[#ff5a1f]" />
+                                    <span>Fixes // {s.fixes.toLowerCase()}</span>
+                                </div>
+                                <h3 className="mt-2 text-base xs:text-lg sm:text-xl lg:text-2xl font-bold leading-snug tracking-[-0.02em]">
                                     {s.title}
                                 </h3>
-                                <p className="mt-3 max-w-lg text-sm leading-[1.8] text-neutral-600 md:text-[15px]">
+                                <p className="mt-2 max-w-lg text-xs sm:text-sm leading-relaxed text-neutral-600">
                                     {s.text}
                                 </p>
                             </article>
