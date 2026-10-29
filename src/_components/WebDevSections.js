@@ -176,7 +176,37 @@ export default function WebDevSections() {
     const trackRef = useRef(null);
     const paraRef = useRef(null);
     const [open, setOpen] = useState(0);
+    const [activeCard, setActiveCard] = useState(0);
     const panels = useRef([]);
+
+    /* Mobile swiper helpers */
+    const handleTrackScroll = () => {
+        const el = trackRef.current;
+        if (!el || window.innerWidth >= 1024) return;
+        const card = el.firstElementChild;
+        if (!card) return;
+        const cardWidth = card.getBoundingClientRect().width + 14;
+        const index = Math.round(el.scrollLeft / cardWidth);
+        setActiveCard(Math.min(Math.max(index, 0), FEATURES.length - 1));
+    };
+
+    const scrollToIndex = (index) => {
+        const el = trackRef.current;
+        if (!el) return;
+        const card = el.firstElementChild;
+        if (!card) return;
+        const cardWidth = card.getBoundingClientRect().width + 14;
+        el.scrollTo({ left: index * cardWidth, behavior: "smooth" });
+        setActiveCard(index);
+    };
+
+    const scrollTrack = (direction) => {
+        const nextIndex = Math.min(
+            Math.max(activeCard + direction, 0),
+            FEATURES.length - 1
+        );
+        scrollToIndex(nextIndex);
+    };
 
     /* Scroll animations */
     useEffect(() => {
@@ -429,73 +459,134 @@ export default function WebDevSections() {
                 ref={featRef}
                 className="relative w-full bg-white text-black lg:flex lg:h-screen lg:items-center lg:overflow-hidden"
             >
-                <div className="w-full py-20 lg:py-0">
-                    <div className="feat-heading mb-10 flex flex-col gap-4 px-5 sm:px-8 md:px-12 lg:mb-12 lg:flex-row lg:items-end lg:justify-between lg:px-16">
-                        <h2 className="max-w-3xl text-5xl font-bold leading-[0.95] tracking-[-0.05em] sm:text-6xl lg:text-7xl">
-                            What we build under web development
-                        </h2>
-                        <p className="max-w-sm text-sm leading-[1.8] text-neutral-600 md:text-[15px]">
-                            Four things we do every week. Scroll sideways
-                            through them.
-                        </p>
+                <div className="w-full py-12 sm:py-16 lg:py-0">
+                    <div className="feat-heading mb-6 sm:mb-8 flex flex-col gap-3 px-5 sm:px-8 md:px-12 lg:mb-12 lg:flex-row lg:items-end lg:justify-between lg:px-16">
+                        <div>
+                            <div className="mb-2 flex items-center gap-2">
+                                <span className="h-1.5 w-1.5 rounded-full bg-[#ff5a1f]" />
+                                <span className="text-[11px] font-semibold uppercase tracking-widest text-neutral-500 font-['Outfit']">
+                                    Our Core Disciplines
+                                </span>
+                            </div>
+                            <h2 className="max-w-3xl text-3xl font-bold leading-[1.02] tracking-[-0.04em] sm:text-5xl lg:text-7xl">
+                                What we build under web development
+                            </h2>
+                        </div>
+                        <div className="flex items-end justify-between gap-4 lg:flex-col lg:items-end">
+                            <p className="max-w-sm text-xs sm:text-sm leading-[1.7] text-neutral-600 md:text-[15px]">
+                                Four things we do every week. Scroll sideways through them.
+                            </p>
+                            {/* Mobile / Tablet arrow controls */}
+                            <div className="flex items-center gap-1.5 lg:hidden">
+                                <button
+                                    type="button"
+                                    onClick={() => scrollTrack(-1)}
+                                    disabled={activeCard === 0}
+                                    aria-label="Previous card"
+                                    className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-black/20 text-black transition-all hover:border-black hover:bg-black hover:text-white disabled:opacity-30 disabled:pointer-events-none active:scale-95"
+                                >
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M19 12H5M12 19l-7-7 7-7" />
+                                    </svg>
+                                </button>
+                                <button
+                                    type="button"
+                                    onClick={() => scrollTrack(1)}
+                                    disabled={activeCard === FEATURES.length - 1}
+                                    aria-label="Next card"
+                                    className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-black/20 text-black transition-all hover:border-black hover:bg-black hover:text-white disabled:opacity-30 disabled:pointer-events-none active:scale-95"
+                                >
+                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M5 12h14M12 5l7 7-7 7" />
+                                    </svg>
+                                </button>
+                            </div>
+                        </div>
                     </div>
 
+                    {/* Swiper track on mobile / horizontal scroll on desktop */}
                     <div
                         ref={trackRef}
-                        className="flex flex-col gap-5 px-5 sm:px-8 md:grid md:grid-cols-2 md:px-12 lg:flex lg:w-max lg:flex-row lg:gap-6 lg:px-16"
+                        onScroll={handleTrackScroll}
+                        className="flex w-full flex-row gap-3.5 sm:gap-4 overflow-x-auto snap-x snap-mandatory scroll-smooth px-5 sm:px-8 md:px-12 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden lg:w-max lg:overflow-visible lg:snap-none lg:gap-6 lg:px-16"
+                        style={{ WebkitOverflowScrolling: "touch" }}
                     >
                         {FEATURES.map((f, i) => (
                             <article
                                 key={f.title}
-                                className="group relative h-[420px] w-full shrink-0 overflow-hidden rounded-2xl bg-neutral-900 lg:h-[56vh] lg:w-[34vw] lg:max-w-[520px]"
+                                className="group relative h-[270px] xs:h-[295px] sm:h-[340px] w-[80vw] max-w-[310px] xs:w-[76vw] sm:w-[340px] shrink-0 snap-start overflow-hidden rounded-2xl bg-neutral-900 shadow-md transition-all duration-300 lg:h-[56vh] lg:w-[34vw] lg:max-w-[520px] lg:shadow-none"
                             >
                                 <Image
                                     src={f.img}
                                     alt={f.title}
                                     fill
-                                    sizes="(max-width: 1024px) 100vw, 34vw"
+                                    sizes="(max-width: 640px) 80vw, (max-width: 1024px) 340px, 34vw"
                                     className="object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                                     style={{ objectPosition: f.pos }}
                                 />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/20 to-transparent" />
-                                <div className="absolute inset-x-0 bottom-0 flex flex-col gap-3 p-6 text-white sm:p-8">
-                                    <span className="h-1 w-10 rounded-full bg-[#ff5a1f] transition-all duration-500 group-hover:w-24" />
-                                    <h3 className="text-3xl font-bold leading-none tracking-[-0.03em] sm:text-4xl">
+                                <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/35 to-black/20" />
+
+                                {/* Card Counter Chip */}
+                                <div className="absolute top-3 right-3 sm:top-4 sm:right-4 z-10">
+                                    <span className="rounded-full bg-black/50 backdrop-blur-md border border-white/15 px-2.5 py-0.5 text-[10px] sm:text-xs font-mono font-medium text-white/90">
+                                        {`0${i + 1} · 0${FEATURES.length}`}
+                                    </span>
+                                </div>
+
+                                {/* Content */}
+                                <div className="absolute inset-x-0 bottom-0 flex flex-col gap-2 sm:gap-3 p-4 sm:p-6 lg:p-8 text-white">
+                                    <span className="h-1 w-8 rounded-full bg-[#ff5a1f] transition-all duration-500 group-hover:w-20" />
+                                    <h3 className="text-xl xs:text-2xl sm:text-3xl lg:text-4xl font-bold leading-tight tracking-[-0.03em]">
                                         {f.title}
                                     </h3>
-                                    <p className="max-w-xs text-sm leading-[1.7] text-white/80">
+                                    <p className="line-clamp-2 sm:line-clamp-none max-w-xs text-xs sm:text-sm leading-[1.6] text-white/80">
                                         {f.text}
                                     </p>
                                 </div>
                             </article>
                         ))}
                     </div>
+
+                    {/* Mobile Pagination Dots */}
+                    <div className="mt-5 flex items-center justify-center gap-1.5 lg:hidden">
+                        {FEATURES.map((_, idx) => (
+                            <button
+                                key={idx}
+                                onClick={() => scrollToIndex(idx)}
+                                aria-label={`Go to slide ${idx + 1}`}
+                                className={`h-1.5 rounded-full transition-all duration-300 ${activeCard === idx
+                                    ? "w-6 bg-[#ff5a1f]"
+                                    : "w-1.5 bg-black/25 hover:bg-black/50"
+                                    }`}
+                            />
+                        ))}
+                    </div>
                 </div>
             </section>
 
             {/* ---------------- Content ---------------- */}
-            <section className="w-full bg-white px-5 py-24 text-black sm:px-8 md:px-12 lg:px-16 lg:py-36">
-                <div className="mx-auto grid max-w-[1400px] gap-14 lg:grid-cols-12 lg:gap-16">
-                    <div className="lg:col-span-7">
-                        <p className="reveal-text text-3xl font-semibold leading-[1.15] tracking-[-0.04em] sm:text-4xl md:text-5xl">
+
+            <section className="w-full overflow-hidden bg-white px-5 py-16 text-black sm:px-8 sm:py-20 md:px-12 md:py-24 lg:px-16 lg:py-36">
+                <div className="mx-auto grid w-full max-w-[1400px] grid-cols-1 gap-10 sm:gap-12 lg:grid-cols-12 lg:gap-16">
+
+                    {/* Text + Stats */}
+                    <div className="min-w-0 lg:col-span-7">
+                        <p className="reveal-text max-w-3xl text-[clamp(1.75rem,6.5vw,3.25rem)] font-semibold leading-[1.18] tracking-[-0.045em] sm:text-4xl md:text-5xl md:leading-[1.15]">
                             <SplitWords text="A website is the first conversation you have with a customer. We make sure it is fast, memorable and impossible to scroll past without feeling something." />
                         </p>
 
-                        <div className="mt-14 grid grid-cols-1 gap-8 border-t border-black/10 pt-10 sm:grid-cols-3">
+                        {/* Stats */}
+                        <div className="mt-10 grid grid-cols-3 gap-x-5 gap-y-8 border-t border-black/10 pt-7 sm:mt-12 sm:gap-x-8 sm:gap-y-10 sm:pt-9 lg:mt-14 lg:grid-cols-3 lg:gap-6 lg:pt-10">
                             {STATS.map((s) => (
-                                <div key={s.label}>
-                                    <div className="flex items-baseline text-6xl font-bold tracking-[-0.06em] lg:text-7xl">
-                                        <span
-                                            className="stat-num"
-                                            data-value={s.value}
-                                        >
+                                <div key={s.label} className="min-w-0">
+                                    <div className="flex items-baseline whitespace-nowrap text-[clamp(2.5rem,10vw,4rem)] font-bold leading-none tracking-[-0.065em] lg:text-7xl">
+                                        <span className="stat-num" data-value={s.value}>
                                             {s.value}
                                         </span>
-                                        <span className="text-[#ff5a1f]">
-                                            {s.suffix}
-                                        </span>
+                                        <span className="text-[#ff5a1f]">{s.suffix}</span>
                                     </div>
-                                    <p className="mt-2 max-w-[180px] text-sm leading-[1.6] text-neutral-600">
+
+                                    <p className="mt-3 max-w-[180px] break-words text-xs leading-[1.7] text-neutral-600 sm:text-sm">
                                         {s.label}
                                     </p>
                                 </div>
@@ -503,21 +594,24 @@ export default function WebDevSections() {
                         </div>
                     </div>
 
-                    <div className="lg:col-span-5">
-                        <div className="content-img relative aspect-[4/5] w-full overflow-hidden rounded-2xl bg-neutral-900">
+                    {/* Image */}
+                    <div className="min-w-0 lg:col-span-5">
+                        <div className="content-img relative aspect-[5/4] w-full overflow-hidden rounded-xl bg-neutral-900 sm:aspect-[4/3] lg:aspect-[4/5] lg:rounded-2xl">
                             <div className="content-img-inner absolute inset-0">
                                 <Image
                                     src="/home/new1.png"
                                     alt="Bugsmoker web development work"
                                     fill
-                                    sizes="(max-width: 1024px) 100vw, 40vw"
+                                    sizes="(max-width: 1023px) 100vw, 40vw"
                                     className="object-cover"
                                 />
                             </div>
                         </div>
                     </div>
+
                 </div>
             </section>
+
 
             {/* ---------------- Problem ---------------- */}
             <section className="w-full bg-black px-5 py-24 text-white sm:px-8 md:px-12 lg:px-16 lg:py-36">
