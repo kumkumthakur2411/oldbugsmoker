@@ -7,6 +7,10 @@ import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
 import servicesData from "@/data/data.json";
+import Navbar from "@/_components/NavBar";
+import Footer from "@/_components/Footer";
+import Blog from "@/_components/Blog";
+import TestimonialsSection from "@/_components/TestimonialsSection";
 
 if (typeof window !== "undefined") {
     gsap.registerPlugin(ScrollTrigger);
@@ -308,13 +312,14 @@ export default function ServicesPage() {
             ref={root}
             className="min-h-screen overflow-x-clip bg-black p-2 font-sans sm:p-3"
         >
+            <Navbar />
             {/* Scroll progress */}
             <div className="progress pointer-events-none fixed left-0 top-0 z-50 h-[3px] w-full origin-left scale-x-0 bg-[#ff5a1f]" />
 
             <div className="flex flex-col gap-3">
                 {/* Hero */}
                 <section className="hero flex min-h-[85svh] flex-col justify-between overflow-hidden rounded-xl bg-white px-4 pb-5 pt-5 text-black sm:min-h-[92vh] sm:px-8 sm:pb-8 sm:pt-6">
-                    <div className="hero-fade flex items-start justify-between gap-4 text-xs sm:text-sm">
+                    <div className="hero-fade flex items-start justify-between gap-4 text-xs sm:text-sm mt-[10vh]">
                         <span className="shrink-0">(Services)</span>
 
                         <span className="max-w-[200px] text-right leading-[1.5] text-neutral-600 sm:max-w-[220px]">
@@ -556,6 +561,9 @@ export default function ServicesPage() {
                     </div>
                 </section>
             </div>
+            <TestimonialsSection />
+            <Blog />
+            <Footer />
         </div>
     );
 }
