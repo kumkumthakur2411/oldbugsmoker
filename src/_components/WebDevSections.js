@@ -254,7 +254,7 @@ export default function WebDevSections() {
                         defaults: { ease: "power2.inOut" },
                         scrollTrigger: {
                             trigger: paraRef.current,
-                            start: "top top",
+                            start: "center center",
                             end: "+=" + n * 45 + "%",
                             pin: true,
                             scrub: 0.6,
@@ -459,43 +459,17 @@ export default function WebDevSections() {
                 ref={featRef}
                 className="relative w-full bg-white text-black lg:flex lg:h-screen lg:items-center lg:overflow-hidden"
             >
-                <div className="w-full py-12 sm:py-16 lg:py-0">
-                    <div className="feat-heading mb-6 sm:mb-8 flex flex-col gap-3 px-5 sm:px-8 md:px-12 lg:mb-12 lg:flex-row lg:items-end lg:justify-between lg:px-16">
+                <div className="w-full pt-8 pb-12 sm:py-16 lg:py-0">
+                    <div className="feat-heading mb-6 flex w-full flex-col gap-3 px-5 sm:mb-8 sm:px-8 md:px-12 lg:mb-14 lg:flex-row lg:items-end lg:justify-between lg:px-16">
                         <div>
-
-                            <h2 className="max-w-3xl text-3xl font-bold leading-[1.02] tracking-[-0.04em] sm:text-5xl lg:text-7xl">
-                                What we build under web development
+                            <h2 className="max-w-3xl text-[clamp(1.5rem,10vw,5rem)] font-bold leading-[0.92] tracking-[-0.065em] sm:text-[clamp(4rem,10vw,6.5rem)] md:text-[clamp(3.2rem,5.5vw,6.5rem)] md:leading-[0.94]">
+                                Our core web capabilities
                             </h2>
                         </div>
-                        <div className="flex items-end justify-between gap-4 lg:flex-col lg:items-end">
+                        <div className="lg:flex lg:flex-col lg:items-end">
                             <p className="max-w-sm text-xs sm:text-sm leading-[1.7] text-neutral-600 md:text-[15px]">
                                 Four things we do every week. Scroll sideways through them.
                             </p>
-                            {/* Mobile / Tablet arrow controls */}
-                            <div className="flex items-center gap-1.5 lg:hidden">
-                                <button
-                                    type="button"
-                                    onClick={() => scrollTrack(-1)}
-                                    disabled={activeCard === 0}
-                                    aria-label="Previous card"
-                                    className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-black/20 text-black transition-all hover:border-black hover:bg-black hover:text-white disabled:opacity-30 disabled:pointer-events-none active:scale-95"
-                                >
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                        <path d="M19 12H5M12 19l-7-7 7-7" />
-                                    </svg>
-                                </button>
-                                <button
-                                    type="button"
-                                    onClick={() => scrollTrack(1)}
-                                    disabled={activeCard === FEATURES.length - 1}
-                                    aria-label="Next card"
-                                    className="flex h-8 w-8 cursor-pointer items-center justify-center rounded-full border border-black/20 text-black transition-all hover:border-black hover:bg-black hover:text-white disabled:opacity-30 disabled:pointer-events-none active:scale-95"
-                                >
-                                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
-                                        <path d="M5 12h14M12 5l7 7-7 7" />
-                                    </svg>
-                                </button>
-                            </div>
                         </div>
                     </div>
 
@@ -560,18 +534,17 @@ export default function WebDevSections() {
             </section>
 
             {/* ---------------- Content ---------------- */}
-
-            <section className="w-full overflow-hidden bg-white px-5 py-16 text-black sm:px-8 sm:py-20 md:px-12 md:py-24 lg:px-16 lg:py-36">
-                <div className="mx-auto grid w-full max-w-[1400px] grid-cols-1 gap-10 sm:gap-12 lg:grid-cols-12 lg:gap-16">
+            <section className="w-full overflow-hidden bg-white px-5 py-12 text-black sm:px-8 sm:py-16 md:px-12 lg:px-16 lg:py-28">
+                <div className="mx-auto grid w-full max-w-[1400px] grid-cols-1 gap-8 sm:gap-12 lg:grid-cols-12 lg:gap-20">
 
                     {/* Text + Stats */}
                     <div className="min-w-0 lg:col-span-7">
-                        <p className="reveal-text max-w-3xl text-[clamp(1.75rem,6.5vw,3.25rem)] font-semibold leading-[1.18] tracking-[-0.045em] sm:text-4xl md:text-5xl md:leading-[1.15]">
+                        <p className="reveal-text max-w-3xl text-[clamp(1.5rem,6.5vw,2.7rem)] font-semibold leading-[1.14] tracking-[-0.055em] sm:text-4xl lg:text-5xl">
                             <SplitWords text="A website is the first conversation you have with a customer. We make sure it is fast, memorable and impossible to scroll past without feeling something." />
                         </p>
 
                         {/* Stats */}
-                        <div className="mt-10 grid grid-cols-3 gap-x-5 gap-y-8 border-t border-black/10 pt-7 sm:mt-12 sm:gap-x-8 sm:gap-y-10 sm:pt-9 lg:mt-14 lg:grid-cols-3 lg:gap-6 lg:pt-10">
+                        <div className="mt-8 grid grid-cols-3 gap-x-5 gap-y-8 border-t border-black/10 pt-6 sm:mt-12 sm:gap-x-8 sm:gap-y-10 sm:pt-9 lg:mt-16 lg:grid-cols-3 lg:gap-8 lg:pt-12">
                             {STATS.map((s) => (
                                 <div key={s.label} className="min-w-0">
                                     <div className="flex items-baseline whitespace-nowrap text-[clamp(2.5rem,10vw,4rem)] font-bold leading-none tracking-[-0.065em] lg:text-7xl">
@@ -609,13 +582,13 @@ export default function WebDevSections() {
 
 
             {/* ---------------- Problem ---------------- */}
-            <section className="w-full overflow-hidden bg-black px-5 py-16 text-white sm:px-8 sm:py-20 md:px-12 md:py-24 lg:px-16 lg:py-36">
+            <section className="w-full overflow-hidden bg-black px-5 py-12 text-white sm:px-8 sm:py-16 md:px-12 lg:px-16 lg:py-28">
                 <div className="mx-auto max-w-[1400px]">
                     {/* Heading */}
-                    <div className="flex items-end justify-between gap-4">
-                        <h2 className="max-w-4xl text-[clamp(2.5rem,8.5vw,5rem)] font-bold leading-[0.94] tracking-[-0.065em] sm:text-6xl md:text-7xl lg:text-8xl">
-                            Most websites quietly{" "}
-                            <span className="text-white/45">lose people.</span>
+                    <div className="flex items-end justify-between gap-6">
+                        <h2 className="max-w-4xl text-[clamp(1.5rem,10vw,5rem)] font-bold leading-[0.92] tracking-[-0.065em] sm:text-[clamp(4rem,10vw,6.5rem)] md:text-[clamp(3.2rem,5.5vw,6.5rem)] md:leading-[0.94]">
+                            <span className="block">Most websites quietly</span>
+                            <span className="block text-white/45">lose people.</span>
                         </h2>
 
                         <span className="mb-1 hidden shrink-0 text-xs uppercase tracking-[0.15em] text-white/40 md:block">
@@ -626,11 +599,11 @@ export default function WebDevSections() {
                     </div>
 
                     {/* Problem rows */}
-                    <div className="mt-10 sm:mt-14 lg:mt-24">
+                    <div className="mt-8 sm:mt-10 lg:mt-16">
                         {PROBLEMS.map((p, i) => (
                             <div
                                 key={p.title}
-                                className="problem-row relative py-6 sm:py-8 lg:py-10"
+                                className="problem-row relative py-5 sm:py-6 lg:py-9"
                             >
                                 <div className="grid grid-cols-1 gap-3 sm:gap-4 lg:grid-cols-12 lg:items-center lg:gap-10">
                                     {/* Number + title */}
@@ -672,8 +645,8 @@ export default function WebDevSections() {
             </section>
 
             {/* ---------------- Solution ---------------- */}
-            <section className="w-full bg-white px-5 py-14 text-black sm:px-8 sm:py-20 md:px-12 lg:px-16 lg:py-24">
-                <div className="mx-auto grid max-w-[1400px] gap-8 lg:grid-cols-12 lg:gap-14">
+            <section className="w-full bg-white px-5 py-12 text-black sm:px-8 sm:py-16 md:px-12 lg:px-16 lg:py-28">
+                <div className="mx-auto grid max-w-[1400px] gap-8 sm:gap-12 lg:grid-cols-12 lg:gap-20">
                     <div className="lg:col-span-5">
                         <div className="lg:sticky lg:top-24">
                             <div className="mb-2 flex items-center gap-2">
@@ -682,7 +655,7 @@ export default function WebDevSections() {
                                     Strategic Answers
                                 </span>
                             </div>
-                            <h2 className="text-3xl font-bold leading-[1.02] tracking-[-0.04em] sm:text-4xl lg:text-5xl">
+                            <h2 className="text-[clamp(1.5rem,10vw,5rem)] font-bold leading-[0.92] tracking-[-0.065em] sm:text-[clamp(4rem,10vw,6.5rem)] md:text-[clamp(3.2rem,5.5vw,6.5rem)] md:leading-[0.94]">
                                 So we fix them at the root.
                             </h2>
                             <p className="mt-3 max-w-sm text-xs sm:text-sm leading-relaxed text-neutral-600 md:text-[14px]">
@@ -725,12 +698,12 @@ export default function WebDevSections() {
             </section>
             <section
                 ref={paraRef}
-                className="w-full  px-5 py-16 text-black sm:px-8 md:px-12 lg:flex lg:h-screen lg:items-center lg:px-16 lg:py-0"
+                className="w-full px-5 py-12 text-black sm:px-8 md:px-12 lg:px-16 lg:py-28"
             >
-                <div className="mx-auto grid w-full max-w-[1400px] gap-12 lg:grid-cols-12 lg:gap-16">
+                <div className="mx-auto grid w-full max-w-[1400px] gap-8 sm:gap-12 lg:grid-cols-12 lg:gap-20">
                     {/* Left: heading + progress list (desktop) */}
                     <div className="lg:col-span-5">
-                        <h2 className="text-5xl font-bold leading-[0.95] tracking-[-0.05em] sm:text-6xl lg:text-7xl">
+                        <h2 className="text-[clamp(1.5rem,10vw,5rem)] font-bold leading-[0.92] tracking-[-0.065em] sm:text-[clamp(4rem,10vw,6.5rem)] md:text-[clamp(3.2rem,5.5vw,6.5rem)] md:leading-[0.94]">
                             Content and SEO that works together
                         </h2>
 
@@ -751,7 +724,7 @@ export default function WebDevSections() {
                     </div>
 
                     {/* Right: paragraphs */}
-                    <div className="relative flex flex-col gap-10 lg:col-span-7 lg:block lg:h-[56vh] lg:gap-0">
+                    <div className="relative flex flex-col gap-10 lg:col-span-7 lg:block lg:min-h-[320px] lg:h-[360px] lg:gap-0">
                         {PARAGRAPHS.map((p) => (
                             <div
                                 key={p.title}
@@ -769,10 +742,10 @@ export default function WebDevSections() {
                 </div>
             </section>
             {/* ---------------- FAQ ---------------- */}
-            <section className="w-full bg-neutral-50 px-5 py-24 text-black sm:px-8 md:px-12 lg:px-16 lg:py-36">
-                <div className="mx-auto grid max-w-[1400px] gap-12 lg:grid-cols-12 lg:gap-16">
+            <section className="w-full bg-neutral-50 px-5 py-12 text-black sm:px-8 sm:py-16 md:px-12 lg:px-16 lg:py-28">
+                <div className="mx-auto grid max-w-[1400px] gap-8 sm:gap-12 lg:grid-cols-12 lg:gap-20">
                     <div className="lg:col-span-4">
-                        <h2 className="text-5xl font-bold leading-[0.95] tracking-[-0.05em] sm:text-6xl">
+                        <h2 className="text-[clamp(1.5rem,10vw,5rem)] font-bold leading-[0.92] tracking-[-0.065em] sm:text-[clamp(4rem,10vw,6.5rem)] md:text-[clamp(3.2rem,5.5vw,6.5rem)] md:leading-[0.94]">
                             Questions we hear a lot
                         </h2>
                         <p className="mt-6 max-w-xs text-sm leading-[1.8] text-neutral-600 md:text-[15px]">

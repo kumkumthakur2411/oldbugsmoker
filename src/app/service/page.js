@@ -21,7 +21,7 @@ export default function ServicePage() {
             {/* Hero Section */}
 
             <section className="relative w-full bg-white text-black">
-                <div className="flex min-h-screen flex-col md:min-h-screen md:flex-row">
+                <div className="flex flex-col md:min-h-screen md:flex-row">
                     {/* Image */}
                     <div className="relative h-[44svh] min-h-[300px] w-full shrink-0 overflow-hidden bg-neutral-900 sm:h-[52svh] md:h-screen md:w-1/2">
                         <Image
@@ -47,20 +47,20 @@ export default function ServicePage() {
                     </div>
 
                     {/* Content */}
-                    <div className="relative flex w-full flex-1 flex-col justify-between px-5 pb-8 pt-7 sm:px-8 sm:pb-10 sm:pt-9 md:w-1/2 md:flex-none md:justify-end md:px-10 md:pb-12 lg:px-16 lg:pb-16">
+                    <div className="relative flex w-full flex-col justify-between px-5 pb-7 pt-6 sm:px-8 sm:pb-8 sm:pt-8 md:min-h-screen md:w-1/2 md:flex-none md:justify-end md:px-12 md:pb-12 lg:px-16 lg:pb-16">
                         <div>
                             {/* Eyebrow */}
 
 
 
                             {/* Heading */}
-                            <h1 className="font-['Outfit'] text-[clamp(1.5rem,10vw,5rem)] font-extrabold uppercase leading-[0.82] tracking-[-0.075em] sm:text-[clamp(4rem,10vw,6.5rem)] md:text-[clamp(3.2rem,5.5vw,6.5rem)] md:leading-[0.85] md:tracking-[-0.07em]">
+                            <h1 className="font-['Outfit'] text-[clamp(1.5rem,10vw,5rem)] font-bold leading-[0.92] tracking-[-0.065em] sm:text-[clamp(4rem,10vw,6.5rem)] md:text-[clamp(3.2rem,5.5vw,6.5rem)] md:leading-[0.94]">
                                 <span className="block">Web</span>
                                 <span className="mt-1 block">Development <span className="text-[#ff5a1f]">.</span></span>
                             </h1>
 
                             {/* Description */}
-                            <div className="mt-7 border-t border-black/15 pt-5 sm:mt-8 sm:pt-6 md:mt-8">
+                            <div className="mt-6 border-t border-black/15 pt-4 sm:mt-7 sm:pt-5 md:mt-8 md:pt-6">
                                 {/* <div className="mb-3 flex items-center justify-between">
                                     <span className="text-[10px] font-semibold uppercase tracking-[0.16em] text-neutral-500 sm:text-xs">
                                         What we do
@@ -68,14 +68,14 @@ export default function ServicePage() {
                                     <span className="text-xs text-[#ff5a1f]">↘</span>
                                 </div> */}
 
-                                <p className="max-w-md font-['Outfit'] text-sm leading-[1.8] text-neutral-600 sm:text-base sm:leading-[1.85]">
+                                <p className="max-w-md font-['Outfit'] text-sm leading-[1.75] text-neutral-600 sm:text-base sm:leading-[1.85]">
                                     {description}
                                 </p>
                             </div>
                         </div>
 
                         {/* Bottom detail */}
-                        <div className="mt-9 flex items-center justify-between border-t border-black/10 pt-4 md:mt-12">
+                        <div className="mt-6 flex items-center justify-between border-t border-black/10 pt-4 sm:mt-8 md:mt-12">
                             <span className="text-[10px] uppercase tracking-[0.15em] text-neutral-400 sm:text-xs">
                                 From idea to impact
                             </span>

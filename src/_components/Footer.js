@@ -129,7 +129,7 @@ export default function Footer() {
         <footer className="relative isolate overflow-hidden bg-black text-white">
             {/* Background */}
             <div
-                className="absolute inset-0 -z-20 bg-cover bg-center bg-no-repeat grayscale brightness-90 contrast-110"
+                className="absolute inset-0 -z-20 bg-cover bg-center bg-no-repeat brightness-95 contrast-105"
                 style={{ backgroundImage: "url('/footer.png')" }}
             />
 
