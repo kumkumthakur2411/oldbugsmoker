@@ -18,10 +18,11 @@ export default function Home() {
       <Hero />
       <Content />
       <Services />
+        <CtaSection />
       {/* <Aboutus /> */}
       <Portfolio />
       <Technologies />
-      <CtaSection />
+    
       <TestimonialsSection />
       {/* <Project /> */}
       <Blog />
