@@ -1,252 +1,377 @@
 "use client";
 
-import React, { useRef } from "react";
-import Image from "next/image";
+import React, { useEffect, useRef } from "react";
 import Link from "next/link";
-import { motion, useScroll, useTransform } from "framer-motion";
-import { ArrowUpRight } from "lucide-react";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import servicesData from "@/data/services.json";
 
-const SERVICES_DATA = [
-    {
-        id: "services-overview",
-        isOverview: true,
-        pill: "Our Capabilities & Expertise",
-        serviceName: "Services We Offer",
-        badge: "Overview",
-        tagline:
-            "From custom high-performance web platforms to resilient cloud infrastructure, every service is tailored to make your digital presence memorable and unstoppable.",
-        src: "/home/new1.webp",
-        alt: "Bugsmoker Services Overview",
-        href: "#services",
-        buttonText: "Explore Our Services",
-    },
-    {
-        id: "web-development",
-        number: "01",
-        pill: "01 • Architecture & Frontend",
-        serviceName: "Web Development",
-        badge: "Next.js 15+ & React 19",
-        tagline:
-            "Crafting immersive web platforms that convert & inspire. Modern Next.js architectures engineered for sub-second load times and fluid 60+ FPS motion.",
-        src: "/home/1.webp",
-        alt: "Bugsmoker Web Development",
-        href: "/services",
-        buttonText: "Explore Web Development",
-    },
-    {
-        id: "software-development",
-        number: "02",
-        pill: "02 • Systems & Full-Stack",
-        serviceName: "Software Development",
-        badge: "High-Throughput Engineering",
-        tagline:
-            "Engineering scalable software engines built for exponential growth. Robust full-stack platforms, bespoke dashboards, and automated digital workflows.",
-        src: "/home/2.webp",
-        alt: "Bugsmoker Software Development",
-        href: "/services",
-        buttonText: "Explore Software Development",
-    },
-    {
-        id: "website-optimization",
-        number: "03",
-        pill: "03 • Speed & Core Web Vitals",
-        serviceName: "Website Optimization",
-        badge: "Performance & SEO Lab",
-        tagline:
-            "Sub-second load times, 99+ Core Web Vitals, and effortless fluidity. Eliminate latency, maximize conversions, and dominate search rankings.",
-        src: "/home/3.webp",
-        alt: "Bugsmoker Website Optimization",
-        href: "/services",
-        buttonText: "Explore Optimization",
-    },
-    {
-        id: "hosting-maintenance",
-        number: "04",
-        pill: "04 • Cloud & Infrastructure",
-        serviceName: "Hosting & Maintenance",
-        badge: "DevOps & Global Edge",
-        tagline:
-            "Mission-critical reliability and proactive 24/7 cloud management. Automated zero-downtime deployments, enterprise security hardening, and real-time telemetry.",
-        src: "/home/4.webp",
-        alt: "Bugsmoker Hosting and Maintenance",
-        href: "/services",
-        buttonText: "Explore Hosting & Cloud",
-    },
-    {
-        id: "tech-support",
-        number: "05",
-        pill: "05 • Dedicated Support",
-        serviceName: "Tech Support",
-        badge: "24/7 Developer Pairing",
-        tagline:
-            "Relentless technical support keeping your systems bulletproof. Rapid incident resolution, continuous updates, and hands-on developer pairing.",
-        src: "/home/5.webp",
-        alt: "Bugsmoker Tech Support",
-        href: "/services",
-        buttonText: "Explore Tech Support",
-    },
-];
+if (typeof window !== "undefined") {
+    gsap.registerPlugin(ScrollTrigger);
+}
 
-function ServiceCardItem({ i, service, total, progress, range, targetScale }) {
-    // Dynamic scale as subsequent cards stack over this card
-    const scale = useTransform(progress, range, [1, targetScale]);
-    // Dynamic overlay dimming as subsequent cards stack over this card (hardware accelerated)
-    const stackDimOpacity = useTransform(progress, range, [0, 0.4]);
+const DEFAULT_SERVICES = servicesData?.services
+    ? Object.values(servicesData.services)
+    : [];
 
-    // Cascading top reveal: each card docks slightly lower showing top edge of previous cards
-    const topOffset = `${i * 14}px`;
+const pad = (n) => String(n).padStart(2, "0");
 
+const Arrow = ({ size = 18 }) => (
+    <svg
+        viewBox="0 0 24 24"
+        width={size}
+        height={size}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+    >
+        <path d="M7 17 17 7M8 7h9v9" />
+    </svg>
+);
+
+/* Circular rotating "view service" badge */
+export function SpinBadge({ id = "" }) {
     return (
-        <div
-            className="sticky top-0 h-[100svh] min-h-[580px] w-full flex items-center justify-center px-0 sm:px-5 lg:px-8 pointer-events-none"
-            style={{
-                zIndex: i + 10,
-            }}
-        >
-            <motion.div
-                style={{
-                    scale,
-                    top: topOffset,
-                }}
-                className="card-inner pointer-events-auto relative h-[68svh] min-h-[440px] max-h-[740px] w-full overflow-hidden border-y border-neutral-200/80 bg-neutral-900 shadow-2xl shadow-black/30 sm:h-[560px] sm:min-h-[480px] sm:rounded-xl sm:border md:h-[620px] lg:h-[680px] lg:rounded-2xl xl:h-[720px] will-change-transform transform-gpu"
+        <span className="relative flex h-20 w-20 items-center justify-center rounded-full bg-white text-black shadow-lg shadow-black/20 transition-colors duration-300 group-hover:bg-[#ff5a1f] group-hover:text-white sm:h-24 sm:w-24">
+            <svg
+                viewBox="0 0 100 100"
+                className="absolute inset-0 animate-[spin_14s_linear_infinite] motion-reduce:animate-none"
+                aria-hidden="true"
             >
-                {/* Background Image: Served unoptimized directly as lightweight WebP (~90KB) for instant zero-lag desktop rendering */}
-                <Image
-                    src={service.src}
-                    alt={service.alt}
-                    fill
-                    unoptimized={true}
-                    priority={true}
-                    sizes="100vw"
-                    className="object-cover object-center grayscale brightness-[1.15] contrast-95 transition-transform duration-1000 ease-out group-hover:scale-[1.02] pointer-events-none select-none"
-                />
-
-                {/* Base Dark Overlay */}
-                <div className="absolute inset-0 z-10 bg-black/40 pointer-events-none" />
-
-                {/* Stacking Dim Overlay: smoothly darkens underneath as subsequent cards stack */}
-                <motion.div
-                    style={{ opacity: stackDimOpacity }}
-                    className="absolute inset-0 z-15 bg-black pointer-events-none"
-                />
-
-                {/* Content Area */}
-                <div className="relative z-20 flex h-full w-full flex-col justify-between p-6 sm:p-9 md:p-12 lg:p-14 text-center items-center">
-                    {/* Top Meta Bar */}
-                    <div className="w-full flex items-center justify-between text-left">
-                        <span className="font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-white/50">
-                            BUGSMOKER ATELIER
-                        </span>
-
-                        <span className="font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-white/50">
-                            {service.badge}
-                        </span>
-                    </div>
-
-                    {/* Centered Content: Pill Badge + Big Bold White Service Name + Tagline + Button */}
-                    <div className="my-auto flex flex-col items-center justify-center max-w-4xl px-2">
-                        {/* Centered Category / Sub-heading Pill */}
-                        <div className="mb-3 sm:mb-4">
-                            <span className="inline-flex items-center gap-2 rounded-full border border-white/25 bg-black/40 px-4 py-1.5 sm:px-5 sm:py-2 text-[11px] sm:text-xs font-mono uppercase tracking-[0.2em] text-white backdrop-blur-md shadow-md">
-                                <span className="h-1.5 w-1.5 rounded-full bg-[#ff5a1f]" />
-                                <span>{service.pill}</span>
-                            </span>
-                        </div>
-
-                        {/* Centered Main Heading: Bold White Service Name */}
-                        <h2 className="w-full font-['Outfit'] text-[clamp(2.5rem,6.5vw,5.5rem)] font-bold leading-[0.98] tracking-[-0.035em] text-white text-center">
-                            {service.serviceName}
-                            <span className="text-[#ff5a1f]">.</span>
-                        </h2>
-
-                        {/* Centered Tagline / Description */}
-                        <p className="mt-4 sm:mt-5 text-[14px] sm:text-base md:text-lg leading-relaxed text-white/85 max-w-2xl text-center">
-                            {service.tagline}
-                        </p>
-
-                        {/* Centered Action Button */}
-                        <div className="mt-6 sm:mt-8">
-                            <Link
-                                href={service.href}
-                                className="group/btn inline-flex cursor-pointer select-none items-center justify-center gap-2.5 whitespace-nowrap rounded-full bg-[#ff5a1f] px-6 py-2.5 sm:px-8 sm:py-3.5 text-xs sm:text-sm font-semibold tracking-wide text-white shadow-lg shadow-[#ff5a1f]/20 transition-all duration-300 hover:bg-[#e04f1a] hover:shadow-xl hover:shadow-[#ff5a1f]/35 active:scale-95"
-                            >
-                                <span>{service.buttonText}</span>
-                                <ArrowUpRight
-                                    size={16}
-                                    strokeWidth={2.4}
-                                    className="transition-transform duration-300 group-hover/btn:-translate-y-0.5 group-hover/btn:translate-x-0.5"
-                                />
-                            </Link>
-                        </div>
-                    </div>
-
-                    {/* Bottom Status / Deck Indicator */}
-                    <div className="w-full flex items-center justify-between text-[10px] sm:text-xs text-white/55 font-mono pt-3 border-t border-white/15">
-                        <span className="tracking-wider uppercase">
-                            {service.isOverview
-                                ? "01 / 06 • Overview"
-                                : i === total - 1
-                                ? `0${total} / 0${total} • Complete`
-                                : `0${i + 1} / 0${total} • Scroll for next service ↓`}
-                        </span>
-
-                        {/* Deck Step Indicator */}
-                        <div className="flex items-center gap-1.5">
-                            {Array.from({ length: total }, (_, idx) => (
-                                <span
-                                    key={idx}
-                                    className={`h-1 rounded-full transition-all duration-300 ${
-                                        idx === i
-                                            ? "w-6 bg-[#ff5a1f]"
-                                            : idx < i
-                                            ? "w-2 bg-white/60"
-                                            : "w-2 bg-white/20"
-                                    }`}
-                                />
-                            ))}
-                        </div>
-                    </div>
-                </div>
-            </motion.div>
-        </div>
+                <defs>
+                    <path
+                        id={`badge-${id}`}
+                        d="M50,50 m-37,0 a37,37 0 1,1 74,0 a37,37 0 1,1 -74,0"
+                    />
+                </defs>
+                <text
+                    className="fill-current text-[9.5px] font-semibold uppercase"
+                    textLength="226"
+                    lengthAdjust="spacing"
+                >
+                    <textPath href={`#badge-${id}`}>
+                        View service • View service •{" "}
+                    </textPath>
+                </text>
+            </svg>
+            <span className="transition-transform duration-300 group-hover:rotate-45">
+                <Arrow size={22} />
+            </span>
+        </span>
     );
 }
 
-export default function Services() {
+export function ServiceCard({ service, index = 0, total = 1, href, dark }) {
+    const cardRef = useRef(null);
+    if (!service) return null;
+
+    const isDark = typeof dark === "boolean" ? dark : index % 2 === 1;
+    const num = pad(index + 1);
+    const linkHref = href || `/services/${service.slug || ""}`;
+    const stat = service.content?.stats?.[0];
+
+    return (
+        <article
+            ref={cardRef}
+            id={`service-${service.slug || index}`}
+            style={{ zIndex: index + 1 }}
+            className="service-card relative scroll-mt-3 md:sticky md:top-3 md:h-[calc(100svh-1.5rem)] will-change-transform"
+        >
+            <div
+                className={`card-inner relative h-full min-h-[620px] origin-top overflow-hidden rounded-xl sm:min-h-0 will-change-transform transform-gpu ${
+                    isDark
+                        ? "border border-white/10 bg-neutral-900 text-white"
+                        : "bg-white text-black"
+                }`}
+            >
+                {/* Oversized number watermark */}
+                <span
+                    aria-hidden="true"
+                    className={`card-mark pointer-events-none absolute -bottom-10 -left-4 hidden select-none text-[22rem] font-semibold leading-none tracking-[-0.08em] md:block will-change-transform ${
+                        isDark ? "text-white/[0.04]" : "text-black/[0.04]"
+                    }`}
+                >
+                    {num}
+                </span>
+
+                {/* Dim layer, animated by the stack */}
+                <div className="card-dim pointer-events-none absolute inset-0 z-20 bg-black opacity-0 will-change-[opacity]" />
+
+                <div className="relative grid h-full gap-7 p-4 sm:gap-8 sm:p-8 md:grid-cols-12 md:gap-12">
+                    {/* Text */}
+                    <div className="flex min-w-0 flex-col justify-between gap-8 md:col-span-6 md:gap-10">
+                        <div className="card-anim flex items-center justify-between gap-3 text-xs sm:text-sm">
+                            <span>
+                                <span className="text-[#ff5a1f]">({num})</span>
+                                <span className="opacity-50"> / {pad(total)}</span>
+                            </span>
+                            <span className="text-right opacity-60">
+                                {service.featured?.items?.length || 0} specialities
+                            </span>
+                        </div>
+
+                        <div className="min-w-0">
+                            <Link href={linkHref} className="group block">
+                                <h2 className="card-anim break-words text-[clamp(2.2rem,10vw,3.5rem)] font-semibold lowercase leading-[.92] tracking-[-0.06em] transition-colors duration-300 group-hover:text-[#ff5a1f] sm:text-[clamp(2.6rem,6vw,6rem)] sm:leading-[.9]">
+                                    {service.hero?.titlePlain || service.slug}
+                                </h2>
+                            </Link>
+
+                            <p
+                                className={`card-anim mt-4 max-w-md break-words text-sm leading-[1.8] sm:mt-6 sm:text-[15px] ${
+                                    isDark ? "text-white/70" : "text-neutral-600"
+                                }`}
+                            >
+                                {service.metadata?.description || service.hero?.description}
+                            </p>
+
+                            {service.featured?.items && (
+                                <div className="card-anim mt-5 flex flex-wrap gap-2 sm:mt-6">
+                                    {service.featured.items.map((f) => (
+                                        <span
+                                            key={f.title}
+                                            className={`max-w-full break-words rounded-full border px-3 py-1.5 text-xs ${
+                                                isDark
+                                                    ? "border-white/20"
+                                                    : "border-black/20"
+                                            }`}
+                                        >
+                                            {f.title}
+                                        </span>
+                                    ))}
+                                </div>
+                            )}
+                        </div>
+
+                        <Link
+                            href={linkHref}
+                            className="card-anim group inline-flex min-h-11 w-fit items-center gap-3 text-sm font-semibold"
+                        >
+                            <span>View service</span>
+                            <span
+                                className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-all duration-300 group-hover:rotate-45 group-hover:bg-[#ff5a1f] group-hover:text-white ${
+                                    isDark
+                                        ? "bg-white text-black"
+                                        : "bg-black text-white"
+                                }`}
+                            >
+                                <Arrow />
+                            </span>
+                        </Link>
+                    </div>
+
+                    {/* Image */}
+                    <Link
+                        href={linkHref}
+                        aria-label={`View ${service.hero?.titlePlain || service.slug}`}
+                        className="group relative block aspect-[4/3] min-w-0 overflow-hidden rounded-lg bg-neutral-800 md:col-span-6 md:aspect-auto md:h-full"
+                    >
+                        {/* eslint-disable-next-line @next/next/no-img-element */}
+                        <img
+                            src={service.hero?.image}
+                            alt={service.hero?.imageAlt || service.hero?.titlePlain}
+                            className="card-img absolute inset-0 h-full w-full object-cover group-hover:scale-105 will-change-transform"
+                        />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/10" />
+
+                        {/* Rotating badge */}
+                        <div className="card-anim absolute right-3 top-3 sm:right-4 sm:top-4">
+                            <SpinBadge id={service.id || service.slug} />
+                        </div>
+
+                        {stat && (
+                            <div className="card-anim absolute bottom-3 left-3 right-3 flex items-end justify-between gap-3 rounded-md bg-black/60 p-3 backdrop-blur-md sm:bottom-4 sm:left-4 sm:right-4 sm:p-4">
+                                <div>
+                                    <div className="text-xl font-semibold text-white sm:text-2xl">
+                                        {stat.value}
+                                        <span className="text-[#ff5a1f]">
+                                            {stat.suffix}
+                                        </span>
+                                    </div>
+                                    <div className="text-xs text-white/70">
+                                        {stat.label}
+                                    </div>
+                                </div>
+                                <span className="text-xs uppercase tracking-wider text-[#ff5a1f]">
+                                    Verified
+                                </span>
+                            </div>
+                        )}
+                    </Link>
+                </div>
+            </div>
+        </article>
+    );
+}
+
+export default function Services({
+    services,
+    service,
+    index = 0,
+    total,
+    href,
+    dark,
+}) {
     const containerRef = useRef(null);
 
-    // Track scroll of the entire services section
-    const { scrollYProgress } = useScroll({
-        target: containerRef,
-        offset: ["start start", "end end"],
-    });
+    // If passed a single service directly, render just the card
+    if (service) {
+        return (
+            <ServiceCard
+                service={service}
+                index={index}
+                total={total || 1}
+                href={href}
+                dark={dark}
+            />
+        );
+    }
+
+    const items = services || DEFAULT_SERVICES;
+
+    useEffect(() => {
+        const container = containerRef.current;
+        if (!container) return;
+
+        let refreshTimer;
+
+        const ctx = gsap.context(() => {
+            const mm = gsap.matchMedia();
+
+            mm.add("(prefers-reduced-motion: no-preference)", () => {
+                const cards = gsap.utils.toArray(".service-card", container);
+                cards.forEach((card) => {
+                    const animElements = card.querySelectorAll(".card-anim");
+                    if (animElements.length > 0) {
+                        gsap.fromTo(
+                            animElements,
+                            { y: 35, opacity: 0 },
+                            {
+                                y: 0,
+                                opacity: 1,
+                                duration: 0.7,
+                                ease: "power3.out",
+                                stagger: 0.06,
+                                scrollTrigger: {
+                                    trigger: card,
+                                    start: "top 80%",
+                                    toggleActions: "play none none none",
+                                    once: true,
+                                },
+                            }
+                        );
+                    }
+
+                    const img = card.querySelector(".card-img");
+                    if (img) {
+                        gsap.fromTo(
+                            img,
+                            { scale: 1.15 },
+                            {
+                                scale: 1,
+                                duration: 1.1,
+                                ease: "power2.out",
+                                scrollTrigger: {
+                                    trigger: card,
+                                    start: "top 80%",
+                                    toggleActions: "play none none none",
+                                    once: true,
+                                },
+                                onComplete: () => {
+                                    img.classList.add(
+                                        "transition-transform",
+                                        "duration-500",
+                                        "ease-out"
+                                    );
+                                },
+                            }
+                        );
+                    }
+
+                    const mark = card.querySelector(".card-mark");
+                    if (mark) {
+                        gsap.fromTo(
+                            mark,
+                            { yPercent: 10 },
+                            {
+                                yPercent: -10,
+                                ease: "none",
+                                scrollTrigger: {
+                                    trigger: card,
+                                    start: "top bottom",
+                                    end: "bottom top",
+                                    scrub: true,
+                                },
+                            }
+                        );
+                    }
+                });
+            });
+
+            // Card stacking effect on desktop
+            mm.add(
+                "(min-width: 768px) and (prefers-reduced-motion: no-preference)",
+                () => {
+                    const cards = gsap.utils.toArray(".service-card", container);
+                    cards.forEach((card, i) => {
+                        const next = cards[i + 1];
+                        if (!next) return;
+                        const st = {
+                            trigger: next,
+                            start: "top 65%",
+                            end: "top top+=12",
+                            scrub: 0.5,
+                        };
+                        const inner = card.querySelector(".card-inner");
+                        if (inner) {
+                            gsap.to(inner, {
+                                scale: 0.94,
+                                ease: "none",
+                                scrollTrigger: st,
+                            });
+                        }
+                        const dim = card.querySelector(".card-dim");
+                        if (dim) {
+                            gsap.to(dim, {
+                                opacity: 0.55,
+                                ease: "none",
+                                scrollTrigger: st,
+                            });
+                        }
+                    });
+                }
+            );
+        }, containerRef);
+
+        // Ensure triggers align correctly after layout settles
+        refreshTimer = setTimeout(() => {
+            ScrollTrigger.refresh();
+        }, 150);
+
+        return () => {
+            clearTimeout(refreshTimer);
+            ctx.revert();
+        };
+    }, [items]);
 
     return (
         <section
             id="services"
             ref={containerRef}
-            className="relative w-full bg-white text-[rgb(36,36,36)] pt-4 pb-0 sm:pt-6 sm:pb-0"
+            className="relative flex flex-col gap-3 w-full px-2 sm:px-3"
         >
-            {/* Stacking Cards Track: each card has an equal 100svh track in document flow */}
-            <div className="relative w-full">
-                {SERVICES_DATA.map((service, i) => {
-                    const targetScale = 1 - (SERVICES_DATA.length - i - 1) * 0.035;
-                    const step = 1 / SERVICES_DATA.length;
-                    const range = [i * step, 1];
-
-                    return (
-                        <ServiceCardItem
-                            key={service.id}
-                            i={i}
-                            service={service}
-                            total={SERVICES_DATA.length}
-                            progress={scrollYProgress}
-                            range={range}
-                            targetScale={targetScale}
-                        />
-                    );
-                })}
-            </div>
+            {items.map((s, i) => (
+                <ServiceCard
+                    key={s.id || s.slug || i}
+                    service={s}
+                    index={i}
+                    total={items.length}
+                    href={`/services/${s.slug}`}
+                />
+            ))}
         </section>
     );
 }

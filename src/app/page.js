@@ -7,7 +7,7 @@ import Blog from "../_components/Blog";
 import TestimonialsSection from "@/_components/TestimonialsSection";
 import Footer from "../_components/Footer";
 import Aboutus from "@/_components/Aboutus";
-import Portfolio from "@/_components/Portfolio";
+import Portfolio from "@/_components/WorksShowcase";
 import Technologies from "@/_components/Technologies";
 import CtaSection from "@/_components/CtaSection";
 
@@ -16,9 +16,9 @@ export default function Home() {
     <>
       <Navbar />
       <Hero />
-      {/* <Content /> */}
+      <Content />
       <Services />
-      <Aboutus />
+      {/* <Aboutus /> */}
       <Portfolio />
       <Technologies />
       <CtaSection />
