@@ -10,6 +10,7 @@ import Aboutus from "@/_components/Aboutus";
 import Portfolio from "@/_components/WorksShowcase";
 import Technologies from "@/_components/Technologies";
 import CtaSection from "@/_components/CtaSection";
+import Cta from "@/_components/cta";
 
 export default function Home() {
   return (
@@ -21,6 +22,7 @@ export default function Home() {
         <CtaSection />
       {/* <Aboutus /> */}
       <Portfolio />
+      {/* <Cta/> */}
       <Technologies />
     
       <TestimonialsSection />

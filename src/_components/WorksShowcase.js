@@ -281,7 +281,7 @@ export default function WorksShowcase({
         <section
             ref={rootRef}
             id="portfolio"
-            className="works-section relative w-full bg-[#f8f8f7] text-black font-['Outfit',sans-serif] px-4 pb-16 pt-12 sm:px-6 sm:pb-20 sm:pt-16 lg:pt-24 select-none overflow-hidden"
+            className="works-section relative w-full  text-black font-['Outfit',sans-serif] px-4 pb-16 pt-12 sm:px-6 sm:pb-20 sm:pt-16 lg:pt-24 select-none overflow-hidden"
         >
             {/* Header matching reference image */}
             <div className="ws-head relative mx-auto max-w-4xl text-center mb-8 sm:mb-12 lg:mb-14">

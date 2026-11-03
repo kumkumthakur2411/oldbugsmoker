@@ -1,9 +1,27 @@
-
 "use client";
 
-import { useRef, useState, useEffect, useCallback } from "react";
+import {
+  useRef,
+  useState,
+  useEffect,
+  useLayoutEffect,
+} from "react";
 import Image from "next/image";
-import { ChevronLeft, ChevronRight, Quote } from "lucide-react";
+import Link from "next/link";
+import gsap from "gsap";
+import { ScrollTrigger } from "gsap/ScrollTrigger";
+import { ArrowUpRight, Quote } from "lucide-react";
+
+if (typeof window !== "undefined") {
+  gsap.registerPlugin(ScrollTrigger);
+}
+
+const useIsoLayoutEffect =
+  typeof window !== "undefined" ? useLayoutEffect : useEffect;
+
+/* ------------------------------------------------------------------ */
+/* Data                                                                */
+/* ------------------------------------------------------------------ */
 
 const TESTIMONIALS = [
   {
@@ -12,7 +30,6 @@ const TESTIMONIALS = [
     quote:
       "Por lejos el mejor servicio que me salvó la vida mental y física. Ya no hay forma de volver a quien era.",
     avatar: "/testimonials/alex.jpg",
-    heightClass: "h-[260px] sm:h-[320px] md:h-[340px]",
   },
   {
     id: "2",
@@ -20,7 +37,6 @@ const TESTIMONIALS = [
     quote:
       "No solo es un espacio o servicio con un grupo de amigos con los que ahora no paro de hacer planes. Con su hogar en las clases.",
     avatar: "/testimonials/camila.jpg",
-    heightClass: "h-[190px] sm:h-[225px] md:h-[240px]",
   },
   {
     id: "3",
@@ -28,7 +44,6 @@ const TESTIMONIALS = [
     quote:
       "Lo que más destaco es la calidad de la gente, verdaderamente se siente como una familia. Mi proceso ha sido increíble en cada etapa.",
     avatar: "/testimonials/esteban.jpg",
-    heightClass: "h-[255px] sm:h-[315px] md:h-[335px]",
   },
   {
     id: "4",
@@ -36,7 +51,6 @@ const TESTIMONIALS = [
     quote:
       "Una experiencia que supera cualquier expectativa. La dedicación, el cuidado en cada detalle y la vibra hacen que cada día cuente.",
     avatar: "/testimonials/sofia.jpg",
-    heightClass: "h-[195px] sm:h-[230px] md:h-[245px]",
   },
   {
     id: "5",
@@ -44,7 +58,6 @@ const TESTIMONIALS = [
     quote:
       "BugSmoker turned our loose vision into an unforgettable brand world. Every detail has bite, character, and pure creative clarity.",
     avatar: "/testimonials/mateo.jpg",
-    heightClass: "h-[270px] sm:h-[330px] md:h-[350px]",
   },
   {
     id: "6",
@@ -52,260 +65,397 @@ const TESTIMONIALS = [
     quote:
       "Working with them felt like adding an electric extra brain to our team. Fast, thoughtful, and always pushing the work somewhere more interesting.",
     avatar: "/testimonials/alex.jpg",
-    heightClass: "h-[200px] sm:h-[235px] md:h-[250px]",
   },
 ];
 
+const TOTAL = TESTIMONIALS.length;
+
+/* Cards cycle through white, black and orange */
+const THEMES = [
+  {
+    card: "bg-white text-black",
+    muted: "text-black/50",
+    body: "text-neutral-800",
+    idx: "text-[#ff5a1f]",
+    ring: "border-black/15",
+    mark: "text-black/[0.06] group-hover:text-[#ff5a1f]",
+    bar: "bg-[#ff5a1f]",
+  },
+  {
+    card: "bg-black text-white border border-white/10",
+    muted: "text-white/50",
+    body: "text-white/85",
+    idx: "text-[#ff5a1f]",
+    ring: "border-white/25",
+    mark: "text-white/[0.07] group-hover:text-[#ff5a1f]",
+    bar: "bg-[#ff5a1f]",
+  },
+  {
+    card: "bg-[#ff5a1f] text-black",
+    muted: "text-black/60",
+    body: "text-black/90",
+    idx: "text-black",
+    ring: "border-black/30",
+    mark: "text-black/15 group-hover:text-black/30",
+    bar: "bg-black",
+  },
+];
+
+const pad = (n) => String(n).padStart(2, "0");
+
+/* ------------------------------------------------------------------ */
+/* Helpers                                                             */
+/* ------------------------------------------------------------------ */
+
+function MaskLine({ children }) {
+  return (
+    <span
+      className="block overflow-hidden"
+      style={{
+        paddingTop: "0.15em",
+        paddingBottom: "0.12em",
+        marginTop: "-0.15em",
+        marginBottom: "-0.12em",
+      }}
+    >
+      <span className="mask-inner block">{children}</span>
+    </span>
+  );
+}
+
+/* ------------------------------------------------------------------ */
+/* Component                                                           */
+/* ------------------------------------------------------------------ */
+
 export default function TestimonialsSection() {
-  const scrollRef = useRef(null);
-  const cardRefs = useRef([]);
+  const rootRef = useRef(null);
+  const trackRef = useRef(null);
+  const barRef = useRef(null);
+  const counterRef = useRef(null);
 
-  const [canScrollLeft, setCanScrollLeft] = useState(false);
-  const [canScrollRight, setCanScrollRight] = useState(true);
-  const [activeIndex, setActiveIndex] = useState(0);
-  const [isDragging, setIsDragging] = useState(false);
-
-  const dragRef = useRef({
-    startX: 0,
-    startScrollLeft: 0,
-    moved: false,
-    active: false,
+  /* true on desktop with motion allowed: the section pins and scrolls sideways */
+  const [pinned, setPinned] = useState(() => {
+    if (typeof window !== "undefined") {
+      return (
+        window.innerWidth >= 1024 &&
+        !window.matchMedia("(prefers-reduced-motion: reduce)").matches
+      );
+    }
+    return false;
   });
 
-  const checkScroll = useCallback(() => {
-    const container = scrollRef.current;
-    if (!container) return;
-
-    const { scrollLeft, scrollWidth, clientWidth } = container;
-
-    setCanScrollLeft(scrollLeft > 5);
-    setCanScrollRight(
-      scrollLeft < scrollWidth - clientWidth - 5
+  useIsoLayoutEffect(() => {
+    const mq = window.matchMedia(
+      "(min-width: 1024px) and (prefers-reduced-motion: no-preference)"
     );
-
-    const center = scrollLeft + clientWidth / 2;
-    let closestIndex = 0;
-    let closestDistance = Infinity;
-
-    cardRefs.current.forEach((card, index) => {
-      if (!card) return;
-
-      const cardCenter = card.offsetLeft + card.offsetWidth / 2;
-      const distance = Math.abs(cardCenter - center);
-
-      if (distance < closestDistance) {
-        closestDistance = distance;
-        closestIndex = index;
-      }
-    });
-
-    setActiveIndex(closestIndex);
+    const update = () => setPinned(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
   }, []);
 
   useEffect(() => {
-    const container = scrollRef.current;
-    if (!container) return;
+    const root = rootRef.current;
+    const track = trackRef.current;
+    if (!root || !track) return;
 
-    checkScroll();
+    const reduce = window.matchMedia(
+      "(prefers-reduced-motion: reduce)"
+    ).matches;
 
-    const observer = new ResizeObserver(checkScroll);
-    observer.observe(container);
-
-    return () => observer.disconnect();
-  }, [checkScroll]);
-
-  const scrollToCard = (index) => {
-    const container = scrollRef.current;
-    const card = cardRefs.current[index];
-
-    if (!container || !card) return;
-
-    const target =
-      card.offsetLeft -
-      (container.clientWidth - card.offsetWidth) / 2;
-
-    container.scrollTo({
-      left: target,
-      behavior: "smooth",
-    });
-  };
-
-  const scrollByAmount = (direction) => {
-    const nextIndex = Math.max(
-      0,
-      Math.min(
-        TESTIMONIALS.length - 1,
-        activeIndex + direction
-      )
-    );
-
-    scrollToCard(nextIndex);
-  };
-
-  const handleMouseDown = (event) => {
-    if (event.button !== 0 || !scrollRef.current) return;
-
-    dragRef.current = {
-      startX: event.pageX,
-      startScrollLeft: scrollRef.current.scrollLeft,
-      moved: false,
-      active: true,
+    const setProgress = (p) => {
+      const clamped = Math.min(1, Math.max(0, p));
+      if (barRef.current) {
+        barRef.current.style.transform = `scaleX(${clamped})`;
+      }
+      if (counterRef.current) {
+        counterRef.current.textContent = pad(
+          Math.min(TOTAL, Math.floor(clamped * TOTAL) + 1)
+        );
+      }
     };
+    setProgress(0);
 
-    setIsDragging(true);
-  };
+    let removeScrollListener = null;
 
-  const handleMouseMove = (event) => {
-    const drag = dragRef.current;
-    const container = scrollRef.current;
+    const ctx = gsap.context(() => {
+      /* Heading entrance */
+      if (!reduce) {
+        gsap.from(".tm-line .mask-inner", {
+          yPercent: 115,
+          duration: 1.1,
+          ease: "power4.out",
+          stagger: 0.12,
+          scrollTrigger: { trigger: root, start: "top 80%" },
+        });
+        gsap.from(".tm-fade", {
+          opacity: 0,
+          y: 20,
+          duration: 0.8,
+          ease: "power3.out",
+          stagger: 0.08,
+          delay: 0.15,
+          scrollTrigger: { trigger: root, start: "top 80%" },
+        });
+      }
 
-    if (!drag.active || !container) return;
+      if (pinned) {
+        /* Desktop: pin the section and move the row sideways with scroll */
+        const getDist = () =>
+          Math.max(track.scrollWidth - root.clientWidth + 96, 0);
 
-    const distance = event.pageX - drag.startX;
+        const tween = gsap.to(track, {
+          x: () => -getDist(),
+          ease: "none",
+          scrollTrigger: {
+            trigger: root,
+            start: "top top+=12",
+            end: () => `+=${getDist() + 250}`,
+            pin: true,
+            pinSpacing: true,
+            scrub: 1,
+            invalidateOnRefresh: true,
+            onUpdate: (self) => setProgress(self.progress),
+          },
+        });
 
-    if (Math.abs(distance) > 4) {
-      drag.moved = true;
+        /* Cards scale and straighten as they enter from the right */
+        gsap.utils.toArray(".tm-card-inner", track).forEach((el) => {
+          gsap.fromTo(
+            el,
+            { opacity: 0.2, scale: 0.9, rotate: 3 },
+            {
+              opacity: 1,
+              scale: 1,
+              rotate: 0,
+              ease: "none",
+              scrollTrigger: {
+                trigger: el.parentElement,
+                containerAnimation: tween,
+                start: "left 98%",
+                end: "left 62%",
+                scrub: true,
+              },
+            }
+          );
+        });
+      } else {
+        /* Mobile and tablet: native swipe, progress follows scrollLeft */
+        const onScroll = () => {
+          const max = track.scrollWidth - track.clientWidth;
+          setProgress(max > 0 ? track.scrollLeft / max : 0);
+        };
+        track.addEventListener("scroll", onScroll, { passive: true });
+        removeScrollListener = () =>
+          track.removeEventListener("scroll", onScroll);
+
+        if (!reduce) {
+          gsap.from(".tm-card-inner", {
+            y: 60,
+            opacity: 0,
+            duration: 0.9,
+            ease: "power3.out",
+            stagger: 0.1,
+            scrollTrigger: { trigger: track, start: "top 85%" },
+          });
+        }
+      }
+    }, root);
+
+    const refreshTimer = setTimeout(() => {
+      ScrollTrigger.refresh();
+    }, 250);
+
+    if (typeof document !== "undefined" && document.fonts) {
+      document.fonts.ready.then(() => {
+        ScrollTrigger.refresh();
+      });
     }
 
-    if (drag.moved) {
-      event.preventDefault();
-      container.scrollLeft =
-        drag.startScrollLeft - distance;
-    }
-  };
+    return () => {
+      clearTimeout(refreshTimer);
+      if (removeScrollListener) removeScrollListener();
+      ctx.revert();
+    };
+  }, [pinned]);
 
-  const stopDragging = () => {
-    dragRef.current.active = false;
-    setIsDragging(false);
-  };
+  const cardHeight = pinned
+    ? "h-[min(62svh,520px)]"
+    : "min-h-[400px]";
 
   return (
     <section
+      ref={rootRef}
       id="testimonials"
-      className="relative w-full overflow-hidden bg-white text-[rgb(36,36,36)] font-['Outfit',sans-serif] pt-10 sm:pt-12 md:pt-14 pb-8 sm:pb-10 md:pb-12 select-none"
+      style={{ zIndex: 30 }}
+      className={`relative z-30 mt-3 w-full select-none overflow-hidden rounded-xl border border-white/10 bg-neutral-900 font-['Outfit',sans-serif] text-white ${
+        pinned ? "flex h-[calc(100svh-1.5rem)] flex-col" : ""
+      }`}
     >
-      <div className="relative z-10 w-full px-1 sm:px-2 lg:px-3">
-        {/* Header */}
-        <div className="flex items-end justify-between gap-6 pb-4 sm:pb-6 mb-5 sm:mb-6 md:mb-7">
-          <div>
-            <div className="flex items-center gap-2 mb-2">
+      <div className={pinned ? "flex min-h-0 flex-1 items-center" : ""}>
+        <div
+          ref={trackRef}
+          className={
+            pinned
+              ? "flex w-max items-center gap-6 px-12 will-change-transform"
+              : "flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 py-10 [-ms-overflow-style:none] [scrollbar-width:none] sm:gap-5 sm:px-8 sm:py-12 [&::-webkit-scrollbar]:hidden"
+          }
+          style={pinned ? undefined : { WebkitOverflowScrolling: "touch" }}
+        >
+          {/* ---------- Heading tile (first item in the row) ---------- */}
+          <div
+            className={`flex shrink-0 snap-start flex-col justify-between gap-8 ${cardHeight} ${
+              pinned
+                ? "w-[min(58vw,820px)] pr-10"
+                : "w-[86vw] max-w-[520px] pr-2"
+            }`}
+          >
+            <div className="tm-fade flex items-center gap-2">
               <span className="h-2 w-2 rounded-full bg-[#ff5a1f]" />
-              <span className="font-mono text-[11px] sm:text-xs uppercase tracking-[0.22em] text-[rgb(36,36,36)]/60 font-semibold">
-                TESTIMONIALS // VOICES &amp; EXPERIENCES
+              <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-white/60 sm:text-xs">
+                Testimonials // Voices &amp; experiences
               </span>
             </div>
-            <h2 className="font-['Outfit'] text-[clamp(1.8rem,7vw,3.2rem)] font-semibold leading-[1.02] tracking-[-0.06em] text-[rgb(36,36,36)]">
-              Good people.
-              <br />
-              <span className="text-neutral-400">
-                Real experiences.
+
+            <h2 className="text-[clamp(2.2rem,10vw,3.2rem)] font-semibold lowercase leading-[.88] tracking-[-0.07em] sm:text-[clamp(3rem,6.5vw,7rem)]">
+              <span className="tm-line block">
+                <MaskLine>good people.</MaskLine>
+              </span>
+              <span className="tm-line mt-[0.04em] block">
+                <MaskLine>
+                  <span className="text-white/35">real experiences</span>
+                  <span className="text-[#ff5a1f]">.</span>
+                </MaskLine>
               </span>
             </h2>
+
+            <p className="tm-fade max-w-xs text-sm leading-[1.8] text-white/60">
+              Kind words from the founders and teams we&apos;ve built with.
+            </p>
           </div>
 
-          {/* Navigation Controls on Right */}
-          <div className="flex items-center gap-2">
-            <button
-              onClick={() => {
-                if (scrollRef.current) scrollRef.current.scrollBy({ left: -380, behavior: "smooth" });
-              }}
-              className="group inline-flex h-9 w-9 sm:h-10 sm:w-10 cursor-pointer items-center justify-center rounded-full border border-black/20 bg-white text-black shadow-xs transition-all duration-200 hover:border-[#ff5a1f] hover:bg-[#ff5a1f] hover:text-white active:scale-95"
-              aria-label="Previous testimonial"
+          {/* ---------- Testimonial cards ---------- */}
+          {TESTIMONIALS.map((item, i) => {
+            const t = THEMES[i % THEMES.length];
+            const stagger = pinned
+              ? i % 2 === 0
+                ? "-translate-y-4"
+                : "translate-y-6"
+              : "";
+
+            return (
+              <article
+                key={item.id}
+                className={`tm-card w-[80vw] max-w-[340px] shrink-0 snap-start sm:w-[380px] sm:max-w-none lg:w-[400px] ${stagger}`}
+              >
+                <div className="tm-card-inner">
+                  <div
+                    className={`group relative flex flex-col justify-between overflow-hidden rounded-xl p-5 sm:p-7 md:p-8 ${cardHeight} ${t.card}`}
+                  >
+                    {/* Top row */}
+                    <div className="relative z-10 flex items-start justify-between">
+                      <span className={`font-mono text-xs sm:text-sm ${t.idx}`}>
+                        ({pad(i + 1)})
+                      </span>
+                      <Quote
+                        aria-hidden="true"
+                        size={72}
+                        strokeWidth={1.2}
+                        className={`-mr-2 -mt-3 transition-colors duration-500 ${t.mark}`}
+                      />
+                    </div>
+
+                    {/* Quote */}
+                    <p
+                      className={`relative z-10 my-6 text-lg font-medium leading-[1.3] tracking-[-0.03em] sm:text-xl lg:text-[22px] ${t.body}`}
+                    >
+                      “{item.quote}”
+                    </p>
+
+                    {/* Author */}
+                    <div className="relative z-10 flex items-center gap-3">
+                      <div
+                        className={`relative h-11 w-11 shrink-0 overflow-hidden rounded-full border bg-neutral-300 sm:h-12 sm:w-12 ${t.ring}`}
+                      >
+                        <Image
+                          src={item.avatar}
+                          alt={item.name}
+                          fill
+                          sizes="48px"
+                          draggable={false}
+                          className="object-cover object-center"
+                        />
+                      </div>
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold sm:text-base">
+                          {item.name}
+                        </p>
+                        <p
+                          className={`mt-0.5 font-mono text-[9px] uppercase tracking-[0.14em] sm:text-[10px] ${t.muted}`}
+                        >
+                          Client experience
+                        </p>
+                      </div>
+                    </div>
+
+                    {/* Hover accent */}
+                    <div
+                      className={`absolute bottom-0 left-0 h-[3px] w-0 transition-all duration-500 group-hover:w-full ${t.bar}`}
+                    />
+                  </div>
+                </div>
+              </article>
+            );
+          })}
+
+          {/* ---------- End tile ---------- */}
+          <div
+            className={`flex w-[80vw] max-w-[340px] shrink-0 snap-start flex-col justify-between rounded-xl border border-white/15 p-5 sm:w-[380px] sm:max-w-none sm:p-7 md:p-8 lg:w-[400px] ${cardHeight}`}
+          >
+            <span className="font-mono text-xs text-[#ff5a1f] sm:text-sm">
+              (Next)
+            </span>
+
+            <h3 className="text-[clamp(2.4rem,9vw,3.5rem)] font-semibold lowercase leading-[.9] tracking-[-0.06em] sm:text-6xl">
+              your story
+              <br />
+              is next
+              <span className="text-[#ff5a1f]">.</span>
+            </h3>
+
+            <Link
+              href="/contactus"
+              className="group inline-flex w-fit items-center gap-3 text-sm font-semibold"
             >
-              <ChevronLeft size={16} strokeWidth={2.2} />
-            </button>
-            <button
-              onClick={() => {
-                if (scrollRef.current) scrollRef.current.scrollBy({ left: 380, behavior: "smooth" });
-              }}
-              className="group inline-flex h-9 w-9 sm:h-10 sm:w-10 cursor-pointer items-center justify-center rounded-full border border-black/20 bg-white text-black shadow-xs transition-all duration-200 hover:border-[#ff5a1f] hover:bg-[#ff5a1f] hover:text-white active:scale-95"
-              aria-label="Next testimonial"
-            >
-              <ChevronRight size={16} strokeWidth={2.2} />
-            </button>
+              <span>Start a project</span>
+              <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-black transition-all duration-300 group-hover:rotate-45 group-hover:bg-[#ff5a1f] group-hover:text-white">
+                <ArrowUpRight size={18} strokeWidth={2} />
+              </span>
+            </Link>
           </div>
         </div>
       </div>
 
-      {/* Staggered testimonial cards */}
-      <div className="w-full relative">
-        <div
-          ref={scrollRef}
-          onScroll={checkScroll}
-          onMouseDown={handleMouseDown}
-          onMouseMove={handleMouseMove}
-          onMouseUp={stopDragging}
-          onMouseLeave={stopDragging}
-          onClickCapture={(event) => {
-            if (dragRef.current.moved) {
-              event.preventDefault();
-              event.stopPropagation();
-              dragRef.current.moved = false;
-            }
-          }}
-          className={`flex items-end gap-3 sm:gap-5 md:gap-6 overflow-x-auto px-1 sm:px-2 lg:px-3 pt-2 pb-2 select-none scroll-smooth [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden ${isDragging ? "cursor-grabbing" : "cursor-grab"
-            }`}
-          style={{
-            scrollbarWidth: "none",
-            msOverflowStyle: "none",
-            WebkitOverflowScrolling: "touch",
-            scrollSnapType: "x mandatory",
-          }}
-        >
-          {TESTIMONIALS.map((item, index) => (
-            <article
-              key={item.id}
-              ref={(element) => {
-                cardRefs.current[index] = element;
-              }}
-              className={`group relative flex w-[78vw] max-w-[310px] shrink-0 flex-col justify-between overflow-hidden rounded-[4px] bg-[#736e4e] p-5 shadow-[0_12px_28px_rgba(0,0,0,0.06)] transition-transform duration-300 hover:-translate-y-1.5 sm:w-[370px] sm:max-w-none sm:p-7 md:w-[400px] md:p-8 ${item.heightClass}`}
-              style={{
-                scrollSnapAlign: "start",
-              }}
-            >
-              {/* Decorative quote */}
-              <div className="pointer-events-none absolute -right-2 -top-4 opacity-[0.08]">
-                <Quote
-                  size={90}
-                  strokeWidth={1.2}
-                  className="text-white"
-                />
-              </div>
+      {/* ---------- Progress bar ---------- */}
+      <div className="tm-fade flex items-center gap-4 px-4 pb-5 pt-1 sm:gap-6 sm:px-8 sm:pb-6 lg:px-12">
+        <p className="shrink-0 font-mono text-xs tabular-nums sm:text-sm">
+          <span className="text-[#ff5a1f]">
+            (<span ref={counterRef}>01</span>)
+          </span>
+          <span className="text-white/40"> / {pad(TOTAL)}</span>
+        </p>
 
-              {/* Avatar and quote */}
-              <div className="relative z-10">
-                <div className="mb-4 flex items-center gap-3 sm:mb-6">
-                  <div className="relative h-9 w-9 shrink-0 overflow-hidden rounded-full border border-white/30 bg-black/20 sm:h-11 sm:w-11">
-                    <Image
-                      src={item.avatar}
-                      alt={item.name}
-                      fill
-                      sizes="44px"
-                      className="object-cover object-center"
-                    />
-                  </div>
-
-                  <div>
-                    <p className="font-['Outfit'] text-sm font-semibold text-white sm:text-[15px]">
-                      {item.name}
-                    </p>
-
-                    <p className="mt-0.5 font-mono text-[8px] uppercase tracking-[0.12em] text-white/55 sm:text-[9px]">
-                      Client experience
-                    </p>
-                  </div>
-                </div>
-
-                <p className="font-['Outfit'] text-[13px] leading-[1.6] tracking-[-0.01em] text-[#f3f0e7] sm:text-[15px] sm:leading-[1.7]">
-                  “{item.quote}”
-                </p>
-              </div>
-
-              {/* Hover accent */}
-              <div className="absolute bottom-0 left-0 h-[3px] w-0 bg-[#ff5a1f] transition-all duration-500 group-hover:w-full" />
-            </article>
-          ))}
+        <div className="relative h-[2px] flex-1 bg-white/15">
+          <span
+            ref={barRef}
+            className="absolute inset-0 origin-left bg-[#ff5a1f]"
+            style={{ transform: "scaleX(0)" }}
+          />
         </div>
+
+        <span className="shrink-0 font-mono text-[11px] uppercase tracking-[0.2em] text-white/50">
+          {pinned ? "Scroll" : "Swipe"}
+        </span>
       </div>
     </section>
   );

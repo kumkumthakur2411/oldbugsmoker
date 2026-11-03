@@ -33,7 +33,30 @@ const PERKS = [
     "Clear, fixed-scope quotes",
 ];
 
-const MARQUEE = ["Websites", "Apps", "Software", "Hosting", "Tech support"];
+const MARQUEE_1 = [
+    "Websites",
+    "Apps",
+    "High Performance",
+    "Software",
+    "Sub-Second Speed",
+    "Hosting & DevOps",
+    "Tech Support",
+    "Scalable Systems",
+];
+
+const MARQUEE_2 = [
+    "Bugsmoker Atelier",
+    "Digital Engineering",
+    "Creative Direction",
+    "Next.js 15+ & React 19",
+    "Zero Downtime",
+    "Fluid 60+ FPS Motion",
+    "Enterprise Grade",
+    "Bespoke Platforms",
+];
+
+const MARQUEE_ITEMS_1 = [...MARQUEE_1, ...MARQUEE_1];
+const MARQUEE_ITEMS_2 = [...MARQUEE_2, ...MARQUEE_2];
 
 const WORDS = QUOTE.split(/\s+/);
 
@@ -93,7 +116,8 @@ export default function CtaSection() {
     const glowRef = useRef(null);
     const quoteRef = useRef(null);
     const logoRef = useRef(null);
-    const trackRef = useRef(null);
+    const trackRef1 = useRef(null);
+    const trackRef2 = useRef(null);
     const btnWrapRef = useRef(null);
     const btnRef = useRef(null);
 
@@ -170,18 +194,30 @@ export default function CtaSection() {
                     }
                 );
 
-                /* Marquee that speeds up with scroll velocity */
-                const track = trackRef.current;
-                if (track) {
-                    const loop = gsap.to(track, {
+                /* Two diagonal crossing marquees that speed up with scroll velocity */
+                const track1 = trackRef1.current;
+                const track2 = trackRef2.current;
+                if (track1 && track2) {
+                    const loop1 = gsap.to(track1, {
                         xPercent: -50,
                         ease: "none",
-                        duration: 28,
+                        duration: 26,
                         repeat: -1,
                     });
 
+                    const loop2 = gsap.fromTo(
+                        track2,
+                        { xPercent: -50 },
+                        {
+                            xPercent: 0,
+                            ease: "none",
+                            duration: 28,
+                            repeat: -1,
+                        }
+                    );
+
                     let vel = 0;
-                    ScrollTrigger.create({
+                    const st = ScrollTrigger.create({
                         trigger: root,
                         start: "top bottom",
                         end: "bottom top",
@@ -193,16 +229,22 @@ export default function CtaSection() {
                     const tick = () => {
                         const target =
                             1 + gsap.utils.clamp(0, 8, Math.abs(vel) / 300);
-                        loop.timeScale(
-                            gsap.utils.interpolate(loop.timeScale(), target, 0.1)
+                        const curScale = gsap.utils.interpolate(
+                            loop1.timeScale(),
+                            target,
+                            0.1
                         );
+                        loop1.timeScale(curScale);
+                        loop2.timeScale(curScale);
                         vel *= 0.9;
                     };
                     gsap.ticker.add(tick);
 
                     return () => {
                         gsap.ticker.remove(tick);
-                        loop.kill();
+                        loop1.kill();
+                        loop2.kill();
+                        st.kill();
                     };
                 }
             });
@@ -342,7 +384,7 @@ export default function CtaSection() {
                             </ul>
                         </div> */}
 
-                        <div className="mt-8 pt-4 lg:mt-auto">
+                        {/* <div className="mt-8 pt-4 lg:mt-auto">
                             <div ref={logoRef} className="w-fit origin-bottom-left">
                                 <Image
                                     src="/bs-logo.png"
@@ -353,7 +395,7 @@ export default function CtaSection() {
                                     priority
                                 />
                             </div>
-                        </div>
+                        </div> */}
                     </div>
 
                     {/* Right column */}
@@ -391,61 +433,58 @@ export default function CtaSection() {
                             })}
                         </blockquote>
 
-                        <div className="mt-10 flex flex-wrap items-center gap-6 sm:mt-12 sm:gap-8">
-                            {/* Magnetic circular CTA */}
-                            <div
-                                ref={btnWrapRef}
-                                className="-m-3 p-3 sm:-m-6 sm:p-6"
-                            >
-                                <Link
-                                    ref={btnRef}
-                                    href="/contactus"
-                                    aria-label="Let's build together, contact us"
-                                    className="group relative flex h-32 w-32 cursor-pointer items-center justify-center rounded-full bg-black text-white shadow-lg shadow-black/20 transition-colors duration-300 hover:bg-[#ff5a1f] sm:h-40 sm:w-40"
-                                >
-                                    <Ring />
-                                    <span className="relative flex h-14 w-14 items-center justify-center rounded-full bg-white text-black transition-transform duration-300 group-hover:rotate-45 sm:h-16 sm:w-16">
-                                        <ArrowUpRight size={26} strokeWidth={2.2} />
-                                    </span>
-                                </Link>
-                            </div>
-
-                            <div className="cta-fade flex flex-col gap-2">
-                                <span className="text-lg font-semibold tracking-[-0.03em] sm:text-2xl">
-                                    Let&apos;s Build Together
-                                </span>
-                                <Link
-                                    href="/services"
-                                    className="w-fit cursor-pointer font-mono text-xs uppercase tracking-widest text-neutral-500 transition-colors hover:text-[#ff5a1f]"
-                                >
-                                    [ View Capabilities ]
-                                </Link>
-                            </div>
-                        </div>
+                        
                     </div>
                 </div>
             </div>
 
-            {/* Marquee: black band, white outlined text */}
+            {/* Two Narrow Diagonal Crossing Marquees */}
             <div
-                className="relative z-10 overflow-hidden bg-black py-4 sm:py-5"
+                className="relative z-10 overflow-hidden py-16 sm:py-20 md:py-24 select-none my-2 sm:my-4"
                 aria-hidden="true"
             >
-                <div ref={trackRef} className="flex w-max will-change-transform">
-                    {[0, 1].map((copy) => (
-                        <div key={copy} className="flex shrink-0 items-center">
-                            {MARQUEE.map((m) => (
-                                <span
-                                    key={`${copy}-${m}`}
-                                    className="mr-6 inline-flex shrink-0 cursor-default items-center gap-6 whitespace-nowrap text-4xl font-semibold uppercase tracking-[-0.04em] text-transparent transition-colors duration-300 hover:text-[#ff5a1f] sm:mr-10 sm:gap-10 sm:text-6xl"
-                                    style={{ WebkitTextStroke: "1px rgba(255,255,255,0.7)" }}
-                                >
-                                    {m}
-                                    <span className="h-2 w-2 shrink-0 rounded-full bg-[#ff5a1f] sm:h-3 sm:w-3" />
-                                </span>
+                {/* Diagonal Ribbon 1 (Angled -2.5deg, Brand Orange, scrolls Left) */}
+                <div className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 w-[160%] -rotate-[2.5deg] sm:-rotate-[3deg] z-10 pointer-events-none">
+                    <div className="w-full bg-[#ff5a1f] text-black py-2 sm:py-2.5 shadow-xl border-y border-black/20 overflow-hidden">
+                        <div ref={trackRef1} className="flex w-max will-change-transform">
+                            {[0, 1].map((copy) => (
+                                <div key={copy} className="flex shrink-0 items-center">
+                                    {MARQUEE_ITEMS_1.map((m, i) => (
+                                        <span
+                                            key={`${copy}-${i}`}
+                                            className="mx-3 sm:mx-5 inline-flex shrink-0 items-center gap-3 sm:gap-5 whitespace-nowrap text-xs sm:text-sm md:text-base font-extrabold uppercase tracking-wider text-black"
+                                        >
+                                            <span>{m}</span>
+                                            <span className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-black shrink-0" />
+                                        </span>
+                                    ))}
+                                </div>
                             ))}
                         </div>
-                    ))}
+                    </div>
+                </div>
+
+                {/* Diagonal Ribbon 2 (Angled +2.5deg, Dark Charcoal with White/Orange, scrolls Right) */}
+                <div className="relative left-1/2 -translate-x-1/2 w-[160%] rotate-[2.5deg] sm:rotate-[3deg] z-20 pointer-events-none">
+                    <div className="w-full bg-neutral-900/95 backdrop-blur-xs text-white py-2 sm:py-2.5 shadow-2xl border-y border-white/20 overflow-hidden">
+                        <div ref={trackRef2} className="flex w-max will-change-transform">
+                            {[0, 1].map((copy) => (
+                                <div key={copy} className="flex shrink-0 items-center">
+                                    {MARQUEE_ITEMS_2.map((m, i) => (
+                                        <span
+                                            key={`${copy}-${i}`}
+                                            className="mx-3 sm:mx-5 inline-flex shrink-0 items-center gap-3 sm:gap-5 whitespace-nowrap text-xs sm:text-sm md:text-base font-extrabold uppercase tracking-wider text-white"
+                                        >
+                                            <span className="text-white hover:text-[#ff5a1f] transition-colors">
+                                                {m}
+                                            </span>
+                                            <span className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-[#ff5a1f] shrink-0" />
+                                        </span>
+                                    ))}
+                                </div>
+                            ))}
+                        </div>
+                    </div>
                 </div>
             </div>
         </section>
