@@ -22,7 +22,7 @@ export default function Home() {
         <CtaSection />
       {/* <Aboutus /> */}
       <Portfolio />
-      {/* <Cta/> */}
+      <Cta/>
       <Technologies />
     
       <TestimonialsSection />
