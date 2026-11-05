@@ -6,7 +6,7 @@
 /*
   Install once:  npm i gsap lenis
   (Swiper is no longer needed on this page: the image ticker is driven by GSAP.)
-  Images expected in /public:  about1.jpeg ... about8.jpeg
+  Images expected in /public:  1.png ... about8.jpeg
 */
 
 import React, { useEffect, useRef, useState } from "react";
@@ -25,9 +25,9 @@ if (typeof window !== "undefined") {
 /* ------------------------------------------------------------------ */
 
 const projects = [
-    { id: "01", title: "Editorial", image: "/about1.jpeg" },
-    { id: "02", title: "Fashion", image: "/about2.jpeg" },
-    { id: "03", title: "Portrait", image: "/about3.jpeg" },
+    { id: "01", title: "Editorial", image: "/1.png" },
+    { id: "02", title: "Fashion", image: "/1.png" },
+    { id: "03", title: "Portrait", image: "/1.png" },
     { id: "04", title: "Brand", image: "/about4.jpeg" },
     { id: "05", title: "UI Design", image: "/about5.jpeg" },
     { id: "06", title: "Magazine", image: "/about6.jpeg" },
@@ -57,7 +57,7 @@ const PRINCIPLES = [
     {
         title: "Make it loud",
         text: "Ideas that are hard to ignore, shaped so they still make sense.",
-        image: "/about3.jpeg",
+        image: "/1.png",
     },
     {
         title: "Make it work",
@@ -72,7 +72,7 @@ const PRINCIPLES = [
     {
         title: "Finish it properly",
         text: "Details, handover and support that don't disappear after launch.",
-        image: "/about1.jpeg",
+        image: "/1.png",
     },
 ];
 
@@ -626,7 +626,7 @@ export default function PortfolioHero() {
                                 <MaskLine>
                                     we are
                                     <Pill
-                                        src="/about3.jpeg"
+                                        src="/1.png"
                                         depth={1}
                                         tag="CRAFT"
                                         className="ml-[0.1em] h-[0.6em] w-[1.5em]"
@@ -757,7 +757,7 @@ export default function PortfolioHero() {
                     <div className="expand-wrap absolute inset-0 overflow-hidden will-change-[clip-path]">
                         {/* eslint-disable-next-line @next/next/no-img-element */}
                         <img
-                            src="/about2.jpeg"
+                            src="/1.png"
                             alt="Bugsmoker studio work"
                             className="expand-img absolute inset-0 h-full w-full object-cover will-change-transform"
                         />
