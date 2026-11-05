@@ -1,0 +1,200 @@
+{
+  "posts": [
+    {
+      "slug": "why-fast-websites-win",
+      "title": "Why fast websites quietly win every time",
+      "excerpt": "Speed is not a technical detail. It decides who stays, who buys and who comes back.",
+      "category": "Performance",
+      "date": "2026-10-20",
+      "readTime": 6,
+      "image": "/home/1.png",
+      "author": { "name": "Aarav Singh", "role": "Lead Developer" },
+      "tags": ["speed", "conversion", "next.js"],
+      "content": [
+        { "type": "p", "text": "Nobody ever leaves a website and says, 'That was wonderfully slow.' Yet speed is usually the last thing discussed in a project kickoff, long after colours, fonts and animations have been argued over." },
+        { "type": "p", "text": "That is a mistake. A fast site feels trustworthy before a visitor reads a single word. A slow one feels broken, even when everything on it works." },
+        { "type": "h2", "text": "Speed is a design decision" },
+        { "type": "p", "text": "Every image, font and script you add has a cost. The fastest sites are not the ones with clever tricks at the end, they are the ones where someone said no early and often." },
+        { "type": "quote", "text": "A page that loads in one second and a page that loads in three are not the same product." },
+        { "type": "h2", "text": "Where the time actually goes" },
+        { "type": "list", "items": ["Oversized images served at full resolution to every device", "Fonts that block text from appearing", "Third-party scripts nobody remembers adding", "Client-side rendering for content that never changes"] },
+        { "type": "image", "src": "/home/2.png", "alt": "Performance dashboard", "caption": "Most of the weight on a typical page is images." },
+        { "type": "h2", "text": "A simple starting checklist" },
+        { "type": "p", "text": "Compress and resize images, preload only the font weights you use, defer anything non-essential and render static content on the server. None of this is glamorous. All of it works." },
+        { "type": "p", "text": "Fast websites win quietly. Visitors do not notice the speed, they just stay a little longer, click a little more and come back a little sooner." }
+      ]
+    },
+    {
+      "slug": "designing-for-the-smallest-screen",
+      "title": "Designing for the smallest screen first",
+      "excerpt": "Starting on a phone forces better decisions. Here is how we plan layouts from the inside out.",
+      "category": "Design",
+      "date": "2026-10-12",
+      "readTime": 5,
+      "image": "/home/2.png",
+      "author": { "name": "Meera Kapoor", "role": "Design Lead" },
+      "tags": ["mobile", "layout", "ux"],
+      "content": [
+        { "type": "p", "text": "Most of your visitors are holding a phone. It is strange, then, how many designs begin on a wide desktop canvas and get squeezed down at the end." },
+        { "type": "p", "text": "We flip the order. The smallest screen comes first, because it has the least room for anything that does not matter." },
+        { "type": "h2", "text": "Constraints make better layouts" },
+        { "type": "p", "text": "On a 375 pixel screen you cannot hide behind whitespace or decoration. You have to decide what the page is about, what comes first and what the visitor should do next." },
+        { "type": "h3", "text": "Start with the content order" },
+        { "type": "p", "text": "Write the page as a single column. If the story still makes sense top to bottom, the wide version will be easy." },
+        { "type": "quote", "text": "If it works in one column, it will work in three." },
+        { "type": "h2", "text": "Then grow outward" },
+        { "type": "list", "items": ["Add columns only when content genuinely sits side by side", "Make tap targets at least 44 pixels", "Keep line lengths comfortable on every width", "Test with a thumb, not a cursor"] },
+        { "type": "p", "text": "Designing small first is not about limiting the large screen. It is about making sure nothing on it is accidental." }
+      ]
+    },
+    {
+      "slug": "seo-before-design",
+      "title": "Plan the SEO before you plan the design",
+      "excerpt": "Page structure, keywords and internal links shape a site more than most people expect.",
+      "category": "SEO",
+      "date": "2026-10-03",
+      "readTime": 7,
+      "image": "/home/3.png",
+      "author": { "name": "Rohan Verma", "role": "SEO Strategist" },
+      "tags": ["seo", "structure", "content"],
+      "content": [
+        { "type": "p", "text": "SEO is often treated as a coat of paint applied after launch. By then the structure is fixed, the URLs are set and the pages are built around the wrong questions." },
+        { "type": "h2", "text": "Start with what people search for" },
+        { "type": "p", "text": "Before a wireframe exists, list the questions your customers ask. Each strong question deserves a page of its own, and that list becomes your site map." },
+        { "type": "image", "src": "/home/3.png", "alt": "Site structure sketch", "caption": "A site map drawn from real search questions." },
+        { "type": "h2", "text": "Structure carries meaning" },
+        { "type": "list", "items": ["One clear h1 per page that matches the search intent", "Headings that outline the page like a table of contents", "Short, readable URLs", "Internal links that connect related pages"] },
+        { "type": "quote", "text": "Design decides how a page looks. Structure decides whether anyone finds it." },
+        { "type": "h2", "text": "Do it in the right order" },
+        { "type": "p", "text": "Research, structure, content, then design. When the design arrives last, it has something real to serve instead of something imaginary to decorate." }
+      ]
+    },
+    {
+      "slug": "motion-that-means-something",
+      "title": "Motion that actually means something",
+      "excerpt": "Animation should guide attention, not compete for it. A few rules we follow with GSAP.",
+      "category": "Design",
+      "date": "2026-09-24",
+      "readTime": 4,
+      "image": "/home/new1.png",
+      "author": { "name": "Meera Kapoor", "role": "Design Lead" },
+      "tags": ["gsap", "animation", "motion"],
+      "content": [
+        { "type": "p", "text": "Animation is easy to overdo. When everything moves, nothing stands out, and the page starts to feel like it is performing instead of helping." },
+        { "type": "h2", "text": "Three rules we follow" },
+        { "type": "list", "items": ["Move things to show what changed, not to fill silence", "Keep one hero moment per page and let the rest stay calm", "Always respect reduced motion preferences"] },
+        { "type": "h2", "text": "A small example" },
+        { "type": "p", "text": "A heading that slides up once on load is enough. Here is the pattern we reuse most often:" },
+        { "type": "code", "lang": "javascript", "text": "gsap.from('.hero-line', {\n  yPercent: 110,\n  duration: 1.1,\n  ease: 'power4.out',\n  stagger: 0.12,\n});" },
+        { "type": "quote", "text": "Good motion answers a question the visitor was about to ask." },
+        { "type": "p", "text": "If an animation does not guide, confirm or reveal something, cut it. Your page will feel faster and your best moments will land harder." }
+      ]
+    },
+    {
+      "slug": "nextjs-lessons-from-production",
+      "title": "Lessons from shipping Next.js to production",
+      "excerpt": "Caching, rendering modes and the small mistakes that cost us the most time.",
+      "category": "Development",
+      "date": "2026-09-15",
+      "readTime": 9,
+      "image": "/home/4.png",
+      "author": { "name": "Aarav Singh", "role": "Lead Developer" },
+      "tags": ["next.js", "caching", "react"],
+      "content": [
+        { "type": "p", "text": "Next.js makes it easy to build something that works on your laptop. Production is where the details start to matter." },
+        { "type": "h2", "text": "Pick the rendering mode on purpose" },
+        { "type": "p", "text": "Static, server-rendered and client-rendered pages all have a place. Our mistake early on was using the same mode everywhere because it was the default." },
+        { "type": "list", "items": ["Static for pages that rarely change, such as blog posts", "Server rendering for pages that depend on the visitor", "Client rendering only for truly interactive pieces"] },
+        { "type": "h2", "text": "Caching is where the surprises live" },
+        { "type": "p", "text": "Stale data is rarely a bug in your code. It is usually a cache you forgot you configured. Write down what is cached, for how long and what clears it." },
+        { "type": "code", "lang": "javascript", "text": "export const revalidate = 3600; // refresh at most once an hour" },
+        { "type": "h2", "text": "Small mistakes, big costs" },
+        { "type": "p", "text": "Unoptimised images, giant client bundles and missing error pages cost us more hours than any hard problem. Boring checklists are underrated." },
+        { "type": "quote", "text": "Most production bugs are decisions we never made on purpose." }
+      ]
+    },
+    {
+      "slug": "how-we-run-a-project",
+      "title": "How a Bugsmoker project actually runs",
+      "excerpt": "From first call to launch day: the rhythm we use to keep small projects calm and fast.",
+      "category": "Studio",
+      "date": "2026-09-05",
+      "readTime": 5,
+      "image": "/home/mos.png",
+      "author": { "name": "Team Bugsmoker", "role": "Studio" },
+      "tags": ["process", "studio", "projects"],
+      "content": [
+        { "type": "p", "text": "Small projects go wrong in boring ways: unclear goals, late feedback, surprise scope. Our process exists to prevent those, not to look impressive." },
+        { "type": "h2", "text": "Four steps, every time" },
+        { "type": "list", "items": ["Discover: goals, audience and what success looks like", "Design: structure and visuals reviewed with you", "Build: clean, tested code with early progress to see", "Support: hosting and improvements after launch"] },
+        { "type": "h2", "text": "Why the rhythm matters" },
+        { "type": "p", "text": "You hear from us weekly, you see real progress early and there are no big reveals at the end. Surprises are fun at birthdays, not at launches." },
+        { "type": "quote", "text": "Calm projects are fast projects." },
+        { "type": "p", "text": "After launch we stay close. Monitoring, fixes and small improvements are part of the work, not an upsell." }
+      ]
+    },
+    {
+      "slug": "core-web-vitals-in-plain-words",
+      "title": "Core Web Vitals in plain words",
+      "excerpt": "What the three metrics measure, why they matter and the quickest ways to improve them.",
+      "category": "Performance",
+      "date": "2026-08-27",
+      "readTime": 6,
+      "image": "/home/5.png",
+      "author": { "name": "Aarav Singh", "role": "Lead Developer" },
+      "tags": ["web vitals", "lcp", "cls"],
+      "content": [
+        { "type": "p", "text": "Core Web Vitals sound technical, but each one answers a simple human question about your page." },
+        { "type": "h2", "text": "The three metrics" },
+        { "type": "h3", "text": "LCP: how fast does it appear?" },
+        { "type": "p", "text": "Largest Contentful Paint measures how long the main content takes to show up. Aim for under two and a half seconds." },
+        { "type": "h3", "text": "INP: how quickly does it respond?" },
+        { "type": "p", "text": "Interaction to Next Paint tracks how soon the page reacts after a tap or click. Heavy scripts are the usual culprit." },
+        { "type": "h3", "text": "CLS: does it jump around?" },
+        { "type": "p", "text": "Cumulative Layout Shift measures unexpected movement. Reserve space for images and ads so nothing pushes the text away." },
+        { "type": "h2", "text": "Quick wins" },
+        { "type": "list", "items": ["Set width and height on every image", "Preload the hero image", "Split large scripts and load them later", "Use system fonts or font-display: swap"] },
+        { "type": "quote", "text": "Fix the biggest image first. It is almost always the answer." }
+      ]
+    },
+    {
+      "slug": "offline-first-apps",
+      "title": "Why your app should work without a signal",
+      "excerpt": "Offline-first thinking makes apps feel faster and more trustworthy, even on good connections.",
+      "category": "Development",
+      "date": "2026-08-14",
+      "readTime": 8,
+      "image": "/home/new2.png",
+      "author": { "name": "Rohan Verma", "role": "Mobile Engineer" },
+      "tags": ["offline", "mobile", "sync"],
+      "content": [
+        { "type": "p", "text": "Connections drop in lifts, trains and basements. An app that goes blank at that moment teaches people not to rely on it." },
+        { "type": "h2", "text": "Local first, network second" },
+        { "type": "p", "text": "In an offline-first app, the screen reads from local storage and the network syncs in the background. Taps feel instant because they do not wait for a server." },
+        { "type": "image", "src": "/home/new2.png", "alt": "App working offline", "caption": "The app keeps working when the signal does not." },
+        { "type": "h2", "text": "What it takes" },
+        { "type": "list", "items": ["A local database as the source of truth", "A queue of changes waiting to sync", "Clear rules for resolving conflicts", "A calm indicator that shows sync status"] },
+        { "type": "quote", "text": "Trust is built in the moments when the network fails." },
+        { "type": "p", "text": "It is more work up front, but the payoff is an app that feels fast everywhere, including places where connectivity is great." }
+      ]
+    },
+    {
+      "slug": "small-studio-big-opinions",
+      "title": "Small studio, big opinions",
+      "excerpt": "What we believe about craft, speed and keeping things fun while doing serious work.",
+      "category": "Studio",
+      "date": "2026-08-02",
+      "readTime": 3,
+      "image": "/home/6.png",
+      "author": { "name": "Team Bugsmoker", "role": "Studio" },
+      "tags": ["studio", "craft", "values"],
+      "content": [
+        { "type": "p", "text": "We are a small team, and we like it that way. Fewer people means fewer handoffs, and fewer handoffs means fewer things lost in translation." },
+        { "type": "h2", "text": "What we believe" },
+        { "type": "list", "items": ["Craft beats volume", "Fast beats flashy", "Honest timelines beat optimistic ones", "Work can be serious without being stiff"] },
+        { "type": "quote", "text": "Take the work seriously. Take yourself lightly." },
+        { "type": "p", "text": "If that sounds like the kind of team you want in your corner, say hello. We would love to hear what you are building." }
+      ]
+    }
+  ]
+}

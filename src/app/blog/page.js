@@ -1,9 +1,9 @@
 "use client";
 
 /*
-  Install once:  npm i gsap lenis
-  Posts:         replace the POSTS array below with your real data (or import it from your CMS / JSON).
-  Links:         each post links to /blog/[slug]. Change POST_HREF if your route differs.
+  Blog listing page  ->  /blog
+  Data:   src/data/blog.json
+  Detail: /blog/[slug]
 */
 
 import React, { useEffect, useMemo, useRef, useState } from "react";
@@ -11,6 +11,7 @@ import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 import Lenis from "lenis";
+import blogData from "@/data/blog.json";
 
 if (typeof window !== "undefined") {
     gsap.registerPlugin(ScrollTrigger);
@@ -19,101 +20,10 @@ if (typeof window !== "undefined") {
 const POST_HREF = (slug) => `/blog/${slug}`;
 
 /* ------------------------------------------------------------------ */
-/* Placeholder posts: replace with your own                            */
+/* Data (from blog.json, newest first)                                 */
 /* ------------------------------------------------------------------ */
 
-const POSTS = [
-    {
-        slug: "why-fast-websites-win",
-        title: "Why fast websites quietly win every time",
-        excerpt:
-            "Speed is not a technical detail. It decides who stays, who buys and who comes back.",
-        category: "Performance",
-        date: "2026-10-20",
-        readTime: 6,
-        image: "/home/1.png",
-    },
-    {
-        slug: "designing-for-the-smallest-screen",
-        title: "Designing for the smallest screen first",
-        excerpt:
-            "Starting on a phone forces better decisions. Here is how we plan layouts from the inside out.",
-        category: "Design",
-        date: "2026-10-12",
-        readTime: 5,
-        image: "/home/2.png",
-    },
-    {
-        slug: "seo-before-design",
-        title: "Plan the SEO before you plan the design",
-        excerpt:
-            "Page structure, keywords and internal links shape a site more than most people expect.",
-        category: "SEO",
-        date: "2026-10-03",
-        readTime: 7,
-        image: "/home/3.png",
-    },
-    {
-        slug: "motion-that-means-something",
-        title: "Motion that actually means something",
-        excerpt:
-            "Animation should guide attention, not compete for it. A few rules we follow with GSAP.",
-        category: "Design",
-        date: "2026-09-24",
-        readTime: 4,
-        image: "/home/new1.png",
-    },
-    {
-        slug: "nextjs-lessons-from-production",
-        title: "Lessons from shipping Next.js to production",
-        excerpt:
-            "Caching, rendering modes and the small mistakes that cost us the most time.",
-        category: "Development",
-        date: "2026-09-15",
-        readTime: 9,
-        image: "/home/4.png",
-    },
-    {
-        slug: "how-we-run-a-project",
-        title: "How a Bugsmoker project actually runs",
-        excerpt:
-            "From first call to launch day: the rhythm we use to keep small projects calm and fast.",
-        category: "Studio",
-        date: "2026-09-05",
-        readTime: 5,
-        image: "/home/mos.png",
-    },
-    {
-        slug: "core-web-vitals-in-plain-words",
-        title: "Core Web Vitals in plain words",
-        excerpt:
-            "What the three metrics measure, why they matter and the quickest ways to improve them.",
-        category: "Performance",
-        date: "2026-08-27",
-        readTime: 6,
-        image: "/home/5.png",
-    },
-    {
-        slug: "offline-first-apps",
-        title: "Why your app should work without a signal",
-        excerpt:
-            "Offline-first thinking makes apps feel faster and more trustworthy, even on good connections.",
-        category: "Development",
-        date: "2026-08-14",
-        readTime: 8,
-        image: "/home/new2.png",
-    },
-    {
-        slug: "small-studio-big-opinions",
-        title: "Small studio, big opinions",
-        excerpt:
-            "What we believe about craft, speed and keeping things fun while doing serious work.",
-        category: "Studio",
-        date: "2026-08-02",
-        readTime: 3,
-        image: "/home/6.png",
-    },
-].sort((a, b) => (a.date < b.date ? 1 : -1));
+const POSTS = (blogData?.posts || []).slice().sort((a, b) => (a.date < b.date ? 1 : -1));
 
 const FEATURED = POSTS.slice(0, 4);
 const CATEGORIES = ["All", ...Array.from(new Set(POSTS.map((p) => p.category)))];
@@ -179,7 +89,7 @@ export default function BlogPage() {
         );
     }, [category, query]);
 
-    const feat = FEATURED[featIdx];
+    const feat = FEATURED[featIdx] || POSTS[0];
 
     /* Smooth scroll (Lenis) wired into GSAP's ticker */
     useEffect(() => {
@@ -317,7 +227,6 @@ export default function BlogPage() {
     const onSubscribe = (e) => {
         e.preventDefault();
         if (!email.trim()) return;
-        // Connect this to your newsletter provider here.
         setSubscribed(true);
     };
 
@@ -332,8 +241,9 @@ export default function BlogPage() {
                 className="pointer-events-none fixed left-0 top-0 z-40 hidden lg:block"
             >
                 <div
-                    className={`flex h-24 w-24 items-center justify-center rounded-full bg-[#ff5a1f] text-sm font-semibold text-white transition duration-300 ${cursorOn ? "scale-100 opacity-100" : "scale-0 opacity-0"
-                        }`}
+                    className={`flex h-24 w-24 items-center justify-center rounded-full bg-[#ff5a1f] text-sm font-semibold text-white transition duration-300 ${
+                        cursorOn ? "scale-100 opacity-100" : "scale-0 opacity-0"
+                    }`}
                 >
                     Read
                 </div>
@@ -349,8 +259,9 @@ export default function BlogPage() {
                                 key={p.slug}
                                 src={p.image}
                                 alt={i === featIdx ? p.title : ""}
-                                className={`hero-img-${i} absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${i === featIdx ? "opacity-100" : "opacity-0"
-                                    }`}
+                                className={`hero-img-${i} absolute inset-0 h-full w-full object-cover transition-opacity duration-700 ${
+                                    i === featIdx ? "opacity-100" : "opacity-0"
+                                }`}
                             />
                         ))}
                     </div>
@@ -369,90 +280,94 @@ export default function BlogPage() {
                         </div>
 
                         {/* Bottom */}
-                        <div className="grid gap-10 pt-32 lg:grid-cols-12 lg:items-end">
-                            <div className="lg:col-span-8">
-                                <div ref={featTextRef}>
-                                    <span className="inline-flex items-center gap-2 rounded-full border border-white/30 px-3 py-1.5 text-xs backdrop-blur-sm">
-                                        <span className="h-1.5 w-1.5 rounded-full bg-[#ff5a1f]" />
-                                        {feat.category}
-                                    </span>
-
-                                    <h1 className="mt-5 max-w-3xl text-[clamp(2.2rem,5.2vw,4.75rem)] font-semibold leading-[.98] tracking-[-0.045em]">
-                                        {feat.title}
-                                    </h1>
-
-                                    <p className="mt-5 max-w-lg text-sm leading-[1.8] text-white/75 md:text-[15px]">
-                                        {feat.excerpt}
-                                    </p>
-
-                                    <div className="mt-7 flex flex-wrap items-center gap-5">
-                                        <Link
-                                            href={POST_HREF(feat.slug)}
-                                            className="group inline-flex items-center gap-3 text-sm font-semibold"
-                                        >
-                                            <span>Read story</span>
-                                            <span className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-black transition-all duration-300 group-hover:rotate-45 group-hover:bg-[#ff5a1f] group-hover:text-white">
-                                                <Arrow />
-                                            </span>
-                                        </Link>
-                                        <span className="text-xs text-white/70 sm:text-sm">
-                                            {fmt(feat.date)} &middot; {feat.readTime} min read
+                        {feat && (
+                            <div className="grid gap-10 pt-32 lg:grid-cols-12 lg:items-end">
+                                <div className="lg:col-span-8">
+                                    <div ref={featTextRef}>
+                                        <span className="inline-flex items-center gap-2 rounded-full border border-white/30 px-3 py-1.5 text-xs backdrop-blur-sm">
+                                            <span className="h-1.5 w-1.5 rounded-full bg-[#ff5a1f]" />
+                                            {feat.category}
                                         </span>
+
+                                        <h1 className="mt-5 max-w-3xl text-[clamp(2.2rem,5.2vw,4.75rem)] font-semibold leading-[.98] tracking-[-0.045em]">
+                                            {feat.title}
+                                        </h1>
+
+                                        <p className="mt-5 max-w-lg text-sm leading-[1.8] text-white/75 md:text-[15px]">
+                                            {feat.excerpt}
+                                        </p>
+
+                                        <div className="mt-7 flex flex-wrap items-center gap-5">
+                                            <Link
+                                                href={POST_HREF(feat.slug)}
+                                                className="group inline-flex items-center gap-3 text-sm font-semibold"
+                                            >
+                                                <span>Read story</span>
+                                                <span className="flex h-11 w-11 items-center justify-center rounded-full bg-white text-black transition-all duration-300 group-hover:rotate-45 group-hover:bg-[#ff5a1f] group-hover:text-white">
+                                                    <Arrow />
+                                                </span>
+                                            </Link>
+                                            <span className="text-xs text-white/70 sm:text-sm">
+                                                {fmt(feat.date)} &middot; {feat.readTime} min read
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            {/* Latest list (desktop) */}
-                            <ul className="hero-fade hidden flex-col gap-1 lg:col-span-4 lg:flex">
-                                <li className="mb-2 text-xs text-white/60">(Latest)</li>
-                                {FEATURED.map((p, i) => (
-                                    <li key={p.slug}>
-                                        <button
-                                            type="button"
-                                            onMouseEnter={() => setFeatIdx(i)}
-                                            onFocus={() => setFeatIdx(i)}
-                                            onClick={() => setFeatIdx(i)}
-                                            aria-current={i === featIdx}
-                                            className={`flex w-full cursor-pointer items-start gap-4 border-l-2 py-3 pl-4 text-left transition-all duration-300 ${i === featIdx
-                                                    ? "border-[#ff5a1f] opacity-100"
-                                                    : "border-white/20 opacity-50 hover:opacity-80"
+                                {/* Latest list (desktop) */}
+                                <ul className="hero-fade hidden flex-col gap-1 lg:col-span-4 lg:flex">
+                                    <li className="mb-2 text-xs text-white/60">(Latest)</li>
+                                    {FEATURED.map((p, i) => (
+                                        <li key={p.slug}>
+                                            <button
+                                                type="button"
+                                                onMouseEnter={() => setFeatIdx(i)}
+                                                onFocus={() => setFeatIdx(i)}
+                                                onClick={() => setFeatIdx(i)}
+                                                aria-current={i === featIdx}
+                                                className={`flex w-full cursor-pointer items-start gap-4 border-l-2 py-3 pl-4 text-left transition-all duration-300 ${
+                                                    i === featIdx
+                                                        ? "border-[#ff5a1f] opacity-100"
+                                                        : "border-white/20 opacity-50 hover:opacity-80"
                                                 }`}
-                                        >
-                                            <span className="pt-0.5 text-xs text-[#ff5a1f]">
-                                                {pad(i + 1)}
-                                            </span>
-                                            <span>
-                                                <span className="block text-base font-medium leading-[1.3] tracking-[-0.02em]">
-                                                    {p.title}
+                                            >
+                                                <span className="pt-0.5 text-xs text-[#ff5a1f]">
+                                                    {pad(i + 1)}
                                                 </span>
-                                                <span className="mt-1 block text-xs text-white/60">
-                                                    {fmt(p.date)}
+                                                <span>
+                                                    <span className="block text-base font-medium leading-[1.3] tracking-[-0.02em]">
+                                                        {p.title}
+                                                    </span>
+                                                    <span className="mt-1 block text-xs text-white/60">
+                                                        {fmt(p.date)}
+                                                    </span>
                                                 </span>
-                                            </span>
-                                        </button>
-                                    </li>
-                                ))}
-                            </ul>
+                                            </button>
+                                        </li>
+                                    ))}
+                                </ul>
 
-                            {/* Compact switcher (mobile / tablet) */}
-                            <div className="hero-fade flex gap-2 lg:hidden">
-                                {FEATURED.map((p, i) => (
-                                    <button
-                                        key={p.slug}
-                                        type="button"
-                                        onClick={() => setFeatIdx(i)}
-                                        aria-label={`Show story ${i + 1}: ${p.title}`}
-                                        aria-current={i === featIdx}
-                                        className={`h-10 min-w-10 rounded-full border px-4 text-xs transition-colors duration-300 ${i === featIdx
-                                                ? "border-[#ff5a1f] bg-[#ff5a1f] text-white"
-                                                : "border-white/30 text-white"
+                                {/* Compact switcher (mobile / tablet) */}
+                                <div className="hero-fade flex gap-2 lg:hidden">
+                                    {FEATURED.map((p, i) => (
+                                        <button
+                                            key={p.slug}
+                                            type="button"
+                                            onClick={() => setFeatIdx(i)}
+                                            aria-label={`Show story ${i + 1}: ${p.title}`}
+                                            aria-current={i === featIdx}
+                                            className={`h-10 min-w-10 rounded-full border px-4 text-xs transition-colors duration-300 ${
+                                                i === featIdx
+                                                    ? "border-[#ff5a1f] bg-[#ff5a1f] text-white"
+                                                    : "border-white/30 text-white"
                                             }`}
-                                    >
-                                        {pad(i + 1)}
-                                    </button>
-                                ))}
+                                        >
+                                            {pad(i + 1)}
+                                        </button>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
+                        )}
                     </div>
                 </section>
 
@@ -472,10 +387,11 @@ export default function BlogPage() {
                                     role="tab"
                                     aria-selected={on}
                                     onClick={() => setCategory(c)}
-                                    className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-4 py-2 text-xs transition-colors duration-300 sm:text-sm ${on
+                                    className={`inline-flex cursor-pointer items-center gap-2 rounded-full border px-4 py-2 text-xs transition-colors duration-300 sm:text-sm ${
+                                        on
                                             ? "border-black bg-black text-white"
                                             : "border-black/20 hover:border-black"
-                                        }`}
+                                    }`}
                                 >
                                     {c}
                                     <span className={on ? "text-[#ff5a1f]" : "text-black/40"}>
@@ -535,14 +451,15 @@ export default function BlogPage() {
                                         key={p.slug}
                                         onMouseEnter={() => setCursorOn(true)}
                                         onMouseLeave={() => setCursorOn(false)}
-                                        className="post-card lg:[&:nth-child(3n+2)]:mt-16"
+                                        className="post-card group"
                                     >
-                                        <Link href={POST_HREF(p.slug)} className="group block">
-                                            <div className="relative aspect-[4/5] overflow-hidden rounded-lg bg-neutral-200">
+                                        <Link href={POST_HREF(p.slug)} className="block">
+                                            <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-neutral-200">
                                                 {/* eslint-disable-next-line @next/next/no-img-element */}
                                                 <img
                                                     src={p.image}
                                                     alt={p.title}
+                                                    loading="lazy"
                                                     className="absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
                                                 />
                                             </div>

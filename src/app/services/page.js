@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef } from "react";
 import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -25,16 +25,6 @@ const SERVICE_HREF = (slug) => `/services/${slug}`;
 const TICKER = Array.from(
     new Set(SERVICES.flatMap((s) => s.featured.items.map((i) => i.title)))
 );
-
-/* Up to five services with different images, for the fanned cards in the hero */
-const FAN = (() => {
-    const seen = new Set();
-    return SERVICES.filter((s) => {
-        if (seen.has(s.hero.image)) return false;
-        seen.add(s.hero.image);
-        return true;
-    }).slice(0, 5);
-})();
 
 const TOTAL_SPECIALITIES = SERVICES.reduce(
     (sum, s) => sum + s.featured.items.length,
@@ -68,17 +58,11 @@ const PROCESS = [
     },
 ];
 
-/* "Help me choose": each intent points at a service slug */
-const INTENTS = [
-    { label: "A website that sells", slug: "web-development" },
-    { label: "A mobile app people keep", slug: "app-development" },
-    { label: "Custom business software", slug: "software-development" },
-    { label: "Fast, reliable hosting", slug: "hosting" },
-    { label: "Someone to fix and maintain things", slug: "tech-support" },
-    { label: "Hosting and support together", slug: "hosting-and-tech-support" },
-].filter((i) => SERVICES.some((s) => s.slug === i.slug));
-
 const pad = (n) => String(n).padStart(2, "0");
+
+const prefersReducedMotion = () =>
+    typeof window !== "undefined" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches;
 
 /* ------------------------------------------------------------------ */
 /* Helpers                                                             */
@@ -116,37 +100,21 @@ const Arrow = ({ size = 18 }) => (
     </svg>
 );
 
-/* Circular rotating "view service" badge */
-function SpinBadge({ id }) {
-    return (
-        <span className="relative flex h-20 w-20 items-center justify-center rounded-full bg-white text-black shadow-lg shadow-black/20 transition-colors duration-300 group-hover:bg-[#ff5a1f] group-hover:text-white sm:h-24 sm:w-24">
-            <svg
-                viewBox="0 0 100 100"
-                className="absolute inset-0 animate-[spin_14s_linear_infinite] motion-reduce:animate-none"
-                aria-hidden="true"
-            >
-                <defs>
-                    <path
-                        id={`badge-${id}`}
-                        d="M50,50 m-37,0 a37,37 0 1,1 74,0 a37,37 0 1,1 -74,0"
-                    />
-                </defs>
-                <text
-                    className="fill-current text-[9.5px] font-semibold uppercase"
-                    textLength="226"
-                    lengthAdjust="spacing"
-                >
-                    <textPath href={`#badge-${id}`}>
-                        View service • View service •{" "}
-                    </textPath>
-                </text>
-            </svg>
-            <span className="transition-transform duration-300 group-hover:rotate-45">
-                <Arrow size={22} />
-            </span>
-        </span>
-    );
-}
+const ArrowDown = ({ size = 18 }) => (
+    <svg
+        viewBox="0 0 24 24"
+        width={size}
+        height={size}
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="2"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+        aria-hidden="true"
+    >
+        <path d="M12 5v14M6 13l6 6 6-6" />
+    </svg>
+);
 
 /* ------------------------------------------------------------------ */
 /* Page                                                                */
@@ -156,20 +124,13 @@ export default function ServicesPage() {
     const root = useRef(null);
     const lenisRef = useRef(null);
     const trackRef = useRef(null);
-    const fanRef = useRef(null);
-    const fanInnerRef = useRef(null);
     const btnWrapRef = useRef(null);
     const btnRef = useRef(null);
-
-    const [pick, setPick] = useState(0);
-    const picked = INTENTS[pick]
-        ? SERVICES.find((s) => s.slug === INTENTS[pick].slug)
-        : null;
+    const cursorRef = useRef(null);
 
     /* Smooth scroll (Lenis) wired into GSAP's ticker */
     useEffect(() => {
-        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches)
-            return;
+        if (prefersReducedMotion()) return;
 
         const lenis = new Lenis({ lerp: 0.09 });
         lenisRef.current = lenis;
@@ -189,9 +150,7 @@ export default function ServicesPage() {
     /* Ticker strip: speeds up and skews with scroll velocity */
     useEffect(() => {
         const track = trackRef.current;
-        if (!track) return;
-        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches)
-            return;
+        if (!track || prefersReducedMotion()) return;
 
         let x = 0;
         const setSkew = gsap.quickTo(track, "skewX", {
@@ -202,7 +161,7 @@ export default function ServicesPage() {
         const tick = (time, delta) => {
             const v = lenisRef.current ? lenisRef.current.velocity : 0;
             const unit = track.scrollWidth / 2;
-            x -= (70 + v * 45) * (delta / 1000);
+            x -= (60 + v * 45) * (delta / 1000);
             if (x <= -unit) x += unit;
             if (x > 0) x -= unit;
             gsap.set(track, { x });
@@ -213,114 +172,62 @@ export default function ServicesPage() {
         return () => gsap.ticker.remove(tick);
     }, []);
 
-    /* Hero: fanned service cards that spread out on hover and drift with the mouse */
+    /* Cursor chip over service images (desktop with a mouse only) */
     useEffect(() => {
-        const fan = fanRef.current;
-        const inner = fanInnerRef.current;
-        if (!fan || !inner) return;
+        const chip = cursorRef.current;
+        const host = root.current;
+        if (!chip || !host) return;
+        if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches)
+            return;
 
-        const cards = gsap.utils.toArray(".fan-card", fan);
-        if (!cards.length) return;
+        gsap.set(chip, { xPercent: -50, yPercent: -50, scale: 0 });
+        const moveX = gsap.quickTo(chip, "x", { duration: 0.35, ease: "power3" });
+        const moveY = gsap.quickTo(chip, "y", { duration: 0.35, ease: "power3" });
 
-        const reduce = window.matchMedia(
-            "(prefers-reduced-motion: reduce)"
-        ).matches;
-        const mid = (cards.length - 1) / 2;
+        const targets = Array.from(host.querySelectorAll("[data-cursor]"));
 
-        const layout = (spread = 1, intro = false) => {
-            const w = fan.clientWidth;
-            cards.forEach((card, i) => {
-                const o = i - mid;
-                gsap.to(card, {
-                    x: o * w * 0.17 * spread,
-                    y: Math.abs(o) * 12 * spread,
-                    rotation: o * 7 * spread,
-                    scale: 1,
-                    opacity: 1,
-                    zIndex: i + 1,
-                    duration: reduce ? 0 : intro ? 1.1 : 0.7,
-                    delay: intro && !reduce ? 0.5 + i * 0.09 : 0,
-                    ease: "power4.out",
-                    overwrite: "auto",
-                });
+        const onEnter = (e) => {
+            gsap.set(chip, { x: e.clientX, y: e.clientY });
+            gsap.to(chip, {
+                scale: 1,
+                duration: 0.45,
+                ease: "back.out(1.7)",
+                overwrite: "auto",
             });
-        };
-
-        gsap.set(cards, {
-            xPercent: -50,
-            yPercent: -50,
-            y: reduce ? 0 : 280,
-            opacity: reduce ? 1 : 0,
-        });
-        layout(1, true);
-
-        let hovering = false;
-
-        const onEnter = () => {
-            hovering = true;
-            layout(1.45);
-        };
-        const onLeave = () => {
-            hovering = false;
-            layout(1);
-            gsap.to(inner, { x: 0, y: 0, duration: 0.8, ease: "power3.out" });
         };
         const onMove = (e) => {
-            const r = fan.getBoundingClientRect();
-            const nx = (e.clientX - r.left) / r.width - 0.5;
-            const ny = (e.clientY - r.top) / r.height - 0.5;
-            gsap.to(inner, {
-                x: nx * 28,
-                y: ny * 18,
-                duration: 0.8,
-                ease: "power3.out",
-                overwrite: "auto",
-            });
+            moveX(e.clientX);
+            moveY(e.clientY);
         };
-
-        const cardEnter = (card) => () =>
-            gsap.to(card, {
-                rotation: 0,
-                scale: 1.08,
-                zIndex: 50,
-                duration: 0.4,
-                ease: "power3.out",
+        const onLeave = () =>
+            gsap.to(chip, {
+                scale: 0,
+                duration: 0.3,
+                ease: "power3.in",
                 overwrite: "auto",
             });
-        const cardLeave = () => hovering && layout(1.45);
 
-        const bound = cards.map((card) => {
-            const fn = cardEnter(card);
-            card.addEventListener("mouseenter", fn);
-            card.addEventListener("mouseleave", cardLeave);
-            return [card, fn];
+        targets.forEach((el) => {
+            el.addEventListener("mouseenter", onEnter);
+            el.addEventListener("mousemove", onMove);
+            el.addEventListener("mouseleave", onLeave);
         });
 
-        fan.addEventListener("mouseenter", onEnter);
-        fan.addEventListener("mouseleave", onLeave);
-        fan.addEventListener("mousemove", onMove);
-
-        const onResize = () => layout(hovering ? 1.45 : 1);
-        window.addEventListener("resize", onResize);
-
         return () => {
-            fan.removeEventListener("mouseenter", onEnter);
-            fan.removeEventListener("mouseleave", onLeave);
-            fan.removeEventListener("mousemove", onMove);
-            bound.forEach(([card, fn]) => {
-                card.removeEventListener("mouseenter", fn);
-                card.removeEventListener("mouseleave", cardLeave);
+            targets.forEach((el) => {
+                el.removeEventListener("mouseenter", onEnter);
+                el.removeEventListener("mousemove", onMove);
+                el.removeEventListener("mouseleave", onLeave);
             });
-            window.removeEventListener("resize", onResize);
         };
     }, []);
 
-    const jumpTo = (slug) => {
-        const el = document.getElementById(`service-${slug}`);
+    const scrollToId = (id, offset = -90) => {
+        const el = document.getElementById(id);
         if (!el) return;
 
         if (lenisRef.current) {
-            lenisRef.current.scrollTo(el, { offset: -12, duration: 1.4 });
+            lenisRef.current.scrollTo(el, { offset, duration: 1.4 });
         } else {
             el.scrollIntoView({ behavior: "smooth", block: "start" });
         }
@@ -335,12 +242,7 @@ export default function ServicesPage() {
         const dx = e.clientX - (r.left + r.width / 2);
         const dy = e.clientY - (r.top + r.height / 2);
 
-        gsap.to(btn, {
-            x: dx * 0.35,
-            y: dy * 0.35,
-            duration: 0.4,
-            ease: "power3",
-        });
+        gsap.to(btn, { x: dx * 0.35, y: dy * 0.35, duration: 0.4, ease: "power3" });
     };
 
     const onBtnLeave = () => {
@@ -371,27 +273,11 @@ export default function ServicesPage() {
                     y: 20,
                     duration: 0.9,
                     ease: "power3.out",
-                    stagger: 0.08,
-                    delay: 0.6,
+                    stagger: 0.1,
+                    delay: 0.5,
                 });
-
-                const count = document.querySelector(".hero-count");
-                if (count) {
-                    const total = Number(count.dataset.total);
-                    const c = { v: 0 };
-                    gsap.to(c, {
-                        v: total,
-                        duration: 1.4,
-                        delay: 0.5,
-                        ease: "power2.out",
-                        onUpdate: () => {
-                            count.textContent = pad(Math.round(c.v));
-                        },
-                    });
-                }
-
                 gsap.to(".hero-title", {
-                    yPercent: -10,
+                    yPercent: -8,
                     ease: "none",
                     scrollTrigger: {
                         trigger: ".hero",
@@ -411,30 +297,62 @@ export default function ServicesPage() {
                     }
                 );
 
-                /* Service cards */
-                gsap.utils.toArray(".service-card").forEach((card) => {
-                    gsap.from(card.querySelectorAll(".card-anim"), {
-                        y: 40,
+                /* List header */
+                gsap.from(".list-head-anim", {
+                    y: 36,
+                    opacity: 0,
+                    duration: 0.9,
+                    ease: "power3.out",
+                    stagger: 0.1,
+                    scrollTrigger: { trigger: ".list-head", start: "top 85%" },
+                });
+
+                /* Service rows */
+                gsap.utils.toArray(".service-row").forEach((row) => {
+                    const trigger = { trigger: row, start: "top 85%" };
+
+                    gsap.fromTo(
+                        row.querySelector(".row-line"),
+                        { scaleX: 0 },
+                        {
+                            scaleX: 1,
+                            duration: 1.2,
+                            ease: "power3.out",
+                            scrollTrigger: trigger,
+                        }
+                    );
+                    gsap.from(row.querySelectorAll(".row-anim"), {
+                        y: 30,
                         opacity: 0,
-                        duration: 0.8,
+                        duration: 0.9,
                         ease: "power3.out",
-                        stagger: 0.08,
-                        scrollTrigger: { trigger: card, start: "top 75%" },
-                    });
-                    gsap.from(card.querySelector(".card-img"), {
-                        scale: 1.25,
-                        duration: 1.4,
-                        ease: "power3.out",
-                        scrollTrigger: { trigger: card, start: "top 75%" },
+                        stagger: 0.07,
+                        scrollTrigger: trigger,
                     });
                     gsap.fromTo(
-                        card.querySelector(".card-mark"),
-                        { yPercent: 12 },
+                        row.querySelector(".row-img-wrap"),
+                        { clipPath: "inset(0% 0% 100% 0% round 14px)" },
                         {
-                            yPercent: -12,
+                            clipPath: "inset(0% 0% 0% 0% round 14px)",
+                            duration: 1.3,
+                            ease: "power4.inOut",
+                            scrollTrigger: trigger,
+                        }
+                    );
+                    gsap.from(row.querySelector(".row-img"), {
+                        scale: 1.25,
+                        duration: 1.5,
+                        ease: "power3.out",
+                        scrollTrigger: trigger,
+                    });
+                    gsap.fromTo(
+                        row.querySelector(".row-img"),
+                        { yPercent: -6 },
+                        {
+                            yPercent: 6,
                             ease: "none",
                             scrollTrigger: {
-                                trigger: card,
+                                trigger: row,
                                 start: "top bottom",
                                 end: "bottom top",
                                 scrub: true,
@@ -445,12 +363,12 @@ export default function ServicesPage() {
 
                 /* Stats band */
                 gsap.from(".stat-item", {
-                    y: 50,
+                    y: 40,
                     opacity: 0,
                     duration: 0.9,
                     ease: "power3.out",
                     stagger: 0.1,
-                    scrollTrigger: { trigger: ".stats", start: "top 75%" },
+                    scrollTrigger: { trigger: ".stats", start: "top 80%" },
                 });
                 gsap.utils.toArray(".stat-num").forEach((el) => {
                     const target = Number(el.dataset.value);
@@ -464,7 +382,7 @@ export default function ServicesPage() {
                         },
                         scrollTrigger: {
                             trigger: el,
-                            start: "top 90%",
+                            start: "top 92%",
                             once: true,
                         },
                     });
@@ -481,7 +399,7 @@ export default function ServicesPage() {
                             duration: 1,
                             ease: "power3.out",
                             delay: (i % 2) * 0.1,
-                            scrollTrigger: { trigger: step, start: "top 85%" },
+                            scrollTrigger: { trigger: step, start: "top 88%" },
                         }
                     );
                     gsap.from(step.querySelectorAll(".proc-anim"), {
@@ -490,26 +408,17 @@ export default function ServicesPage() {
                         duration: 0.8,
                         ease: "power3.out",
                         stagger: 0.08,
-                        scrollTrigger: { trigger: step, start: "top 85%" },
+                        scrollTrigger: { trigger: step, start: "top 88%" },
                     });
                 });
 
-                /* Picker + CTA */
-                gsap.from(".pick-fade", {
-                    y: 40,
-                    opacity: 0,
-                    duration: 0.8,
-                    ease: "power3.out",
-                    stagger: 0.1,
-                    scrollTrigger: { trigger: ".picker", start: "top 75%" },
-                });
-
+                /* CTA */
                 gsap.from(".cta-line .mask-inner", {
                     yPercent: 115,
                     duration: 1.1,
                     ease: "power4.out",
                     stagger: 0.12,
-                    scrollTrigger: { trigger: ".cta", start: "top 70%" },
+                    scrollTrigger: { trigger: ".cta", start: "top 75%" },
                 });
                 gsap.from(".cta-fade", {
                     opacity: 0,
@@ -518,64 +427,20 @@ export default function ServicesPage() {
                     ease: "power3.out",
                     stagger: 0.1,
                     delay: 0.3,
-                    scrollTrigger: { trigger: ".cta", start: "top 70%" },
+                    scrollTrigger: { trigger: ".cta", start: "top 75%" },
                 });
             });
-
-            /* Stacking: next card slides over, previous shrinks and dims */
-            mm.add(
-                "(min-width: 768px) and (prefers-reduced-motion: no-preference)",
-                () => {
-                    const cards = gsap.utils.toArray(".service-card");
-                    cards.forEach((card, i) => {
-                        const next = cards[i + 1];
-                        if (!next) return;
-                        const st = {
-                            trigger: next,
-                            start: "top bottom",
-                            end: "top top+=12",
-                            scrub: true,
-                        };
-                        gsap.to(card.querySelector(".card-inner"), {
-                            scale: 0.94,
-                            ease: "none",
-                            scrollTrigger: st,
-                        });
-                        gsap.to(card.querySelector(".card-dim"), {
-                            opacity: 0.55,
-                            ease: "none",
-                            scrollTrigger: st,
-                        });
-                    });
-                }
-            );
         }, root);
 
-        return () => ctx.revert();
-    }, []);
+        /* Images change layout once loaded, so re-measure triggers */
+        const refresh = () => ScrollTrigger.refresh();
+        window.addEventListener("load", refresh);
 
-    /* Picker result re-animates when the choice changes */
-    useEffect(() => {
-        if (window.matchMedia("(prefers-reduced-motion: reduce)").matches)
-            return;
-        gsap.fromTo(
-            ".pick-result-anim",
-            { y: 24, opacity: 0 },
-            {
-                y: 0,
-                opacity: 1,
-                duration: 0.6,
-                ease: "power3.out",
-                stagger: 0.06,
-                overwrite: true,
-            }
-        );
-        gsap.fromTo(
-            ".pick-result-img",
-            { scale: 1.2 },
-            { scale: 1, duration: 1.1, ease: "power3.out", overwrite: true }
-        );
-    }, [pick]);
+        return () => {
+            window.removeEventListener("load", refresh);
+            ctx.revert();
+        };
+    }, []);
 
     return (
         <div
@@ -587,248 +452,140 @@ export default function ServicesPage() {
             {/* Scroll progress */}
             <div className="progress pointer-events-none fixed left-0 top-0 z-50 h-[3px] w-full origin-left scale-x-0 bg-[#ff5a1f]" />
 
-            <div className="flex flex-col gap-3">
-                {/* ---------------- Hero ---------------- */}
-                <section className="hero relative flex min-h-[85svh] flex-col justify-between overflow-hidden rounded-xl bg-white px-4 pb-5 pt-5 text-black sm:min-h-[92vh] sm:px-8 sm:pb-8 sm:pt-6">
-                    <div className="hero-fade mt-[10vh] flex items-start justify-between gap-4 text-xs sm:text-sm">
-                        <span className="shrink-0">(Services)</span>
-                        <span className="max-w-[200px] text-right leading-[1.5] text-neutral-600 sm:max-w-[220px]">
-                            Everything we build, run and look after, in one place.
-                        </span>
-                    </div>
+            {/* Cursor chip (desktop with a mouse only) */}
+            <div
+                ref={cursorRef}
+                aria-hidden="true"
+                className="pointer-events-none fixed left-0 top-0 z-[60] hidden h-20 w-20 scale-0 items-center justify-center rounded-full bg-[#ff5a1f] text-xs font-semibold uppercase tracking-[0.08em] text-white shadow-xl shadow-black/30 [@media(hover:hover)_and_(pointer:fine)]:flex"
+            >
+                View
+            </div>
 
-                    {/* Fanned service cards */}
-                    <div
-                        ref={fanRef}
-                        className="relative mx-auto mt-10 h-[300px] w-full max-w-[380px] sm:h-[340px] lg:absolute lg:right-10 lg:top-[16vh] lg:mt-0 lg:h-[50vh] lg:w-[34vw] lg:max-w-none"
-                    >
-                        <div ref={fanInnerRef} className="absolute inset-0">
-                            {FAN.map((s, i) => (
-                                <button
-                                    key={s.id}
-                                    type="button"
-                                    onClick={() => jumpTo(s.slug)}
-                                    aria-label={`Jump to ${s.hero.titlePlain}`}
-                                    className="fan-card absolute left-1/2 top-1/2 aspect-[3/4] w-[42%] cursor-pointer overflow-hidden rounded-xl bg-neutral-800 text-left shadow-2xl shadow-black/25"
-                                >
-                                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                                    <img
-                                        src={s.hero.image}
-                                        alt=""
-                                        className="absolute inset-0 h-full w-full object-cover"
-                                    />
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-transparent to-transparent" />
-                                    <div className="absolute inset-x-0 bottom-0 p-3 text-white">
-                                        <span className="block text-[10px] text-[#ff5a1f]">
-                                            {pad(i + 1)}
-                                        </span>
-                                        <span className="block text-xs font-semibold leading-tight tracking-[-0.02em] sm:text-sm">
-                                            {s.hero.titlePlain}
-                                        </span>
-                                    </div>
-                                </button>
-                            ))}
-                        </div>
-                    </div>
+            <div className="flex flex-col gap-2 sm:gap-3">
+               
+<section className="hero relative flex min-h-[78svh] flex-col justify-end overflow-hidden rounded-xl 
+bg-[#f5f5f2] px-5 py-6 text-[#171717] sm:min-h-[88vh] sm:px-10 sm:py-8 lg:px-12">
 
-                    <div className="pt-12 sm:pt-20 lg:pt-32">
-                        <div className="relative">
-                            <span className="hero-fade absolute -top-6 right-0 text-sm font-semibold sm:-top-4 sm:text-base lg:hidden">
-                                (
-                                <span
-                                    className="hero-count tabular-nums"
-                                    data-total={SERVICES.length}
-                                >
-                                    {pad(SERVICES.length)}
-                                </span>
-                                )
-                            </span>
+    <div className="relative mt-20 sm:mt-0">
+        
 
-                            <h1 className="hero-title text-[clamp(3.5rem,15vw,12.5rem)] font-semibold leading-[.82] tracking-[-0.08em] sm:text-[clamp(4rem,12vw,12.5rem)] sm:leading-[.73] sm:tracking-[-.1em]">
-                                <span className="hero-line block">
-                                    <MaskLine>what we</MaskLine>
-                                </span>
-                                <span className="hero-line mt-[0.08em] block">
-                                    <MaskLine>
-                                        do<span className="text-[#ff5a1f]">.</span>
-                                    </MaskLine>
-                                </span>
-                            </h1>
-                        </div>
+        <h1 className="hero-title text-[clamp(4rem,15vw,13rem)] font-semibold leading-[0.78] tracking-[-0.085em]">
+            <span className="hero-line block">
+                <MaskLine>what we</MaskLine>
+            </span>
 
-                        {/* Service navigation */}
-                        <div className="hero-fade mt-8 flex flex-wrap gap-2 border-t border-black/15 pt-5 sm:mt-10">
-                            {SERVICES.map((s, i) => (
-                                <button
-                                    key={s.id}
-                                    type="button"
-                                    onClick={() => jumpTo(s.slug)}
-                                    className="group inline-flex min-h-10 max-w-full cursor-pointer items-center gap-2 rounded-full border border-black/20 px-3 py-2 text-left text-xs transition-colors duration-300 hover:border-black hover:bg-black hover:text-white sm:px-4 sm:text-sm"
-                                >
-                                    <span className="shrink-0 text-[#ff5a1f]">
-                                        {pad(i + 1)}
-                                    </span>
-                                    <span className="break-words">
-                                        {s.hero.titlePlain}
-                                    </span>
-                                </button>
-                            ))}
-                        </div>
-                    </div>
-                </section>
+            <span className="hero-line mt-[0.08em] block">
+                <MaskLine>
+                    do<span className="text-[#ff5a1f]">.</span>
+                </MaskLine>
+            </span>
+        </h1>
+         <div className="mt-5 flex flex-col justify-between gap-6 border-t border-black/15 pt-5 sm:flex-row sm:items-end sm:pt-6">
+
+        <p className="max-w-[310px] text-sm leading-relaxed text-black/55 sm:text-base">
+            We turn complex business problems into simple,
+            thoughtful and powerful digital experiences.
+        </p>
+
+        
+    </div>
+    </div>
+
+    {/* Bottom information */}
+   
+
+</section>
+
 
                 {/* ---------------- Ticker ---------------- */}
-                <section className="overflow-hidden bg-black py-5">
+                <section className="overflow-hidden bg-black py-4 sm:py-5">
                     <div ref={trackRef} className="flex w-max will-change-transform">
                         {[...TICKER, ...TICKER].map((title, i) => (
                             <span
                                 key={`${title}-${i}`}
                                 aria-hidden={i >= TICKER.length}
-                                className="mr-7 inline-flex shrink-0 items-center gap-7 whitespace-nowrap text-2xl font-semibold tracking-[-0.03em] text-white sm:mr-10 sm:gap-10 sm:text-4xl"
+                                className="mr-6 inline-flex shrink-0 items-center gap-6 whitespace-nowrap text-xl font-semibold tracking-[-0.03em] text-white sm:mr-10 sm:gap-10 sm:text-4xl"
                             >
                                 {title}
-                                <span className="h-2 w-2 shrink-0 rounded-full bg-[#ff5a1f]" />
+                                <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#ff5a1f] sm:h-2 sm:w-2" />
                             </span>
                         ))}
                     </div>
                 </section>
 
-                {/* ---------------- Service cards ---------------- */}
-                <section className="flex flex-col gap-3">
-                    {SERVICES.map((s, i) => {
-                        const dark = i % 2 === 1;
-                        const stat = s.content.stats[0];
+                {/* ---------------- Services list ---------------- */}
+                <section
+                    id="services"
+                    className="rounded-xl bg-white px-4 pb-4 pt-12 text-black sm:px-8 sm:pb-8 lg:pt-24"
+                >
+                    <div className="mx-auto max-w-[1400px]">
+                        
 
-                        return (
-                            <article
-                                key={s.id}
-                                id={`service-${s.slug}`}
-                                className="service-card relative scroll-mt-3 md:sticky md:top-3 md:h-[calc(100svh-1.5rem)]"
-                            >
-                                <div
-                                    className={`card-inner relative h-full min-h-[620px] origin-top overflow-hidden rounded-xl sm:min-h-0 ${dark
-                                        ? "border border-white/10 bg-neutral-900 text-white"
-                                        : "bg-white text-black"
-                                        }`}
+                        <div className="group/list">
+                            {SERVICES.map((s, i) => (
+                                <article
+                                    key={s.id}
+                                    id={`service-${s.slug}`}
+                                    className="service-row relative transition-opacity duration-500 md:group-hover/list:opacity-40 md:hover:!opacity-100"
                                 >
-                                    {/* Oversized number watermark */}
-                                    <span
-                                        aria-hidden="true"
-                                        className={`card-mark pointer-events-none absolute -bottom-10 -left-4 hidden select-none text-[22rem] font-semibold leading-none tracking-[-0.08em] md:block ${dark ? "text-white/[0.04]" : "text-black/[0.04]"
-                                            }`}
-                                    >
-                                        {pad(i + 1)}
-                                    </span>
-
-                                    <div className="card-dim pointer-events-none absolute inset-0 z-20 bg-black opacity-0" />
-
-                                    <div className="relative grid h-full gap-7 p-4 sm:gap-8 sm:p-8 md:grid-cols-12 md:gap-12">
-                                        {/* Text */}
-                                        <div className="flex min-w-0 flex-col justify-between gap-8 md:col-span-6 md:gap-10">
-                                            <div className="card-anim flex items-center justify-between gap-3 text-xs sm:text-sm">
-                                                <span>
-                                                    <span className="text-[#ff5a1f]">
-                                                        ({pad(i + 1)})
-                                                    </span>
-                                                    <span className="opacity-50">
-                                                        {" "}
-                                                        / {pad(SERVICES.length)}
-                                                    </span>
-                                                </span>
-                                                <span className="text-right opacity-60">
-                                                    {s.featured.items.length} specialities
-                                                </span>
-                                            </div>
-
-                                            <div className="min-w-0">
-                                                <Link
-                                                    href={SERVICE_HREF(s.slug)}
-                                                    className="group block"
-                                                >
-                                                    <h2 className="card-anim break-words text-[clamp(2.2rem,10vw,3.5rem)] font-semibold lowercase leading-[.92] tracking-[-0.06em] transition-colors duration-300 group-hover:text-[#ff5a1f] sm:text-[clamp(2.6rem,6vw,6rem)] sm:leading-[.9]">
-                                                        {s.hero.titlePlain}
-                                                    </h2>
-                                                </Link>
-
-                                                <p
-                                                    className={`card-anim mt-4 max-w-md break-words text-sm leading-[1.8] sm:mt-6 sm:text-[15px] ${dark ? "text-white/70" : "text-neutral-600"
-                                                        }`}
-                                                >
-                                                    {s.metadata.description}
-                                                </p>
-
-                                                <div className="card-anim mt-5 flex flex-wrap gap-2 sm:mt-6">
-                                                    {s.featured.items.map((f) => (
-                                                        <span
-                                                            key={f.title}
-                                                            className={`max-w-full break-words rounded-full border px-3 py-1.5 text-xs ${dark
-                                                                ? "border-white/20"
-                                                                : "border-black/20"
-                                                                }`}
-                                                        >
-                                                            {f.title}
-                                                        </span>
-                                                    ))}
-                                                </div>
-                                            </div>
-
-                                            <Link
-                                                href={SERVICE_HREF(s.slug)}
-                                                className="card-anim group inline-flex min-h-11 w-fit items-center gap-3 text-sm font-semibold"
-                                            >
-                                                <span>View service</span>
-                                                <span
-                                                    className={`flex h-11 w-11 shrink-0 items-center justify-center rounded-full transition-all duration-300 group-hover:rotate-45 group-hover:bg-[#ff5a1f] group-hover:text-white ${dark
-                                                        ? "bg-white text-black"
-                                                        : "bg-black text-white"
-                                                        }`}
-                                                >
-                                                    <Arrow />
-                                                </span>
-                                            </Link>
-                                        </div>
-
-                                        {/* Image */}
+                                 
+   <span className="row-line absolute left-0 top-0 h-px w-full origin-left bg-black/15" />
+                                    <div className="grid gap-5 py-6 sm:py-8 md:grid-cols-12 md:items-center md:gap-10 lg:py-12">
+                                        {/* Image: first on mobile */}
                                         <Link
                                             href={SERVICE_HREF(s.slug)}
                                             aria-label={`View ${s.hero.titlePlain}`}
-                                            className="group relative block aspect-[4/3] min-w-0 overflow-hidden rounded-lg bg-neutral-800 md:col-span-6 md:aspect-auto md:h-full"
+                                            data-cursor
+                                            className="group relative order-1 block min-w-0 md:order-2 md:col-span-5"
                                         >
-                                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                                            <img
-                                                src={s.hero.image}
-                                                alt={s.hero.imageAlt}
-                                                className="card-img absolute inset-0 h-full w-full object-cover transition-transform duration-700 ease-out group-hover:scale-105"
-                                            />
-                                            <div className="absolute inset-0 bg-gradient-to-t from-black/55 via-transparent to-black/10" />
-
-                                            {/* Rotating badge */}
-                                            <div className="card-anim absolute right-3 top-3 sm:right-4 sm:top-4">
-                                                <SpinBadge id={s.id} />
-                                            </div>
-
-                                            {/* Stat pill */}
-                                            <div className="card-anim absolute bottom-3 left-3 flex max-w-[calc(100%-1.5rem)] items-baseline gap-2 rounded-full bg-white px-3 py-2 text-black sm:bottom-4 sm:left-4 sm:px-4">
-                                                <span className="shrink-0 text-lg font-semibold tracking-[-0.03em]">
-                                                    {stat.value}
-                                                    <span className="text-[#ff5a1f]">
-                                                        {stat.suffix}
-                                                    </span>
-                                                </span>
-                                                <span className="min-w-0 break-words text-xs">
-                                                    {stat.label}
-                                                </span>
+                                            <div className="row-img-wrap relative aspect-[16/11] overflow-hidden rounded-[14px] bg-neutral-200 md:aspect-[4/3]">
+                                                <div className="absolute inset-0 transition-transform duration-700 ease-out group-hover:scale-105">
+                                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                                    <img
+                                                        src={s.hero.image}
+                                                        alt={s.hero.imageAlt}
+                                                        loading="lazy"
+                                                        className="row-img absolute -top-[10%] left-0 h-[120%] w-full object-cover"
+                                                    />
+                                                </div>
                                             </div>
                                         </Link>
+
+                                        {/* Text */}
+                                        <div className="order-2 min-w-0 md:order-1 md:col-span-7">
+                                            <p className="row-anim text-xs text-[#ff5a1f] sm:text-sm">
+                                                ({pad(i + 1)})
+                                            </p>
+
+                                            <Link
+                                                href={SERVICE_HREF(s.slug)}
+                                                className="group mt-3 flex items-start justify-between gap-4 sm:mt-4"
+                                            >
+                                                <h3 className="row-anim min-w-0 break-words text-[clamp(2rem,9vw,3.25rem)] font-semibold lowercase leading-[.95] tracking-[-0.06em] transition-all duration-500 group-hover:translate-x-2 group-hover:text-[#ff5a1f] sm:text-[clamp(2.6rem,5vw,5.5rem)]">
+                                                    {s.hero.titlePlain}
+                                                </h3>
+
+                                                <span className="row-anim mt-1 flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-black text-white transition-all duration-300 group-hover:rotate-45 group-hover:bg-[#ff5a1f] sm:h-14 sm:w-14">
+                                                    <Arrow size={20} />
+                                                </span>
+                                            </Link>
+
+                                            <p className="row-anim mt-3 line-clamp-2 max-w-md text-sm leading-[1.7] text-neutral-600 sm:mt-5 sm:text-[15px]">
+                                                {s.metadata.description}
+                                            </p>
+                                        </div>
+                                        
                                     </div>
-                                </div>
-                            </article>
-                        );
-                    })}
+                                    
+                                </article>
+                            ))}
+                            <div className="h-px w-full bg-black/15" />
+                        </div>
+                    </div>
                 </section>
 
                 {/* ---------------- Stats band ---------------- */}
-                <section className="stats rounded-xl border border-white/10 bg-neutral-900 px-4 py-14 text-white sm:px-8 lg:py-24">
+                <section className="stats rounded-xl border border-white/10 bg-neutral-900 px-4 py-12 text-white sm:px-8 lg:py-24">
                     <div className="mx-auto max-w-[1400px]">
                         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                             <h2 className="max-w-3xl text-4xl font-semibold leading-[0.95] tracking-[-0.05em] sm:text-5xl lg:text-7xl">
@@ -840,7 +597,7 @@ export default function ServicesPage() {
                             </p>
                         </div>
 
-                        <div className="mt-12 grid grid-cols-2 gap-x-6 gap-y-10 border-t border-white/15 pt-10 lg:mt-20 lg:grid-cols-4">
+                        <div className="mt-10 grid grid-cols-2 gap-x-6 gap-y-10 border-t border-white/15 pt-8 lg:mt-20 lg:grid-cols-4 lg:pt-10">
                             {STATS.map((s) => (
                                 <div key={s.label} className="stat-item">
                                     <div className="flex items-baseline text-5xl font-semibold tracking-[-0.06em] sm:text-7xl lg:text-8xl">
@@ -862,7 +619,7 @@ export default function ServicesPage() {
                 </section>
 
                 {/* ---------------- Process ---------------- */}
-                <section className="rounded-xl bg-white px-4 py-14 text-black sm:px-8 lg:py-24">
+                <section className="rounded-xl bg-white px-4 py-12 text-black sm:px-8 lg:py-24">
                     <div className="mx-auto max-w-[1400px]">
                         <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
                             <h2 className="text-4xl font-semibold leading-[0.95] tracking-[-0.05em] sm:text-5xl lg:text-7xl">
@@ -873,7 +630,7 @@ export default function ServicesPage() {
                             </p>
                         </div>
 
-                        <div className="mt-12 grid gap-10 sm:grid-cols-2 lg:mt-20 lg:grid-cols-4 lg:gap-8">
+                        <div className="mt-10 grid gap-9 sm:grid-cols-2 lg:mt-20 lg:grid-cols-4 lg:gap-8">
                             {PROCESS.map((p, i) => (
                                 <div key={p.title} className="proc-step">
                                     <div className="relative h-[2px] w-full bg-black/10">
@@ -894,113 +651,6 @@ export default function ServicesPage() {
                     </div>
                 </section>
 
-                {/* ---------------- Help me choose ---------------- */}
-                {picked && (
-                    <section className="picker rounded-xl bg-neutral-100 px-4 py-14 text-black sm:px-8 lg:py-24">
-                        <div className="mx-auto max-w-[1400px]">
-                            <h2 className="pick-fade text-4xl font-semibold leading-[0.95] tracking-[-0.05em] sm:text-5xl lg:text-7xl">
-                                Not sure where to start?
-                            </h2>
-                            <p className="pick-fade mt-5 max-w-sm text-sm leading-[1.8] text-neutral-600">
-                                Tell us what you need and we&apos;ll point you to the
-                                right service.
-                            </p>
-
-                            <div className="mt-10 grid gap-8 lg:mt-16 lg:grid-cols-12 lg:gap-14">
-                                {/* Choices */}
-                                <div
-                                    className="pick-fade lg:col-span-6"
-                                    role="radiogroup"
-                                    aria-label="What do you need?"
-                                >
-                                    {INTENTS.map((it, i) => {
-                                        const on = i === pick;
-                                        return (
-                                            <button
-                                                key={it.slug}
-                                                type="button"
-                                                role="radio"
-                                                aria-checked={on}
-                                                onClick={() => setPick(i)}
-                                                className="group flex w-full cursor-pointer items-center gap-4 border-t border-black/15 py-5 text-left last:border-b sm:py-6"
-                                            >
-                                                <span
-                                                    className={`text-xs transition-colors duration-300 ${on ? "text-[#ff5a1f]" : "text-black/40"
-                                                        }`}
-                                                >
-                                                    {pad(i + 1)}
-                                                </span>
-                                                <span
-                                                    className={`flex-1 text-xl font-semibold tracking-[-0.03em] transition-all duration-500 sm:text-3xl ${on
-                                                        ? "translate-x-2 text-black"
-                                                        : "text-black/45 group-hover:translate-x-2 group-hover:text-black"
-                                                        }`}
-                                                >
-                                                    {it.label}
-                                                </span>
-                                                <span
-                                                    className={`h-3 w-3 shrink-0 rounded-full transition-all duration-300 ${on
-                                                        ? "scale-100 bg-[#ff5a1f]"
-                                                        : "scale-50 bg-black/15"
-                                                        }`}
-                                                />
-                                            </button>
-                                        );
-                                    })}
-                                </div>
-
-                                {/* Result */}
-                                <div className="pick-fade lg:col-span-6">
-                                    <div
-                                        aria-live="polite"
-                                        className="overflow-hidden rounded-xl bg-neutral-900 text-white"
-                                    >
-                                        <div className="relative aspect-[16/10] overflow-hidden bg-neutral-800">
-                                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                                            <img
-                                                key={picked.slug}
-                                                src={picked.hero.image}
-                                                alt={picked.hero.imageAlt}
-                                                className="pick-result-img absolute inset-0 h-full w-full object-cover"
-                                            />
-                                            <div className="absolute inset-0 bg-gradient-to-t from-neutral-900 via-transparent to-transparent" />
-                                        </div>
-
-                                        <div className="p-5 sm:p-8">
-                                            <p className="pick-result-anim text-xs text-[#ff5a1f]">
-                                                (We&apos;d suggest)
-                                            </p>
-                                            <h3 className="pick-result-anim mt-3 break-words text-3xl font-semibold lowercase leading-[.95] tracking-[-0.05em] sm:text-5xl">
-                                                {picked.hero.titlePlain}
-                                            </h3>
-                                            <p className="pick-result-anim mt-4 max-w-md text-sm leading-[1.8] text-white/70">
-                                                {picked.metadata.description}
-                                            </p>
-
-                                            <div className="pick-result-anim mt-6 flex flex-wrap items-center gap-3">
-                                                <Link
-                                                    href={SERVICE_HREF(picked.slug)}
-                                                    className="inline-flex items-center gap-2 rounded-full bg-[#ff5a1f] px-6 py-3 text-sm font-semibold text-black transition-colors duration-300 hover:bg-white"
-                                                >
-                                                    View service
-                                                    <Arrow />
-                                                </Link>
-                                                <button
-                                                    type="button"
-                                                    onClick={() => jumpTo(picked.slug)}
-                                                    className="cursor-pointer rounded-full border border-white/25 px-6 py-3 text-sm font-semibold transition-colors duration-300 hover:border-white hover:bg-white hover:text-black"
-                                                >
-                                                    Show me above
-                                                </button>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    </section>
-                )}
-
                 {/* ---------------- CTA ---------------- */}
                 <section className="cta overflow-hidden rounded-xl bg-[#ff5a1f] px-4 pb-5 pt-12 text-black sm:px-8 sm:pb-8 sm:pt-16 lg:pt-28">
                     <p className="cta-fade text-xs sm:text-sm">
@@ -1008,7 +658,7 @@ export default function ServicesPage() {
                     </p>
 
                     <div className="mt-6 flex flex-col gap-8 sm:gap-10 lg:flex-row lg:items-end lg:justify-between">
-                        <h2 className="text-[clamp(3.5rem,17vw,16rem)] font-semibold leading-[.8] tracking-[-0.08em] sm:text-[clamp(4.5rem,16vw,16rem)] sm:leading-[.75] sm:tracking-[-.1em]">
+                        <h2 className="text-[clamp(3.6rem,19vw,16rem)] font-semibold leading-[.8] tracking-[-0.08em] sm:text-[clamp(4.5rem,16vw,16rem)] sm:leading-[.75] sm:tracking-[-.1em]">
                             <span className="cta-line block">
                                 <MaskLine>say</MaskLine>
                             </span>
