@@ -298,14 +298,14 @@ export default function WorksShowcase({
                 </div>
             </div>
 
-            {/* 4 Big Image Cards: Refined width and height (2 columns on desktop) */}
-            <div className="mx-auto grid  grid-cols-1 gap-5 sm:gap-6 lg:gap-7 sm:grid-cols-2">
+            {/* 4 Big Image Cards: horizontal swipe slider on mobile, 2-column grid from sm up */}
+            <div className="-mx-4 flex snap-x snap-mandatory scroll-pl-4 gap-4 overflow-x-auto overscroll-x-contain px-4 py-2 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden sm:mx-auto sm:grid sm:snap-none sm:grid-cols-2 sm:gap-6 sm:overflow-visible sm:px-0 sm:py-0 lg:gap-7">
                 {list.slice(0, 4).map((it, i) => (
                     <Link
                         key={it.id ?? it.href ?? i}
                         href={it.href || "/portfolio"}
                         aria-label={it.title}
-                    className="ws-card group relative aspect-[18/5] sm:aspect-[4/3] md:aspect-[1.3] w-full min-h-[360px] sm:min-h-[420px] md:min-h-[460px] lg:min-h-[500px] max-h-[540px] overflow-hidden  bg-[#0e0e11] border border-black/10 dark:border-white/10 shadow-xl flex items-center justify-center cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-[#ff5a1f] will-change-transform"   >
+                    className="ws-card group relative aspect-[18/5] sm:aspect-[4/3] md:aspect-[1.3] w-[82%] shrink-0 snap-start sm:w-full sm:shrink min-h-[360px] sm:min-h-[420px] md:min-h-[460px] lg:min-h-[500px] max-h-[540px] overflow-hidden  bg-[#0e0e11] border border-black/10 dark:border-white/10 shadow-xl flex items-center justify-center cursor-pointer outline-none focus-visible:ring-2 focus-visible:ring-[#ff5a1f] will-change-transform"   >
                         
 
                         {/* Image in center of card div, NOT taking full width & height */}

@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useEffect, useRef } from "react";
@@ -23,7 +22,15 @@ import {
 
 if (typeof window !== "undefined") {
     gsap.registerPlugin(ScrollTrigger);
+    // Stops the mobile address bar showing/hiding from re-calculating every trigger
+    ScrollTrigger.config({ ignoreMobileResize: true });
 }
+
+const BASE_SPEED = 0.45;       // Normal horizontal movement (was 1.1)
+const HOVER_SPEED = 0.15;      // Hover movement (was 0.35)
+const MAX_SCROLL_BOOST = 0.6;  // Scroll speed boost (was 1.6)
+const WAVE_BASE_RATE = 0.008; // Wave animation speed (was 0.02)
+const WAVE_SPEED_RATE = 0.001; // Wave speed influence (was 0.002)
 
 /* ICONS */
 
@@ -205,13 +212,14 @@ const TRACK_ITEMS = [...ITEMS, ...ITEMS, ...ITEMS, ...ITEMS];
 
 /* WAVE DISC */
 
-function WaveDisc({ item }) {
+function WaveDisc({ item, decorative = false }) {
     const { Icon, name } = item;
 
     return (
         <div
-            className="wave-disc group relative mr-3 flex h-16 w-16 shrink-0 cursor-pointer items-center justify-center rounded-full border border-neutral-200/90 bg-white shadow-[0_4px_20px_rgba(0,0,0,0.03)] transition-all duration-300 ease-out hover:z-30 hover:scale-110 hover:border-[#ff5a1f] hover:shadow-[0_12px_28px_rgba(255,90,31,0.22)] sm:mr-4 sm:h-20 sm:w-20 md:mr-5 md:h-[86px] md:w-[86px]"
-            aria-label={name}
+            className="wave-disc group relative mr-3 flex h-16 w-16 shrink-0 cursor-pointer items-center justify-center rounded-full border border-neutral-200/90 bg-white shadow-[0_4px_20px_rgba(0,0,0,0.03)] transition-[scale,border-color,box-shadow] duration-300 ease-out hover:z-30 hover:scale-110 hover:border-[#ff5a1f] hover:shadow-[0_12px_28px_rgba(255,90,31,0.22)] sm:mr-4 sm:h-20 sm:w-20 md:mr-5 md:h-[86px] md:w-[86px]"
+            aria-label={decorative ? undefined : name}
+            aria-hidden={decorative ? "true" : undefined}
         >
             <div className="flex items-center justify-center text-neutral-800 transition-all duration-300 group-hover:scale-110 group-hover:text-[#ff5a1f]">
                 <Icon className="h-6 w-6 sm:h-8 sm:w-8" />
@@ -244,6 +252,24 @@ export default function Technologies() {
             const mm = gsap.matchMedia();
 
             mm.add("(prefers-reduced-motion: no-preference)", () => {
+                /* Heading reveal */
+                gsap.fromTo(
+                    ".tech-head > *",
+                    { y: 24, opacity: 0 },
+                    {
+                        y: 0,
+                        opacity: 1,
+                        duration: 0.8,
+                        ease: "power3.out",
+                        stagger: 0.08,
+                        scrollTrigger: {
+                            trigger: ".tech-head",
+                            start: "top 88%",
+                            once: true,
+                        },
+                    }
+                );
+
                 const discs = gsap.utils.toArray(".wave-disc", track);
 
                 if (!discs.length) return;
@@ -252,6 +278,9 @@ export default function Technologies() {
 
                 const setDiscY = discs.map((disc) =>
                     gsap.quickSetter(disc, "y", "px")
+                );
+                const setDiscOpacity = discs.map((disc) =>
+                    gsap.quickSetter(disc, "opacity")
                 );
 
                 let stepWidth = 100;
@@ -262,7 +291,8 @@ export default function Technologies() {
                 let xPos = 0;
                 let vel = 0;
                 let isHovered = false;
-                let currentSpeed = 1.8;
+                let visible = false;
+                let currentSpeed = BASE_SPEED;
                 let elapsed = 0;
 
                 const measure = () => {
@@ -315,6 +345,13 @@ export default function Technologies() {
                             tertiaryWave;
 
                         setDiscY[i](y);
+
+                        // Depth cue: discs on the crest of the wave are fully
+                        // opaque, discs in the trough fade back slightly
+                        const depth = (1 - y / amplitude) / 2; // 0 (trough) .. 1 (crest)
+                        setDiscOpacity[i](
+                            0.62 + 0.38 * gsap.utils.clamp(0, 1, depth)
+                        );
                     }
                 };
 
@@ -332,10 +369,14 @@ export default function Technologies() {
                     trigger: root,
                     start: "top bottom",
                     end: "bottom top",
+                    onToggle: (self) => {
+                        visible = self.isActive;
+                    },
                     onUpdate: (self) => {
                         vel = self.getVelocity();
                     },
                 });
+                visible = st.isActive;
 
                 const onEnter = (e) => {
                     if (e.pointerType === "mouse") {
@@ -350,18 +391,30 @@ export default function Technologies() {
                 stage.addEventListener("pointerenter", onEnter);
                 stage.addEventListener("pointerleave", onLeave);
 
-                const tick = () => {
+                // Touch screens: scroll-speed boost is capped lower
+                const isTouch = window.matchMedia("(pointer: coarse)").matches;
+                const maxBoost = isTouch ? MAX_SCROLL_BOOST * 0.6 : MAX_SCROLL_BOOST;
+
+                const tick = (time, deltaTime) => {
+                    // Nothing to animate while the section is off-screen
+                    if (!visible) return;
+
+                    // Frame-rate independent: 1 = one 60fps frame
+                    const dt = Math.min(deltaTime, 64) / 16.667;
+
                     const boost = gsap.utils.clamp(
                         0,
-                        4,
-                        Math.abs(vel) / 300
+                        maxBoost,
+                        Math.abs(vel) / 400
                     );
 
-                   const targetSpeed = isHovered ? 1.5 : 5 + boost;
+                    const targetSpeed = isHovered ? HOVER_SPEED : BASE_SPEED + boost;
 
-                    currentSpeed += (targetSpeed - currentSpeed) * 0.12;
+                    // Smooth ease toward the target speed
+                    currentSpeed +=
+                        (targetSpeed - currentSpeed) * (1 - Math.pow(1 - 0.08, dt));
 
-                    xPos -= currentSpeed;
+                    xPos -= currentSpeed * dt;
 
                     if (xPos <= -repeatWidth) {
                         xPos += repeatWidth;
@@ -369,11 +422,11 @@ export default function Technologies() {
 
                     setTrackX(xPos);
 
-                    elapsed += 0.045 + currentSpeed * 0.003;
+                    elapsed += (WAVE_BASE_RATE + currentSpeed * WAVE_SPEED_RATE) * dt;
 
                     applyPositions();
 
-                    vel *= 0.92;
+                    vel *= Math.pow(0.92, dt);
                 };
 
                 gsap.ticker.add(tick);
@@ -419,7 +472,17 @@ export default function Technologies() {
             aria-label="Technologies and Tooling"
             className="relative mt-3 w-full select-none overflow-hidden rounded-xl bg-white py-12 font-['Outfit',sans-serif] text-black sm:py-16 md:py-20"
         >
-          
+            {/* HEADING */}
+
+            <div className="tech-head relative z-30 mx-auto max-w-3xl px-4 text-center sm:px-8">
+                {/* <p className="font-mono text-[11px] uppercase tracking-[0.25em] text-[#ff5a1f] sm:text-xs">
+                    (Our stack)
+                </p> */}
+                <h2 className="mt-2 text-balance text-[clamp(1.9rem,7vw,3.5rem)] font-semibold lowercase leading-[.95] tracking-[-0.05em] sm:mt-3">
+                    tools we build with
+                    <span className="text-[#ff5a1f]">.</span>
+                </h2>
+            </div>
 
             {/* EDGE FADES */}
 
@@ -431,7 +494,7 @@ export default function Technologies() {
 
             <div
                 ref={stageRef}
-                className="relative flex h-[220px] w-full items-center overflow-visible sm:h-[260px] md:h-[300px]"
+                className="relative mt-2 flex h-[220px] w-full items-center overflow-visible sm:mt-4 sm:h-[260px] md:h-[300px]"
             >
                 <div
                     ref={trackRef}
@@ -441,6 +504,8 @@ export default function Technologies() {
                         <WaveDisc
                             key={`${item.id}-${index}`}
                             item={item}
+                            // Only the first copy is exposed to screen readers
+                            decorative={index >= ITEMS.length}
                         />
                     ))}
                 </div>

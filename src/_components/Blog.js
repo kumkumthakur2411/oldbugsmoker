@@ -318,10 +318,12 @@ export default function Blog({
         >
             {/* ================= White band: heading + filters ================= */}
             <div className="bg-white px-4 pb-8 pt-6 text-black sm:px-8 sm:pb-12 sm:pt-8 lg:px-12">
-                
+                {/* Label: same style as the Testimonials label */}
+               
 
-                <div className="mt-10 grid gap-8 sm:mt-14 lg:grid-cols-12 lg:items-end lg:gap-12">
-                    <h2 className="text-[clamp(3.6rem,13vw,11rem)] font-semibold uppercase leading-[.82] tracking-[-0.08em] lg:col-span-8">
+                <div className="mt-8 grid gap-6 sm:mt-12 sm:gap-8 lg:grid-cols-12 lg:items-end lg:gap-12">
+                    {/* Same heading scale, weight, case and tracking as Testimonials */}
+                    <h2 className="text-[clamp(2.3rem,11.5vw,3.4rem)] font-semibold lowercase leading-[.9] tracking-[-0.06em] sm:text-[clamp(3rem,6.5vw,7rem)] sm:leading-[.88] sm:tracking-[-0.07em] lg:col-span-8">
                         {headingWords.map((w, i) => (
                             <span key={`${w}-${i}`} className="block">
                                 <MaskLine>
@@ -334,8 +336,8 @@ export default function Blog({
                         ))}
                     </h2>
 
-                    <div className="bl-fade flex flex-col items-start gap-6 lg:col-span-4 lg:items-end">
-                        <p className="max-w-xs text-[13px] leading-[1.8] text-neutral-600 lg:text-right">
+                    <div className="bl-fade flex flex-col items-start gap-5 sm:gap-6 lg:col-span-4 lg:items-end">
+                        <p className="max-w-xs text-sm leading-[1.7] text-neutral-600 sm:leading-[1.8] lg:text-right">
                             {intro}
                         </p>
                         <Link
@@ -412,8 +414,9 @@ export default function Blog({
                                     </span>
 
                                     <span className="min-w-0 lg:col-span-6">
+                                        {/* Row title: lowercase, semibold, same tracking as the other headings */}
                                         <span
-                                            className={`block break-words text-[clamp(1.6rem,7.5vw,2.6rem)] font-semibold uppercase leading-[.95] tracking-[-0.05em] transition-all duration-500 ease-[cubic-bezier(.22,1,.36,1)] sm:text-[clamp(2rem,6vw,3.2rem)] lg:text-[clamp(2.5rem,4.6vw,5rem)] ${
+                                            className={`block break-words text-[clamp(1.7rem,8vw,2.4rem)] font-semibold lowercase leading-[.92] tracking-[-0.06em] transition-all duration-500 ease-[cubic-bezier(.22,1,.36,1)] sm:text-[clamp(2rem,5vw,3rem)] lg:text-[clamp(2.2rem,3.8vw,4rem)] ${
                                                 hot ? "text-black lg:translate-x-4" : "text-white"
                                             }`}
                                         >
@@ -431,7 +434,7 @@ export default function Blog({
                                             {item.tagline}
                                         </span>
                                         <span
-                                            className={`mt-1 block font-mono text-[10px] uppercase tracking-[0.16em] transition-colors duration-300 ${
+                                            className={`mt-1 block font-mono text-[10px] uppercase tracking-[0.14em] transition-colors duration-300 ${
                                                 hot ? "text-black/70" : "text-white/50"
                                             }`}
                                         >
@@ -442,7 +445,7 @@ export default function Blog({
                                     {/* Date + arrow (desktop) / plus (mobile) */}
                                     <span className="flex items-center justify-end gap-4 lg:col-span-2">
                                         <span
-                                            className={`hidden font-mono text-[10px] uppercase tracking-[0.16em] transition-colors duration-300 xl:inline ${
+                                            className={`hidden font-mono text-[10px] uppercase tracking-[0.14em] transition-colors duration-300 xl:inline ${
                                                 hot ? "text-black/70" : "text-white/50"
                                             }`}
                                         >
@@ -493,20 +496,20 @@ export default function Blog({
                                                 </span>
                                             </div>
 
-                                            <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.16em] text-white/50">
+                                            <p className="mt-4 font-mono text-[10px] uppercase tracking-[0.14em] text-white/50">
                                                 {item.date} &middot; {item.readTime}
                                             </p>
-                                            <p className="mt-2 text-lg font-semibold tracking-[-0.03em] text-[#ff5a1f]">
+                                            <p className="mt-2 text-lg font-semibold tracking-[-0.03em] text-[#ff5a1f] sm:text-xl">
                                                 {item.tagline}
                                             </p>
-                                            <p className="mt-2 max-w-xl text-sm leading-[1.75] text-white/70">
+                                            <p className="mt-2 max-w-xl text-sm leading-[1.7] text-white/60 sm:leading-[1.8]">
                                                 {item.description}
                                             </p>
 
                                             {item.href && (
                                                 <Link
                                                     href={item.href}
-                                                    className="group mt-5 inline-flex w-fit items-center gap-3 text-sm font-semibold"
+                                                    className="group mt-5 inline-flex min-h-11 w-fit items-center gap-3 text-sm font-semibold"
                                                 >
                                                     <span>Read story</span>
                                                     <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-[#ff5a1f] text-black transition-all duration-300 group-hover:rotate-45 group-hover:bg-white">
@@ -541,7 +544,7 @@ export default function Blog({
                             {Array.from({ length: 5 }).map((_, j) => (
                                 <span
                                     key={j}
-                                    className="mr-6 inline-flex items-center gap-6 whitespace-nowrap text-[clamp(1.8rem,5vw,3.6rem)] font-semibold uppercase tracking-[-0.04em] sm:mr-10 sm:gap-10"
+                                    className="mr-6 inline-flex items-center gap-6 whitespace-nowrap text-[clamp(1.7rem,5vw,3.4rem)] font-semibold lowercase leading-none tracking-[-0.06em] sm:mr-10 sm:gap-10"
                                 >
                                     {marqueeText}
                                     <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-black text-[#ff5a1f] transition-transform duration-300 group-hover:rotate-45 sm:h-14 sm:w-14">

@@ -9,6 +9,8 @@ import { ArrowUpRight } from "lucide-react";
 
 if (typeof window !== "undefined") {
     gsap.registerPlugin(ScrollTrigger);
+    // Stops the mobile address bar showing/hiding from re-calculating every trigger
+    ScrollTrigger.config({ ignoreMobileResize: true });
 }
 
 /* ------------------------------------------------------------------ */
@@ -138,26 +140,31 @@ export default function CtaSection() {
                     scrollTrigger: { trigger: root, start: "top 75%" },
                 });
 
-                gsap.from(".cta-fade", {
-                    opacity: 0,
-                    y: 24,
-                    duration: 0.8,
-                    ease: "power3.out",
-                    stagger: 0.08,
-                    delay: 0.2,
-                    scrollTrigger: { trigger: root, start: "top 75%" },
-                });
+                // Only animate elements that are actually rendered
+                if (gsap.utils.toArray(".cta-fade", root).length) {
+                    gsap.from(".cta-fade", {
+                        opacity: 0,
+                        y: 24,
+                        duration: 0.8,
+                        ease: "power3.out",
+                        stagger: 0.08,
+                        delay: 0.2,
+                        scrollTrigger: { trigger: root, start: "top 75%" },
+                    });
+                }
 
-                gsap.from(btnWrapRef.current, {
-                    scale: 0,
-                    rotate: -90,
-                    duration: 1.1,
-                    ease: "back.out(1.6)",
-                    scrollTrigger: {
-                        trigger: quoteRef.current,
-                        start: "bottom 90%",
-                    },
-                });
+                if (btnWrapRef.current) {
+                    gsap.from(btnWrapRef.current, {
+                        scale: 0,
+                        rotate: -90,
+                        duration: 1.1,
+                        ease: "back.out(1.6)",
+                        scrollTrigger: {
+                            trigger: quoteRef.current,
+                            start: "bottom 90%",
+                        },
+                    });
+                }
 
                 /* Word-by-word manifesto reveal, scrubbed with scroll */
                 const words = gsap.utils.toArray(".cta-word", quoteRef.current);
@@ -170,29 +177,33 @@ export default function CtaSection() {
                         stagger: 0.1,
                         scrollTrigger: {
                             trigger: quoteRef.current,
-                            start: "top 82%",
-                            end: "bottom 50%",
+                            // Starts a little higher and ends later on phones,
+                            // where the quote is a tall block of text
+                            start: "top 88%",
+                            end: "bottom 55%",
                             scrub: 0.4,
                         },
                     }
                 );
 
-                /* Logo tilt and drift */
-                gsap.fromTo(
-                    logoRef.current,
-                    { rotate: -8, y: 40 },
-                    {
-                        rotate: 0,
-                        y: -10,
-                        ease: "none",
-                        scrollTrigger: {
-                            trigger: root,
-                            start: "top bottom",
-                            end: "bottom top",
-                            scrub: true,
-                        },
-                    }
-                );
+                /* Logo tilt and drift (only if the logo is rendered) */
+                if (logoRef.current) {
+                    gsap.fromTo(
+                        logoRef.current,
+                        { rotate: -8, y: 40 },
+                        {
+                            rotate: 0,
+                            y: -10,
+                            ease: "none",
+                            scrollTrigger: {
+                                trigger: root,
+                                start: "top bottom",
+                                end: "bottom top",
+                                scrub: true,
+                            },
+                        }
+                    );
+                }
 
                 /* Two diagonal crossing marquees that speed up with scroll velocity */
                 const track1 = trackRef1.current;
@@ -217,18 +228,29 @@ export default function CtaSection() {
                     );
 
                     let vel = 0;
+                    let visible = false;
                     const st = ScrollTrigger.create({
                         trigger: root,
                         start: "top bottom",
                         end: "bottom top",
+                        onToggle: (self) => {
+                            visible = self.isActive;
+                        },
                         onUpdate: (self) => {
                             vel = self.getVelocity();
                         },
                     });
 
+                    // Touch scrolling produces very high velocities, so the
+                    // speed-up is capped lower on phones
+                    const isTouch = window.matchMedia("(pointer: coarse)").matches;
+                    const maxBoost = isTouch ? 4 : 8;
+
                     const tick = () => {
+                        // Skip all work while the section is off-screen
+                        if (!visible) return;
                         const target =
-                            1 + gsap.utils.clamp(0, 8, Math.abs(vel) / 300);
+                            1 + gsap.utils.clamp(0, maxBoost, Math.abs(vel) / 300);
                         const curScale = gsap.utils.interpolate(
                             loop1.timeScale(),
                             target,
@@ -327,7 +349,14 @@ export default function CtaSection() {
             );
         }, root);
 
-        return () => ctx.revert();
+        // Re-measure once fonts/images have settled
+        const onLoad = () => ScrollTrigger.refresh();
+        window.addEventListener("load", onLoad);
+
+        return () => {
+            window.removeEventListener("load", onLoad);
+            ctx.revert();
+        };
     }, []);
 
     return (
@@ -336,18 +365,18 @@ export default function CtaSection() {
             id="cta-manifesto"
             className="relative w-full select-none overflow-hidden rounded-xl bg-white font-['Outfit',sans-serif] text-black"
         >
-            {/* Cursor spotlight (neutral black glow) */}
+            {/* Cursor spotlight (neutral black glow). Hidden on small screens / touch. */}
             <div
                 ref={glowRef}
                 aria-hidden="true"
-                className="pointer-events-none absolute left-0 top-0 z-0 h-[520px] w-[520px] rounded-full opacity-0"
+                className="pointer-events-none absolute left-0 top-0 z-0 hidden h-[520px] w-[520px] rounded-full opacity-0 md:block"
                 style={{
                     background:
                         "radial-gradient(circle, rgba(0,0,0,0.07) 0%, rgba(0,0,0,0) 65%)",
                 }}
             />
 
-            <div className="relative z-10 mx-auto max-w-[1440px] px-4 py-10 sm:px-8 sm:py-12 md:px-12 md:py-14 lg:px-16 lg:py-16">
+            <div className="relative z-10 mx-auto max-w-[1440px] px-4 py-8 sm:px-8 sm:py-12 md:px-12 md:py-14 lg:px-16 lg:py-16">
                 {/* Top row */}
                 {/* <div className="flex flex-wrap items-center justify-between gap-3 font-mono text-[11px] uppercase tracking-[0.2em] sm:text-xs">
                     <span className="cta-fade text-[#ff5a1f]">(Let&apos;s talk)</span>
@@ -360,9 +389,9 @@ export default function CtaSection() {
                     </span>
                 </div> */}
 
-                <div className="mt-10 grid grid-cols-1 items-stretch gap-10 lg:mt-14 lg:grid-cols-12 lg:gap-12">
-                    {/* Left column */}
-                    <div className="flex flex-col justify-between py-1 lg:col-span-4">
+                <div className="mt-2 grid grid-cols-1 items-stretch gap-8 sm:mt-6 lg:mt-14 lg:grid-cols-12 lg:gap-12">
+                    {/* Left column: hidden below lg so an empty block doesn't add blank space on mobile */}
+                    <div className="hidden flex-col justify-between py-1 lg:col-span-4 lg:flex">
                         {/* <div className="cta-fade font-mono text-[11px] uppercase leading-relaxed tracking-[0.2em] text-neutral-600 sm:text-xs">
                             <p className="font-semibold text-black">
                                 Bugsmoker — Beyond the Ordinary
@@ -399,8 +428,9 @@ export default function CtaSection() {
                     </div>
 
                     {/* Right column */}
-                    <div className="flex flex-col justify-center lg:col-span-8">
-                        <h2 className="mb-6 text-[clamp(3rem,9vw,7.5rem)] font-semibold leading-[.85] tracking-[-0.07em] sm:mb-8">
+                    <div className="flex min-w-0 flex-col justify-center text-center sm:text-left lg:col-span-8">
+                        {/* Mobile size follows viewport width so "we'll solve it." never clips */}
+                        <h2 className="mb-5 text-[clamp(2.3rem,11.5vw,3.5rem)] font-semibold leading-[.9] tracking-[-0.06em] sm:mb-8 sm:text-[clamp(3rem,9vw,7.5rem)] sm:leading-[.85] sm:tracking-[-0.07em]">
                             <span className="cta-line block">
                                 <MaskLine>got a problem?</MaskLine>
                             </span>
@@ -414,7 +444,7 @@ export default function CtaSection() {
 
                         <blockquote
                             ref={quoteRef}
-                            className="font-['Outfit'] text-[clamp(1.4rem,2.8vw,2.4rem)] font-semibold leading-[1.18] tracking-[-0.045em] text-black"
+                            className="break-words font-['Outfit'] text-[1.2rem] font-semibold leading-[1.25] tracking-[-0.04em] text-black sm:text-[clamp(1.4rem,2.8vw,2.4rem)] sm:leading-[1.18] sm:tracking-[-0.045em]"
                         >
                             {WORDS.map((w, i) => {
                                 const clean = w.toLowerCase().replace(/[^a-z]/g, "");
@@ -432,30 +462,28 @@ export default function CtaSection() {
                                 );
                             })}
                         </blockquote>
-
-                        
                     </div>
                 </div>
             </div>
 
             {/* Two Narrow Diagonal Crossing Marquees */}
             <div
-                className="relative z-10 overflow-hidden py-16 sm:py-20 md:py-24 select-none my-2 sm:my-4"
+                className="relative z-10 my-2 select-none overflow-hidden py-14 sm:my-4 sm:py-20 md:py-24"
                 aria-hidden="true"
             >
                 {/* Diagonal Ribbon 1 (Angled -2.5deg, Brand Orange, scrolls Left) */}
-                <div className="absolute top-1/2 -translate-y-1/2 left-1/2 -translate-x-1/2 w-[160%] -rotate-[2.5deg] sm:-rotate-[3deg] z-10 pointer-events-none">
-                    <div className="w-full bg-[#ff5a1f] text-black py-2 sm:py-2.5 shadow-xl border-y border-black/20 overflow-hidden">
+                <div className="pointer-events-none absolute left-1/2 top-1/2 z-10 w-[220%] -translate-x-1/2 -translate-y-1/2 -rotate-[7deg] sm:w-[160%] sm:-rotate-[3deg]">
+                    <div className="w-full overflow-hidden border-y border-black/20 bg-[#ff5a1f] py-1.5 text-black shadow-xl sm:py-2.5">
                         <div ref={trackRef1} className="flex w-max will-change-transform">
                             {[0, 1].map((copy) => (
                                 <div key={copy} className="flex shrink-0 items-center">
                                     {MARQUEE_ITEMS_1.map((m, i) => (
                                         <span
                                             key={`${copy}-${i}`}
-                                            className="mx-3 sm:mx-5 inline-flex shrink-0 items-center gap-3 sm:gap-5 whitespace-nowrap text-xs sm:text-sm md:text-base font-extrabold uppercase tracking-wider text-black"
+                                            className="mx-2.5 inline-flex shrink-0 items-center gap-2.5 whitespace-nowrap text-[11px] font-extrabold uppercase tracking-wider text-black sm:mx-5 sm:gap-5 sm:text-sm md:text-base"
                                         >
                                             <span>{m}</span>
-                                            <span className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-black shrink-0" />
+                                            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-black sm:h-2 sm:w-2" />
                                         </span>
                                     ))}
                                 </div>
@@ -465,20 +493,20 @@ export default function CtaSection() {
                 </div>
 
                 {/* Diagonal Ribbon 2 (Angled +2.5deg, Dark Charcoal with White/Orange, scrolls Right) */}
-                <div className="relative left-1/2 -translate-x-1/2 w-[160%] rotate-[2.5deg] sm:rotate-[3deg] z-20 pointer-events-none">
-                    <div className="w-full bg-neutral-900/95 backdrop-blur-xs text-white py-2 sm:py-2.5 shadow-2xl border-y border-white/20 overflow-hidden">
+                <div className="pointer-events-none relative left-1/2 z-20 w-[220%] -translate-x-1/2 rotate-[7deg] sm:w-[160%] sm:rotate-[3deg]">
+                    <div className="w-full overflow-hidden border-y border-white/20 bg-neutral-900/95 py-1.5 text-white shadow-2xl backdrop-blur-xs sm:py-2.5">
                         <div ref={trackRef2} className="flex w-max will-change-transform">
                             {[0, 1].map((copy) => (
                                 <div key={copy} className="flex shrink-0 items-center">
                                     {MARQUEE_ITEMS_2.map((m, i) => (
                                         <span
                                             key={`${copy}-${i}`}
-                                            className="mx-3 sm:mx-5 inline-flex shrink-0 items-center gap-3 sm:gap-5 whitespace-nowrap text-xs sm:text-sm md:text-base font-extrabold uppercase tracking-wider text-white"
+                                            className="mx-2.5 inline-flex shrink-0 items-center gap-2.5 whitespace-nowrap text-[11px] font-extrabold uppercase tracking-wider text-white sm:mx-5 sm:gap-5 sm:text-sm md:text-base"
                                         >
-                                            <span className="text-white hover:text-[#ff5a1f] transition-colors">
+                                            <span className="text-white transition-colors hover:text-[#ff5a1f]">
                                                 {m}
                                             </span>
-                                            <span className="h-1.5 w-1.5 sm:h-2 sm:w-2 rounded-full bg-[#ff5a1f] shrink-0" />
+                                            <span className="h-1.5 w-1.5 shrink-0 rounded-full bg-[#ff5a1f] sm:h-2 sm:w-2" />
                                         </span>
                                     ))}
                                 </div>

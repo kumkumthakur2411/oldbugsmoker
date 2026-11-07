@@ -10,14 +10,21 @@ import Image from "next/image";
 import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
-import { ArrowUpRight, Quote } from "lucide-react";
+import { ArrowLeft, ArrowRight, ArrowUpRight, Quote } from "lucide-react";
 
 if (typeof window !== "undefined") {
   gsap.registerPlugin(ScrollTrigger);
+  // Stops the mobile address bar showing/hiding from re-calculating every trigger
+  ScrollTrigger.config({ ignoreMobileResize: true });
 }
 
 const useIsoLayoutEffect =
   typeof window !== "undefined" ? useLayoutEffect : useEffect;
+
+/* Pin + sideways scroll only on wide AND tall enough screens, with motion allowed.
+   Short laptop windows fall back to the swipe slider so nothing gets clipped. */
+const PIN_QUERY =
+  "(min-width: 1024px) and (min-height: 560px) and (prefers-reduced-motion: no-preference)";
 
 /* ------------------------------------------------------------------ */
 /* Data                                                                */
@@ -133,21 +140,13 @@ export default function TestimonialsSection() {
   const barRef = useRef(null);
   const counterRef = useRef(null);
 
-  /* true on desktop with motion allowed: the section pins and scrolls sideways */
-  const [pinned, setPinned] = useState(() => {
-    if (typeof window !== "undefined") {
-      return (
-        window.innerWidth >= 1024 &&
-        !window.matchMedia("(prefers-reduced-motion: reduce)").matches
-      );
-    }
-    return false;
-  });
+  /* true on desktop with motion allowed: the section pins and scrolls sideways.
+     Starts false so server and first client render match; the layout effect
+     below switches it on before the first paint. */
+  const [pinned, setPinned] = useState(false);
 
   useIsoLayoutEffect(() => {
-    const mq = window.matchMedia(
-      "(min-width: 1024px) and (prefers-reduced-motion: no-preference)"
-    );
+    const mq = window.matchMedia(PIN_QUERY);
     const update = () => setPinned(mq.matches);
     update();
     mq.addEventListener("change", update);
@@ -251,12 +250,12 @@ export default function TestimonialsSection() {
 
         if (!reduce) {
           gsap.from(".tm-card-inner", {
-            y: 60,
+            y: 48,
             opacity: 0,
             duration: 0.9,
             ease: "power3.out",
             stagger: 0.1,
-            scrollTrigger: { trigger: track, start: "top 85%" },
+            scrollTrigger: { trigger: track, start: "top 88%", once: true },
           });
         }
       }
@@ -279,9 +278,19 @@ export default function TestimonialsSection() {
     };
   }, [pinned]);
 
+  /* Arrow buttons for the slider (mouse users can't swipe) */
+  const scrollByCard = (dir) => {
+    const track = trackRef.current;
+    if (!track) return;
+    const card = track.querySelector(".tm-card");
+    const step = (card ? card.offsetWidth : 340) + 20;
+    track.scrollBy({ left: dir * step, behavior: "smooth" });
+  };
+
+  /* Cards: fixed height while pinned, equal height (stretch) in the slider */
   const cardHeight = pinned
     ? "h-[min(62svh,520px)]"
-    : "min-h-[400px]";
+    : "min-h-[380px] sm:min-h-[420px]";
 
   return (
     <section
@@ -298,26 +307,26 @@ export default function TestimonialsSection() {
           className={
             pinned
               ? "flex w-max items-center gap-6 px-12 will-change-transform"
-              : "flex snap-x snap-mandatory gap-3 overflow-x-auto px-4 py-10 [-ms-overflow-style:none] [scrollbar-width:none] sm:gap-5 sm:px-8 sm:py-12 [&::-webkit-scrollbar]:hidden"
+              : "flex snap-x snap-mandatory scroll-pl-4 gap-3 overflow-x-auto overscroll-x-contain px-4 py-8 [-ms-overflow-style:none] [scrollbar-width:none] sm:scroll-pl-8 sm:gap-5 sm:px-8 sm:py-12 [&::-webkit-scrollbar]:hidden"
           }
           style={pinned ? undefined : { WebkitOverflowScrolling: "touch" }}
         >
           {/* ---------- Heading tile (first item in the row) ---------- */}
           <div
-            className={`flex shrink-0 snap-start flex-col justify-between gap-8 ${cardHeight} ${
+            className={`flex shrink-0 snap-start flex-col justify-between gap-6 sm:gap-8 ${cardHeight} ${
               pinned
                 ? "w-[min(58vw,820px)] pr-10"
-                : "w-[86vw] max-w-[520px] pr-2"
+                : "w-[82vw] max-w-[520px] pr-2 sm:w-[70vw] md:w-[52vw]"
             }`}
           >
             <div className="tm-fade flex items-center gap-2">
-              <span className="h-2 w-2 rounded-full bg-[#ff5a1f]" />
-              <span className="font-mono text-[11px] font-semibold uppercase tracking-[0.22em] text-white/60 sm:text-xs">
+              <span className="h-2 w-2 shrink-0 rounded-full bg-[#ff5a1f]" />
+              <span className="font-mono text-[10px] font-semibold uppercase tracking-[0.2em] text-white/60 sm:text-xs sm:tracking-[0.22em]">
                 Testimonials // Voices &amp; experiences
               </span>
             </div>
 
-            <h2 className="text-[clamp(2.2rem,10vw,3.2rem)] font-semibold lowercase leading-[.88] tracking-[-0.07em] sm:text-[clamp(3rem,6.5vw,7rem)]">
+            <h2 className="text-[clamp(2.3rem,11.5vw,3.4rem)] font-semibold lowercase leading-[.9] tracking-[-0.06em] sm:text-[clamp(3rem,6.5vw,7rem)] sm:leading-[.88] sm:tracking-[-0.07em]">
               <span className="tm-line block">
                 <MaskLine>good people.</MaskLine>
               </span>
@@ -329,7 +338,7 @@ export default function TestimonialsSection() {
               </span>
             </h2>
 
-            <p className="tm-fade max-w-xs text-sm leading-[1.8] text-white/60">
+            <p className="tm-fade max-w-xs text-sm leading-[1.7] text-white/60 sm:leading-[1.8]">
               Kind words from the founders and teams we&apos;ve built with.
             </p>
           </div>
@@ -346,11 +355,11 @@ export default function TestimonialsSection() {
             return (
               <article
                 key={item.id}
-                className={`tm-card w-[80vw] max-w-[340px] shrink-0 snap-start sm:w-[380px] sm:max-w-none lg:w-[400px] ${stagger}`}
+                className={`tm-card flex w-[78vw] max-w-[340px] shrink-0 snap-start sm:w-[360px] sm:max-w-none lg:w-[400px] ${stagger}`}
               >
-                <div className="tm-card-inner">
+                <div className="tm-card-inner flex w-full">
                   <div
-                    className={`group relative flex flex-col justify-between overflow-hidden rounded-xl p-5 sm:p-7 md:p-8 ${cardHeight} ${t.card}`}
+                    className={`group relative flex w-full flex-col justify-between overflow-hidden rounded-xl p-5 sm:p-7 md:p-8 ${cardHeight} ${t.card}`}
                   >
                     {/* Top row */}
                     <div className="relative z-10 flex items-start justify-between">
@@ -359,15 +368,14 @@ export default function TestimonialsSection() {
                       </span>
                       <Quote
                         aria-hidden="true"
-                        size={72}
                         strokeWidth={1.2}
-                        className={`-mr-2 -mt-3 transition-colors duration-500 ${t.mark}`}
+                        className={`-mr-2 -mt-3 h-14 w-14 transition-colors duration-500 sm:h-[72px] sm:w-[72px] ${t.mark}`}
                       />
                     </div>
 
                     {/* Quote */}
                     <p
-                      className={`relative z-10 my-6 text-lg font-medium leading-[1.3] tracking-[-0.03em] sm:text-xl lg:text-[22px] ${t.body}`}
+                      className={`relative z-10 my-5 break-words text-[17px] font-medium leading-[1.35] tracking-[-0.03em] sm:my-6 sm:text-xl sm:leading-[1.3] lg:text-[22px] ${t.body}`}
                     >
                       “{item.quote}”
                     </p>
@@ -410,13 +418,13 @@ export default function TestimonialsSection() {
 
           {/* ---------- End tile ---------- */}
           <div
-            className={`flex w-[80vw] max-w-[340px] shrink-0 snap-start flex-col justify-between rounded-xl border border-white/15 p-5 sm:w-[380px] sm:max-w-none sm:p-7 md:p-8 lg:w-[400px] ${cardHeight}`}
+            className={`flex w-[78vw] max-w-[340px] shrink-0 snap-start flex-col justify-between rounded-xl border border-white/15 p-5 sm:w-[360px] sm:max-w-none sm:p-7 md:p-8 lg:w-[400px] ${cardHeight}`}
           >
             <span className="font-mono text-xs text-[#ff5a1f] sm:text-sm">
               (Next)
             </span>
 
-            <h3 className="text-[clamp(2.4rem,9vw,3.5rem)] font-semibold lowercase leading-[.9] tracking-[-0.06em] sm:text-6xl">
+            <h3 className="text-[clamp(2.2rem,10vw,3.2rem)] font-semibold lowercase leading-[.9] tracking-[-0.06em] sm:text-6xl">
               your story
               <br />
               is next
@@ -425,7 +433,7 @@ export default function TestimonialsSection() {
 
             <Link
               href="/contactus"
-              className="group inline-flex w-fit items-center gap-3 text-sm font-semibold"
+              className="group inline-flex min-h-11 w-fit items-center gap-3 text-sm font-semibold"
             >
               <span>Start a project</span>
               <span className="flex h-11 w-11 shrink-0 items-center justify-center rounded-full bg-white text-black transition-all duration-300 group-hover:rotate-45 group-hover:bg-[#ff5a1f] group-hover:text-white">
@@ -436,8 +444,8 @@ export default function TestimonialsSection() {
         </div>
       </div>
 
-      {/* ---------- Progress bar ---------- */}
-      <div className="tm-fade flex items-center gap-4 px-4 pb-5 pt-1 sm:gap-6 sm:px-8 sm:pb-6 lg:px-12">
+      {/* ---------- Progress bar + controls ---------- */}
+      <div className="tm-fade flex items-center gap-3 px-4 pb-5 pt-1 sm:gap-6 sm:px-8 sm:pb-6 lg:px-12">
         <p className="shrink-0 font-mono text-xs tabular-nums sm:text-sm">
           <span className="text-[#ff5a1f]">
             (<span ref={counterRef}>01</span>)
@@ -453,9 +461,36 @@ export default function TestimonialsSection() {
           />
         </div>
 
-        <span className="shrink-0 font-mono text-[11px] uppercase tracking-[0.2em] text-white/50">
-          {pinned ? "Scroll" : "Swipe"}
-        </span>
+        {pinned ? (
+          <span className="shrink-0 font-mono text-[11px] uppercase tracking-[0.2em] text-white/50">
+            Scroll
+          </span>
+        ) : (
+          <>
+            {/* Phones: swipe hint. sm and up: arrow buttons for mouse users */}
+            <span className="shrink-0 font-mono text-[11px] uppercase tracking-[0.2em] text-white/50 sm:hidden">
+              Swipe
+            </span>
+            <div className="hidden shrink-0 items-center gap-2 sm:flex">
+              <button
+                type="button"
+                onClick={() => scrollByCard(-1)}
+                aria-label="Previous testimonial"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/25 text-white transition-colors duration-300 hover:border-[#ff5a1f] hover:bg-[#ff5a1f] active:bg-[#ff5a1f]"
+              >
+                <ArrowLeft size={16} aria-hidden="true" />
+              </button>
+              <button
+                type="button"
+                onClick={() => scrollByCard(1)}
+                aria-label="Next testimonial"
+                className="flex h-10 w-10 items-center justify-center rounded-full border border-white/25 text-white transition-colors duration-300 hover:border-[#ff5a1f] hover:bg-[#ff5a1f] active:bg-[#ff5a1f]"
+              >
+                <ArrowRight size={16} aria-hidden="true" />
+              </button>
+            </div>
+          </>
+        )}
       </div>
     </section>
   );

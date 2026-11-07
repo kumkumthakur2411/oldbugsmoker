@@ -1,4 +1,3 @@
-
 "use client";
 
 import React, { useEffect, useRef, useState } from "react";
@@ -10,6 +9,8 @@ import { ScrollTrigger } from "gsap/ScrollTrigger";
 
 if (typeof window !== "undefined") {
     gsap.registerPlugin(ScrollTrigger);
+    // Stops the mobile address bar showing/hiding from re-calculating every trigger
+    ScrollTrigger.config({ ignoreMobileResize: true });
 }
 
 const DESKTOP_SHOW_INDICES = new Set([
@@ -70,10 +71,31 @@ const isTileShown = (index, mode) => {
     return DESKTOP_SHOW_INDICES.has(index);
 };
 
+/* Masked line: text slides up from behind its own edge */
+function MaskLine({ children }) {
+    return (
+        <span
+            className="block overflow-hidden"
+            style={{
+                paddingTop: "0.15em",
+                paddingBottom: "0.12em",
+                marginTop: "-0.15em",
+                marginBottom: "-0.12em",
+            }}
+        >
+            <span className="hero-mask block">{children}</span>
+        </span>
+    );
+}
+
 export default function Hero() {
     const heroRef = useRef(null);
     const gridRef = useRef(null);
+    const introPlayed = useRef(false);
 
+    // The grid isn't rendered until the screen size is known, so the opening
+    // animation never plays on the wrong (desktop) grid first.
+    const [ready, setReady] = useState(false);
     const [gridConfig, setGridConfig] = useState({
         cols: 10,
         rows: 8,
@@ -108,6 +130,7 @@ export default function Hero() {
                     mode: "desktop",
                 });
             }
+            setReady(true);
         };
 
         updateGrid();
@@ -119,95 +142,173 @@ export default function Hero() {
         };
     }, []);
 
-    // GSAP mosaic animations
+    // GSAP: opening reveal + mosaic scroll animation
     useEffect(() => {
-        if (!gridRef.current || !heroRef.current) return;
+        if (!ready || !gridRef.current || !heroRef.current) return;
 
         const ctx = gsap.context(() => {
-            const tiles =
-                gridRef.current.querySelectorAll(".mosaic-tile");
+            const mm = gsap.matchMedia();
 
-            if (!tiles.length) return;
+            mm.add("(prefers-reduced-motion: no-preference)", () => {
+                const grid = gridRef.current;
+                const tiles = grid.querySelectorAll(".mosaic-tile");
 
-            const isMobile = window.innerWidth < 768;
+                if (!tiles.length) return;
 
-            gsap.set(tiles, {
-                opacity: 0,
-                scale: 0.6,
-                y: 15,
-                transformOrigin: "center center",
+                const isMobile = window.innerWidth < 768;
+
+                /* ---------- Opening: the visual grows from 0 to 100% ---------- */
+                if (!introPlayed.current) {
+                    gsap.set(grid, {
+                        scale: 0,
+                        transformOrigin: "50% 50%",
+                    });
+                    gsap.set(tiles, {
+                        opacity: 0,
+                        scale: 0.6,
+                        transformOrigin: "center center",
+                    });
+
+                    const tl = gsap.timeline({
+                        onComplete: () => {
+                            introPlayed.current = true;
+                        },
+                    });
+
+                    // 1) The whole frame opens from the centre, 0 -> 100%
+                    tl.to(grid, {
+                        scale: 1,
+                        duration: 1.6,
+                        ease: "expo.inOut",
+                    });
+
+                    // 2) Tiles bloom outward from the centre while it opens
+                    tl.to(
+                        tiles,
+                        {
+                            opacity: 1,
+                            scale: 1,
+                            duration: 0.7,
+                            ease: "back.out(1.4)",
+                            stagger: {
+                                amount: 0.9,
+                                from: "center",
+                                grid: [gridConfig.cols, gridConfig.rows],
+                            },
+                        },
+                        0.5
+                    );
+
+                    // 3) Text and thumbnail arrive as the frame settles
+                    tl.from(
+                        ".hero-mask",
+                        {
+                            yPercent: 115,
+                            duration: 1.1,
+                            ease: "power4.out",
+                            stagger: 0.12,
+                        },
+                        1.0
+                    );
+                    tl.from(
+                        ".hero-fade",
+                        {
+                            opacity: 0,
+                            y: 20,
+                            duration: 0.8,
+                            ease: "power3.out",
+                            stagger: 0.08,
+                        },
+                        1.2
+                    );
+                    tl.fromTo(
+                        ".hero-thumb",
+                        { clipPath: "inset(100% 0% 0% 0%)" },
+                        {
+                            clipPath: "inset(0% 0% 0% 0%)",
+                            duration: 1.2,
+                            ease: "power4.out",
+                        },
+                        1.3
+                    );
+                }
+
+                /* ---------- Scroll animation ---------- */
+                if (isMobile) {
+                    gsap.to(grid, {
+                        y: 30,
+                        opacity: 0.7,
+                        ease: "none",
+                        scrollTrigger: {
+                            trigger: heroRef.current,
+                            start: "top top",
+                            end: "bottom top",
+                            scrub: 0.8,
+                        },
+                    });
+                } else {
+                    gsap.to(tiles, {
+                        y: (i) => ((i % 10) - 4.5) * 35,
+                        scale: 0.94,
+                        stagger: {
+                            amount: 0.5,
+                            from: "random",
+                        },
+                        ease: "none",
+                        scrollTrigger: {
+                            trigger: heroRef.current,
+                            start: "top top",
+                            end: "bottom top",
+                            scrub: 1.2,
+                        },
+                    });
+                }
             });
 
-            gsap.to(tiles, {
-                opacity: 1,
-                scale: 1,
-                y: 0,
-                duration: 0.5,
-                ease: "back.out(1.4)",
-                stagger: {
-                    amount: 0.8,
-                    from: "random",
-                },
-                delay: 0.15,
+            // Reduced motion: everything is simply visible
+            mm.add("(prefers-reduced-motion: reduce)", () => {
+                introPlayed.current = true;
             });
-
-            if (isMobile) {
-                gsap.to(gridRef.current, {
-                    y: 30,
-                    opacity: 0.7,
-                    ease: "none",
-                    scrollTrigger: {
-                        trigger: heroRef.current,
-                        start: "top top",
-                        end: "bottom top",
-                        scrub: 0.8,
-                    },
-                });
-            } else {
-                gsap.to(tiles, {
-                    y: (i) => ((i % 10) - 4.5) * 35,
-                    scale: 0.94,
-                    stagger: {
-                        amount: 0.5,
-                        from: "random",
-                    },
-                    ease: "none",
-                    scrollTrigger: {
-                        trigger: heroRef.current,
-                        start: "top top",
-                        end: "bottom top",
-                        scrub: 1.2,
-                    },
-                });
-            }
         }, heroRef);
 
         return () => {
             ctx.revert();
         };
-    }, [gridConfig]);
+    }, [ready, gridConfig]);
 
     return (
         <>
             <section
                 ref={heroRef}
-                className="relative isolate flex min-h-[100svh] w-full flex-col justify-end bg-white text-[rgb(36,36,36)]"
+                className="relative isolate flex min-h-[100svh] w-full flex-col justify-end overflow-hidden bg-white text-[rgb(36,36,36)]"
             >
                 {/* Heading and description */}
                 <div className="pointer-events-none relative z-30 w-full bg-transparent">
-                    <div className="px-5 pb-8 pt-4 sm:px-8 sm:pb-14 sm:pt-9 md:px-12 lg:px-16">
+                    <div className="px-5 pb-12 pt-4 sm:px-8 sm:pb-16 sm:pt-9 md:px-12 lg:px-16">
                         <div className="mx-auto max-w-[1400px]">
                             <div className="mt-auto pt-4 sm:pt-20 md:pt-32">
                                 <div className="pointer-events-auto grid grid-cols-1 items-end gap-5 sm:gap-8 lg:grid-cols-12 lg:gap-10">
                                     <div className="min-w-0 lg:col-span-7">
+                                        {/* Label */}
+                                        <div className="hero-fade mb-4 flex items-center gap-2 sm:mb-6">
+                                           
+                                            
+                                        </div>
+
                                         <h1 className="break-words font-['Outfit'] text-[clamp(2.75rem,11.5vw,4.5rem)] font-bold leading-[0.88] tracking-[-0.06em] sm:text-7xl md:text-8xl lg:text-[6.5rem] xl:text-[7.8rem]">
-                                            We&apos;re
-                                            <br />
-                                            Bugsmoker<span className="text-[#ff5a1f]">.</span>
+                                            <span className="block">
+                                                <MaskLine>We&apos;re</MaskLine>
+                                            </span>
+                                            <span className="block">
+                                                <MaskLine>
+                                                    Bugsmoker
+                                                    <span className="text-[#ff5a1f]">.</span>
+                                                </MaskLine>
+                                            </span>
                                         </h1>
                                     </div>
 
-                                    <div className="w-full max-w-md lg:col-span-4">
+                                    <div className="hero-fade w-full max-w-md lg:col-span-4">
                                         <p className="font-['Outfit'] text-[13px] leading-[1.7] text-[#4a4a4a] sm:text-sm sm:leading-[1.8] md:text-[15px]">
                                             We’re all about making chaotic
                                             digital stuff that actually works
@@ -218,7 +319,7 @@ export default function Hero() {
                                     </div>
 
                                     <div className="hidden lg:col-span-1 lg:block">
-                                        <div className="relative aspect-[3/4]">
+                                        <div className="hero-thumb relative aspect-[3/4]">
                                             <Image
                                                 src="/home/1.png"
                                                 alt="Bugsmoker"
@@ -234,53 +335,64 @@ export default function Hero() {
                     </div>
                 </div>
 
-                {/* Mosaic image grid */}
+                {/* Scroll hint */}
+                <div
+                    aria-hidden="true"
+                    className="pointer-events-none absolute inset-x-0 bottom-4 z-30 hidden justify-center sm:flex"
+                >
+                   
+                   
+                </div>
+
+                {/* Mosaic image grid (only rendered once the screen size is known) */}
                 <div
                     ref={gridRef}
-                    className="pointer-events-none absolute inset-0 z-10 h-full w-full overflow-hidden"
+                    className="pointer-events-none absolute inset-0 z-10 h-full w-full overflow-hidden will-change-transform"
                 >
-                    <div
-                        className="absolute inset-0 grid h-full w-full"
-                        style={{
-                            gridTemplateColumns: `repeat(${gridConfig.cols}, minmax(0, 1fr))`,
-                            gridTemplateRows: `repeat(${gridConfig.rows}, minmax(0, 1fr))`,
-                        }}
-                    >
-                        {Array.from(
-                            { length: gridConfig.tileCount },
-                            (_, i) => {
-                                const show = isTileShown(i, gridConfig.mode);
-                                const col = i % gridConfig.cols;
-                                const row = Math.floor(i / gridConfig.cols);
+                    {ready && (
+                        <div
+                            className="absolute inset-0 grid h-full w-full"
+                            style={{
+                                gridTemplateColumns: `repeat(${gridConfig.cols}, minmax(0, 1fr))`,
+                                gridTemplateRows: `repeat(${gridConfig.rows}, minmax(0, 1fr))`,
+                            }}
+                        >
+                            {Array.from(
+                                { length: gridConfig.tileCount },
+                                (_, i) => {
+                                    const show = isTileShown(i, gridConfig.mode);
+                                    const col = i % gridConfig.cols;
+                                    const row = Math.floor(i / gridConfig.cols);
 
-                                return (
-                                    <div
-                                        key={i}
-                                        className={`mosaic-tile group pointer-events-auto relative overflow-hidden transition-colors duration-300 cursor-pointer ${show
-                                            ? "bg-transparent"
-                                            : "bg-white"
-                                            }`}
-                                    >
-                                        {show && (
-                                            <div
-                                                className="mosaic-tile-image-inner pointer-events-none absolute"
-                                                style={{
-                                                    width: `${gridConfig.cols * 100}%`,
-                                                    height: `${gridConfig.rows * 100}%`,
-                                                    left: `${-col * 100}%`,
-                                                    top: `${-row * 100}%`,
-                                                    backgroundImage: "url('/Vintage%20Computer%20Bloom%20at%20Sunset.png')",
-                                                    backgroundSize: "cover",
-                                                    backgroundPosition: "center",
-                                                    backgroundRepeat: "no-repeat",
-                                                }}
-                                            />
-                                        )}
-                                    </div>
-                                );
-                            }
-                        )}
-                    </div>
+                                    return (
+                                        <div
+                                            key={i}
+                                            className={`mosaic-tile group pointer-events-auto relative overflow-hidden transition-colors duration-300 cursor-pointer ${show
+                                                ? "bg-transparent"
+                                                : "bg-white"
+                                                }`}
+                                        >
+                                            {show && (
+                                                <div
+                                                    className="mosaic-tile-image-inner pointer-events-none absolute"
+                                                    style={{
+                                                        width: `${gridConfig.cols * 100}%`,
+                                                        height: `${gridConfig.rows * 100}%`,
+                                                        left: `${-col * 100}%`,
+                                                        top: `${-row * 100}%`,
+                                                        backgroundImage: "url('/Vintage%20Computer%20Bloom%20at%20Sunset.png')",
+                                                        backgroundSize: "cover",
+                                                        backgroundPosition: "center",
+                                                        backgroundRepeat: "no-repeat",
+                                                    }}
+                                                />
+                                            )}
+                                        </div>
+                                    );
+                                }
+                            )}
+                        </div>
+                    )}
 
                     <style>{`
                         .mosaic-tile {
@@ -294,6 +406,16 @@ export default function Hero() {
                         }
                         .mosaic-tile:hover .mosaic-tile-image-inner {
                             transform: scale(1.04);
+                        }
+                        @keyframes hero-scroll {
+                            0% { transform: translateY(-100%); }
+                            100% { transform: translateY(300%); }
+                        }
+                        .hero-scroll-dot {
+                            animation: hero-scroll 1.8s ease-in-out infinite;
+                        }
+                        @media (prefers-reduced-motion: reduce) {
+                            .hero-scroll-dot { animation: none; }
                         }
                     `}</style>
                 </div>
