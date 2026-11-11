@@ -447,8 +447,7 @@ export default function ServicesPage() {
             ref={root}
             className="min-h-screen overflow-x-clip bg-black p-2 font-sans sm:p-3"
         >
-            <Navbar />
-
+          
             {/* Scroll progress */}
             <div className="progress pointer-events-none fixed left-0 top-0 z-50 h-[3px] w-full origin-left scale-x-0 bg-[#ff5a1f]" />
 
@@ -699,7 +698,7 @@ bg-[#f5f5f2] px-5 py-6 text-[#171717] sm:min-h-[88vh] sm:px-10 sm:py-8 lg:px-12"
 
             <TestimonialsSection />
             <Blog />
-            <Footer />
+           
         </div>
     );
 }

@@ -1,5 +1,8 @@
 import { Inter, Outfit } from "next/font/google";
 import "./globals.css";
+import Navbar from "@/_components/NavBar";
+import Footer from "@/_components/Footer";
+import Preloader from "@/_components/Preloader";
 
 const outfit = Outfit({
   subsets: ["latin"],
@@ -28,12 +31,15 @@ export default function RootLayout({ children }) {
         <link rel="preconnect" href="https://fonts.googleapis.com" />
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Outfit:wght@100..900&display=swap"
+          href="https://fonts.googleapis.com/css2?family=Inter:wght@100..900&family=Noto+Sans+Devanagari:wght@600;700&family=Outfit:wght@100..900&display=swap"
           rel="stylesheet"
         />
       </head>
       <body className="min-h-full flex flex-col bg-white text-black font-['Outfit']">
+        <Preloader/>
+        <Navbar/>
         {children}
+        <Footer/>
       </body>
     </html>
   );

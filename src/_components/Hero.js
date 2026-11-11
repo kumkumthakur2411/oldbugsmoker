@@ -1,9 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
-import Image from "next/image";
-import Link from "next/link";
-import { ArrowUpRight } from "lucide-react";
+import React, { useEffect, useRef } from "react";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
 
@@ -13,63 +10,22 @@ if (typeof window !== "undefined") {
     ScrollTrigger.config({ ignoreMobileResize: true });
 }
 
-const DESKTOP_SHOW_INDICES = new Set([
-    // Row 0
-    2, 5, 8,
-    // Row 1
-    10, 11, 13, 16, 19,
-    // Row 2 (tile 23 shows monitor top, tile 24 is white space)
-    21, 23, 25, 28,
-    // Row 3 (full computer code screen: tiles 33 & 34)
-    30, 33, 34, 35, 37, 39,
-    // Row 4 (tile 43 shows lower screen & flower, tile 44 is white space)
-    41, 43, 46, 49,
-    // Row 5 (tile 53 shows computer base, tile 54 is white space)
-    53,
-    // Rows 6 & 7: 100% clean white for text!
-]);
+// Put your video in the /public folder
+const VIDEO_SRC = "/video.mp4";
+// Optional: a still image shown while the video loads (leave "" to skip)
+const POSTER_SRC = "";
 
-// Mobile (6 cols x 10 rows):
-// row = Math.floor(i / 6), col = i % 6
-const MOBILE_SHOW_INDICES = new Set([
-    // Row 0: empty (keeps navbar area 100% clean and legible)
-    // Row 1: soft sunset glow
-    1 * 6 + 1, // 7
-    1 * 6 + 4, // 10
-    // Row 2: monitor top & sky
-    2 * 6 + 2, // 14
-    2 * 6 + 3, // 15
-    2 * 6 + 5, // 17
-    // Row 3: vintage computer code screen & sunset bloom
-    3 * 6 + 0, // 18
-    3 * 6 + 2, // 20 (code screen)
-    3 * 6 + 3, // 21 (code screen)
-    3 * 6 + 4, // 22
-    // Row 4: lower screen, keyboard & vibrant flower bloom
-    4 * 6 + 1, // 25
-    4 * 6 + 2, // 26
-    4 * 6 + 3, // 27
-    // Row 5: base of flowers
-    5 * 6 + 2, // 32
-    // Rows 6, 7, 8, 9 (indices 36-59): 100% clean white for text!
-]);
-
-// Tablet (8 cols x 8 rows):
-const TABLET_SHOW_INDICES = new Set([
-    2, 5,
-    1 * 8 + 1, 1 * 8 + 3, 1 * 8 + 6,
-    2 * 8 + 2, 2 * 8 + 3, 2 * 8 + 4, 2 * 8 + 7,
-    3 * 8 + 0, 3 * 8 + 3, 3 * 8 + 4, 3 * 8 + 5,
-    4 * 8 + 1, 4 * 8 + 3, 4 * 8 + 6,
-    5 * 8 + 3,
-    // Rows 6 & 7: clean white for text!
-]);
-
-const isTileShown = (index, mode) => {
-    if (mode === "mobile") return MOBILE_SHOW_INDICES.has(index);
-    if (mode === "tablet") return TABLET_SHOW_INDICES.has(index);
-    return DESKTOP_SHOW_INDICES.has(index);
+// Size of the small video at the start in the center of the screen
+const START_FRAME = {
+    desktop: { width: "", height: "", borderRadius: "" },
+    mobile: { width: "", height: "", borderRadius: "" },
 };
+
+// How long the video takes to grow from center to full screen (seconds)
+const GROW_DURATION = 1.9;
+
+// Never wait longer than this for the video to be ready (ms)
+const VIDEO_TIMEOUT = 3500;
 
 /* Masked line: text slides up from behind its own edge */
 function MaskLine({ children }) {
@@ -89,378 +45,410 @@ function MaskLine({ children }) {
 }
 
 export default function Hero() {
-    const heroRef = useRef(null);
-    const gridRef = useRef(null);
-    const introPlayed = useRef(false);
+    const sectionRef = useRef(null);
+    const frameRef = useRef(null);
+    const ringRef = useRef(null);
+    const sheenRef = useRef(null);
+    const parallaxRef = useRef(null);
+    const videoRef = useRef(null);
+    const overlayRef = useRef(null);
+    const contentRef = useRef(null);
 
-    // The grid isn't rendered until the screen size is known, so the opening
-    // animation never plays on the wrong (desktop) grid first.
-    const [ready, setReady] = useState(false);
-    const [gridConfig, setGridConfig] = useState({
-        cols: 10,
-        rows: 8,
-        tileCount: 80,
-        mode: "desktop",
-    });
-
-    // Responsive grid configuration
     useEffect(() => {
-        const updateGrid = () => {
-            const width = window.innerWidth;
+        const section = sectionRef.current;
+        const frame = frameRef.current;
+        const ring = ringRef.current;
+        const sheen = sheenRef.current;
+        const parallax = parallaxRef.current;
+        const video = videoRef.current;
+        const overlay = overlayRef.current;
+        const content = contentRef.current;
+        if (
+            !section ||
+            !frame ||
+            !ring ||
+            !sheen ||
+            !parallax ||
+            !video ||
+            !overlay ||
+            !content
+        )
+            return;
 
-            if (width < 768) {
-                setGridConfig({
-                    cols: 6,
-                    rows: 10,
-                    tileCount: 60,
-                    mode: "mobile",
-                });
-            } else if (width < 1024) {
-                setGridConfig({
-                    cols: 8,
-                    rows: 8,
-                    tileCount: 64,
-                    mode: "tablet",
-                });
-            } else {
-                setGridConfig({
-                    cols: 10,
-                    rows: 8,
-                    tileCount: 80,
-                    mode: "desktop",
-                });
-            }
-            setReady(true);
-        };
+        const masks = section.querySelectorAll(".hero-mask");
+        const fades = section.querySelectorAll(".hero-fade");
 
-        updateGrid();
+        video.muted = true;
 
-        window.addEventListener("resize", updateGrid);
+        const mm = gsap.matchMedia();
 
-        return () => {
-            window.removeEventListener("resize", updateGrid);
-        };
-    }, []);
+        mm.add(
+            {
+                isDesktop: "(min-width: 768px)",
+                isMobile: "(max-width: 767px)",
+                reduce: "(prefers-reduced-motion: reduce)",
+            },
+            (context) => {
+                const { isMobile, reduce } = context.conditions;
+                const startBox = isMobile
+                    ? START_FRAME.mobile
+                    : START_FRAME.desktop;
 
-    // GSAP: opening reveal + mosaic scroll animation
-    useEffect(() => {
-        if (!ready || !gridRef.current || !heroRef.current) return;
-
-        const ctx = gsap.context(() => {
-            const mm = gsap.matchMedia();
-
-            mm.add("(prefers-reduced-motion: no-preference)", () => {
-                const grid = gridRef.current;
-                const tiles = grid.querySelectorAll(".mosaic-tile");
-
-                if (!tiles.length) return;
-
-                const isMobile = window.innerWidth < 768;
-
-                /* ---------- Opening: the visual grows from 0 to 100% ---------- */
-                if (!introPlayed.current) {
-                    gsap.set(grid, {
-                        scale: 0,
-                        transformOrigin: "50% 50%",
-                    });
-                    gsap.set(tiles, {
-                        opacity: 0,
-                        scale: 0.6,
-                        transformOrigin: "center center",
-                    });
-
-                    const tl = gsap.timeline({
-                        onComplete: () => {
-                            introPlayed.current = true;
-                        },
-                    });
-
-                    // 1) The whole frame opens from the centre, 0 -> 100%
-                    tl.to(grid, {
+                /* Reduced motion: no growing, no autoplay, everything simply visible */
+                if (reduce) {
+                    video.pause();
+                    gsap.set(frame, {
+                        autoAlpha: 1,
+                        width: "100%",
+                        height: "100%",
+                        borderRadius: "0px",
                         scale: 1,
-                        duration: 1.6,
-                        ease: "expo.inOut",
+                        rotateX: 0,
+                        rotateY: 0,
+                        rotateZ: 0,
+                        boxShadow: "none",
                     });
+                    gsap.set(ring, { autoAlpha: 0 });
+                    gsap.set(sheen, { autoAlpha: 0 });
+                    gsap.set(overlay, { opacity: 1 });
+                    gsap.set(masks, { yPercent: 0 });
+                    gsap.set(fades, { opacity: 1, y: 0 });
+                    gsap.set(content, { autoAlpha: 1 });
+                    return;
+                }
 
-                    // 2) Tiles bloom outward from the centre while it opens
-                    tl.to(
-                        tiles,
+                let cancelled = false;
+
+                /* Start state: only the video card in the centre, tilted slightly; text hidden */
+                gsap.set(frame, {
+                    autoAlpha: 1,
+                    width: startBox.width,
+                    height: startBox.height,
+                    borderRadius: startBox.borderRadius,
+                    scale: 0.9,
+                    rotateX: 10,
+                    rotateY: -5,
+                    rotateZ: -1.5,
+                    transformOrigin: "50% 50%",
+                    boxShadow: "0 28px 70px rgba(0, 0, 0, 0.22)",
+                });
+                gsap.set(ring, {
+                    autoAlpha: 0,
+                    width: startBox.width,
+                    height: startBox.height,
+                    borderRadius: startBox.borderRadius,
+                    scale: 0.9,
+                    rotateX: 10,
+                    rotateY: -5,
+                    rotateZ: -1.5,
+                    transformOrigin: "50% 50%",
+                });
+                gsap.set(sheen, { autoAlpha: 0, xPercent: -150 });
+                gsap.set(video, { scale: 1, transformOrigin: "50% 50%" });
+                gsap.set(overlay, { opacity: 0 });
+                gsap.set(masks, { yPercent: 115 });
+                gsap.set(fades, { opacity: 0, y: 20 });
+                gsap.set(content, { autoAlpha: 1 });
+
+                /* Scroll: gentle parallax on the video, text fades as you leave.
+                   These touch different elements from the intro, so they never clash. */
+                gsap.to(parallax, {
+                    yPercent: 7,
+                    ease: "none",
+                    scrollTrigger: {
+                        trigger: section,
+                        start: "top top",
+                        end: "bottom top",
+                        scrub: true,
+                    },
+                });
+                gsap.to(content, {
+                    y: -50,
+                    opacity: 0,
+                    ease: "none",
+                    scrollTrigger: {
+                        trigger: section,
+                        start: "top top",
+                        end: "60% top",
+                        scrub: true,
+                    },
+                });
+
+                /* The intro: centred video launches & grows to full screen, then text arrives */
+                const play = () => {
+                    if (cancelled) return;
+
+                    const tl = gsap.timeline();
+
+                    // 1) Kinetic accent ring bursts outward from the centred video card
+                    tl.fromTo(
+                        ring,
+                        { autoAlpha: 0.9, scale: 0.9 },
                         {
-                            opacity: 1,
-                            scale: 1,
-                            duration: 0.7,
-                            ease: "back.out(1.4)",
-                            stagger: {
-                                amount: 0.9,
-                                from: "center",
-                                grid: [gridConfig.cols, gridConfig.rows],
-                            },
+                            autoAlpha: 0,
+                            scale: 1.95,
+                            rotateX: 0,
+                            rotateY: 0,
+                            rotateZ: 0,
+                            duration: 1.15,
+                            ease: "power3.out",
                         },
-                        0.5
+                        0
                     );
 
-                    // 3) Text and thumbnail arrive as the frame settles
-                    tl.from(
-                        ".hero-mask",
+                    // 2) Video straightens from 3D tilt and grows from centre to full width & height
+                    tl.to(
+                        frame,
                         {
-                            yPercent: 115,
+                            rotateX: 0,
+                            rotateY: 0,
+                            rotateZ: 0,
+                            scale: 1,
+                            duration: 1.35,
+                            ease: "power3.out",
+                        },
+                        0
+                    );
+                    tl.to(
+                        frame,
+                        {
+                            width: "100%",
+                            height: "100%",
+                            borderRadius: "0px",
+                            boxShadow: "0 0px 0px rgba(0, 0, 0, 0)",
+                            duration: GROW_DURATION,
+                            ease: "expo.inOut",
+                        },
+                        0.06
+                    );
+
+                    // 3) Diagonal light sheen sweeps across the video while it grows
+                    tl.fromTo(
+                        sheen,
+                        { xPercent: -150 },
+                        {
+                            xPercent: 250,
+                            duration: 1.15,
+                            ease: "power2.inOut",
+                        },
+                        0.3
+                    );
+                    tl.fromTo(
+                        sheen,
+                        { autoAlpha: 0 },
+                        {
+                            autoAlpha: 0.45,
+                            duration: 0.45,
+                            ease: "power2.out",
+                        },
+                        0.3
+                    );
+                    tl.to(
+                        sheen,
+                        {
+                            autoAlpha: 0,
+                            duration: 0.6,
+                            ease: "power2.inOut",
+                        },
+                        0.8
+                    );
+
+                    // 4) Video is now full screen: soft shade so the text stays readable
+                    tl.to(
+                        overlay,
+                        { opacity: 1, duration: 0.8, ease: "power2.out" },
+                        GROW_DURATION - 0.15
+                    );
+
+                    // 5) Then the text arrives
+                    tl.to(
+                        masks,
+                        {
+                            yPercent: 0,
                             duration: 1.1,
                             ease: "power4.out",
                             stagger: 0.12,
                         },
-                        1.0
+                        "<0.2"
                     );
-                    tl.from(
-                        ".hero-fade",
+                    tl.to(
+                        fades,
                         {
-                            opacity: 0,
-                            y: 20,
+                            opacity: 1,
+                            y: 0,
                             duration: 0.8,
                             ease: "power3.out",
-                            stagger: 0.08,
+                            stagger: 0.1,
                         },
-                        1.2
+                        "<0.3"
                     );
-                    tl.fromTo(
-                        ".hero-thumb",
-                        { clipPath: "inset(100% 0% 0% 0%)" },
-                        {
-                            clipPath: "inset(0% 0% 0% 0%)",
-                            duration: 1.2,
-                            ease: "power4.out",
-                        },
-                        1.3
+                };
+
+                /* Wait for the preloader to finish and for the video to be playable,
+                   so the growth is never seen on a black box */
+                const preloaderDone = new Promise((resolve) => {
+                    const noPreloader = !document.querySelector(
+                        '[aria-label="Loading"]'
                     );
-                }
-
-                /* ---------- Scroll animation ---------- */
-                if (isMobile) {
-                    gsap.to(grid, {
-                        y: 30,
-                        opacity: 0.7,
-                        ease: "none",
-                        scrollTrigger: {
-                            trigger: heroRef.current,
-                            start: "top top",
-                            end: "bottom top",
-                            scrub: 0.8,
-                        },
+                    if (window.__preloaderDone || noPreloader) {
+                        resolve();
+                        return;
+                    }
+                    window.addEventListener("preloader:done", resolve, {
+                        once: true,
                     });
-                } else {
-                    gsap.to(tiles, {
-                        y: (i) => ((i % 10) - 4.5) * 35,
-                        scale: 0.94,
-                        stagger: {
-                            amount: 0.5,
-                            from: "random",
-                        },
-                        ease: "none",
-                        scrollTrigger: {
-                            trigger: heroRef.current,
-                            start: "top top",
-                            end: "bottom top",
-                            scrub: 1.2,
-                        },
-                    });
-                }
-            });
+                });
 
-            // Reduced motion: everything is simply visible
-            mm.add("(prefers-reduced-motion: reduce)", () => {
-                introPlayed.current = true;
-            });
-        }, heroRef);
+                const videoReady = new Promise((resolve) => {
+                    if (video.readyState >= 3) {
+                        resolve();
+                        return;
+                    }
+                    const done = () => resolve();
+                    video.addEventListener("canplay", done, { once: true });
+                    video.addEventListener("error", done, { once: true });
+                    setTimeout(done, VIDEO_TIMEOUT);
+                });
+
+                video.play().catch(() => {});
+
+                Promise.all([preloaderDone, videoReady]).then(play);
+
+                return () => {
+                    cancelled = true;
+                };
+            }
+        );
 
         return () => {
-            ctx.revert();
+            mm.revert();
         };
-    }, [ready, gridConfig]);
+    }, []);
 
     return (
-        <>
-            <section
-                ref={heroRef}
-                className="relative isolate flex min-h-[100svh] w-full flex-col justify-end overflow-hidden bg-white text-[rgb(36,36,36)]"
+        <section
+            ref={sectionRef}
+            className="relative isolate flex min-h-[100svh] w-full flex-col justify-end overflow-hidden bg-white text-white"
+        >
+            {/* Video stage: centred card grows to full width & height */}
+            <div
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center overflow-hidden"
+                style={{ perspective: "1400px" }}
             >
-                {/* Heading and description */}
-                <div className="pointer-events-none relative z-30 w-full bg-transparent">
-                    <div className="px-5 pb-12 pt-4 sm:px-8 sm:pb-16 sm:pt-9 md:px-12 lg:px-16">
-                        <div className="mx-auto max-w-[1400px]">
-                            <div className="mt-auto pt-4 sm:pt-20 md:pt-32">
-                                <div className="pointer-events-auto grid grid-cols-1 items-end gap-5 sm:gap-8 lg:grid-cols-12 lg:gap-10">
-                                    <div className="min-w-0 lg:col-span-7">
-                                        {/* Label */}
-                                        <div className="hero-fade mb-4 flex items-center gap-2 sm:mb-6">
-                                           
-                                            
-                                        </div>
+                {/* Expanding accent ring emitted when the video launches */}
+                <div
+                    ref={ringRef}
+                    className="invisible absolute border-2 border-[#ff5a1f]/75 shadow-[0_0_32px_rgba(255,90,31,0.35)] will-change-transform"
+                />
 
-                                        <h1 className="break-words font-['Outfit'] text-[clamp(2.75rem,11.5vw,4.5rem)] font-bold leading-[0.88] tracking-[-0.06em] sm:text-7xl md:text-8xl lg:text-[6.5rem] xl:text-[7.8rem]">
-                                            <span className="block">
-                                                <MaskLine>We&apos;re</MaskLine>
-                                            </span>
-                                            <span className="block">
-                                                <MaskLine>
-                                                    Bugsmoker
-                                                    <span className="text-[#ff5a1f]">.</span>
-                                                </MaskLine>
-                                            </span>
-                                        </h1>
-                                    </div>
-
-                                    <div className="hero-fade w-full max-w-md lg:col-span-4">
-                                        <p className="font-['Outfit'] text-[13px] leading-[1.7] text-[#4a4a4a] sm:text-sm sm:leading-[1.8] md:text-[15px]">
-                                            We’re all about making chaotic
-                                            digital stuff that actually works
-                                            for you. And honestly, we like to
-                                            keep things light and reckless fun
-                                            — because who wants boring, right?
-                                        </p>
-                                    </div>
-
-                                    <div className="hidden lg:col-span-1 lg:block">
-                                        <div className="hero-thumb relative aspect-[3/4]">
-                                            <Image
-                                                src="/home/1.png"
-                                                alt="Bugsmoker"
-                                                fill
-                                                sizes="10vw"
-                                                className="object-cover"
-                                            />
-                                        </div>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+                {/* Video frame: starts small in the centre, grows to full screen */}
+                <div
+                    ref={frameRef}
+                    className="invisible relative isolate overflow-hidden bg-neutral-900 will-change-[width,height,transform]"
+                >
+                    {/* Parallax wrapper (slightly taller than the frame) */}
+                    <div
+                        ref={parallaxRef}
+                        className="absolute inset-x-0 will-change-transform"
+                        style={{ top: "-10%", height: "120%" }}
+                    >
+                        <video
+                            ref={videoRef}
+                            className="h-full w-full object-cover"
+                            src={VIDEO_SRC}
+                            poster={POSTER_SRC || undefined}
+                            autoPlay
+                            muted
+                            loop
+                            playsInline
+                            preload="auto"
+                            disablePictureInPicture
+                        />
                     </div>
-                </div>
 
-                {/* Scroll hint */}
-                <div
-                    aria-hidden="true"
-                    className="pointer-events-none absolute inset-x-0 bottom-4 z-30 hidden justify-center sm:flex"
-                >
-                   
-                   
-                </div>
-
-                {/* Mosaic image grid (only rendered once the screen size is known) */}
-                <div
-                    ref={gridRef}
-                    className="pointer-events-none absolute inset-0 z-10 h-full w-full overflow-hidden will-change-transform"
-                >
-                    {ready && (
-                        <div
-                            className="absolute inset-0 grid h-full w-full"
-                            style={{
-                                gridTemplateColumns: `repeat(${gridConfig.cols}, minmax(0, 1fr))`,
-                                gridTemplateRows: `repeat(${gridConfig.rows}, minmax(0, 1fr))`,
-                            }}
-                        >
-                            {Array.from(
-                                { length: gridConfig.tileCount },
-                                (_, i) => {
-                                    const show = isTileShown(i, gridConfig.mode);
-                                    const col = i % gridConfig.cols;
-                                    const row = Math.floor(i / gridConfig.cols);
-
-                                    return (
-                                        <div
-                                            key={i}
-                                            className={`mosaic-tile group pointer-events-auto relative overflow-hidden transition-colors duration-300 cursor-pointer ${show
-                                                ? "bg-transparent"
-                                                : "bg-white"
-                                                }`}
-                                        >
-                                            {show && (
-                                                <div
-                                                    className="mosaic-tile-image-inner pointer-events-none absolute"
-                                                    style={{
-                                                        width: `${gridConfig.cols * 100}%`,
-                                                        height: `${gridConfig.rows * 100}%`,
-                                                        left: `${-col * 100}%`,
-                                                        top: `${-row * 100}%`,
-                                                        backgroundImage: "url('/Vintage%20Computer%20Bloom%20at%20Sunset.png')",
-                                                        backgroundSize: "cover",
-                                                        backgroundPosition: "center",
-                                                        backgroundRepeat: "no-repeat",
-                                                    }}
-                                                />
-                                            )}
-                                        </div>
-                                    );
-                                }
-                            )}
-                        </div>
-                    )}
-
-                    <style>{`
-                        .mosaic-tile {
-                            position: relative;
-                        }
-                        .mosaic-tile:hover {
-                            z-index: 25 !important;
-                        }
-                        .mosaic-tile .mosaic-tile-image-inner {
-                            transition: transform 0.3s ease;
-                        }
-                        .mosaic-tile:hover .mosaic-tile-image-inner {
-                            transform: scale(1.04);
-                        }
-                        @keyframes hero-scroll {
-                            0% { transform: translateY(-100%); }
-                            100% { transform: translateY(300%); }
-                        }
-                        .hero-scroll-dot {
-                            animation: hero-scroll 1.8s ease-in-out infinite;
-                        }
-                        @media (prefers-reduced-motion: reduce) {
-                            .hero-scroll-dot { animation: none; }
-                        }
-                    `}</style>
-                </div>
-
-            </section>
-
-            {/* Banner section */}
-            {/* <section className="w-full px-0 pb-8 sm:px-5 sm:pb-12 lg:px-8">
-                <div
-                    className="group relative h-[55svh] min-h-[340px] max-h-[720px] w-full overflow-hidden border-y border-neutral-200/80 bg-neutral-900 shadow-xl shadow-black/10 sm:h-[580px] sm:min-h-[480px] sm:rounded-xl sm:border md:h-[620px] lg:h-[680px] lg:rounded-2xl xl:h-[720px]"
-                >
-                    <Image
-                        src="/home/new1.png"
-                        alt="Bugsmoker Hero Banner"
-                        fill
-                        unoptimized={true}
-                        priority
-                        sizes="100vw"
-                        className="object-cover object-center grayscale brightness-[1.15] contrast-95 transition-transform duration-1000 ease-out group-hover:scale-[1.02]"
+                    {/* Diagonal sheen that sweeps across during the grow-up */}
+                    <div
+                        ref={sheenRef}
+                        className="invisible pointer-events-none absolute inset-y-0 left-0 w-1/2 -skew-x-12 will-change-transform"
+                        style={{
+                            background:
+                                "linear-gradient(90deg, transparent 0%, rgba(255,255,255,0.45) 50%, transparent 100%)",
+                        }}
                     />
 
-                    <div className="absolute inset-0 z-10 bg-black/35 backdrop-blur-[0.5px]" />
+                    {/* Shade for text legibility (fades in once the video is full screen) */}
+                    <div
+                        ref={overlayRef}
+                        className="absolute inset-0"
+                        style={{
+                            background:
+                                "linear-gradient(to top, rgba(0,0,0,0.7) 0%, rgba(0,0,0,0.3) 45%, rgba(0,0,0,0.12) 100%)",
+                        }}
+                    />
+                </div>
+            </div>
 
-                    <div className="relative z-20 flex h-full min-h-[340px] w-full flex-col items-center justify-center px-4 py-8 text-center sm:px-8 sm:py-14 md:px-12 lg:px-16">
-                        <h2 className="w-full max-w-3xl font-['Outfit'] text-[clamp(1.6rem,6vw,2.5rem)] font-bold leading-[1.12] tracking-tight text-white sm:text-4xl md:text-5xl lg:text-6xl">
-                            Crafting chaotic digital worlds that people
-                            actually remember.
-                        </h2>
+            {/* Text content: only appears after the video fills the screen */}
+            <div
+                ref={contentRef}
+                className="pointer-events-none invisible relative z-20 w-full"
+            >
+                <div className="px-5 pb-14 pt-4 sm:px-8 sm:pb-16 md:px-12 lg:px-16">
+                    <div className="mx-auto max-w-[1400px]">
+                        <div className="pointer-events-auto grid grid-cols-1 items-end gap-5 sm:gap-8 lg:grid-cols-12 lg:gap-10">
+                            <div className="min-w-0 sm:col-span-8  lg:col-span-12">
+                                <h1 className="break-words font-['Outfit'] text-[clamp(2.75rem,11.5vw,4.5rem)] font-bold leading-[0.88] tracking-[-0.06em] sm:text-7xl md:text-8xl lg:text-[6.5rem] xl:text-[7.8rem]">
+                                    <span className="block">
+                                        <MaskLine>Naturally &apos;beautiful </MaskLine>
+                                    </span>
+                                    <span className="block">
+                                        <MaskLine>Digitally  &apos;creative </MaskLine>
+                                    </span>
+                                    {/* <span className="block">
+                                        <MaskLine>
+                                            Bugsmoker
+                                            <span className="text-[#ff5a1f]">.</span>
+                                        </MaskLine>
+                                    </span> */}
+                                </h1>
+                            </div>
 
-                        <div className="mt-5 sm:mt-9">
-                            <Link
-                                href="#services"
-                                className="group/btn inline-flex cursor-pointer select-none items-center justify-center gap-2.5 whitespace-nowrap rounded-full bg-[#ff5a1f] px-6 py-2.5 text-xs font-semibold tracking-wide text-white shadow-lg shadow-[#ff5a1f]/20 transition-all duration-300 hover:bg-[#e04f1a] hover:shadow-xl hover:shadow-[#ff5a1f]/35 active:scale-95 sm:px-8 sm:py-3.5 sm:text-sm"
-                            >
-                                <span>Contact Us</span>
-                                <ArrowUpRight
-                                    size={15}
-                                    strokeWidth={2.4}
-                                    className="transition-transform duration-300 group-hover/btn:-translate-y-0.5 group-hover/btn:translate-x-0.5"
-                                />
-                            </Link>
+                            {/* <div className="hero-fade w-full max-w-md lg:col-span-4">
+                                <p className="font-['Outfit'] text-[13px] leading-[1.7] text-white/80 sm:text-sm sm:leading-[1.8] md:text-[15px]">
+                                    We’re all about making chaotic digital stuff
+                                    that actually works for you. And honestly, we
+                                    like to keep things light and reckless fun —
+                                    because who wants boring, right?
+                                </p>
+                            </div> */}
                         </div>
                     </div>
                 </div>
-            </section> */}
-        </>
+            </div>
+
+            {/* Scroll hint */}
+            <div
+                aria-hidden="true"
+                className="hero-fade pointer-events-none absolute inset-x-0 bottom-4 z-20 hidden justify-center sm:flex"
+            >
+                <span className="relative block h-8 w-px overflow-hidden bg-white/30">
+                    <span className="hero-scroll-dot absolute left-0 top-0 block h-1/3 w-px bg-[#ff5a1f]" />
+                </span>
+            </div>
+
+            <style>{`
+                @keyframes hero-scroll {
+                    0% { transform: translateY(-100%); }
+                    100% { transform: translateY(300%); }
+                }
+                .hero-scroll-dot {
+                    animation: hero-scroll 1.8s ease-in-out infinite;
+                }
+                @media (prefers-reduced-motion: reduce) {
+                    .hero-scroll-dot { animation: none; }
+                }
+            `}</style>
+        </section>
     );
 }

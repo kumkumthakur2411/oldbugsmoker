@@ -28,7 +28,7 @@ export default function Home() {
       <TestimonialsSection />
       {/* <Project /> */}
       <Blog />
-      <Footer />
+     
     </>
   );
 }
