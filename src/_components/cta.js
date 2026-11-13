@@ -1,7 +1,6 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
-import Image from "next/image";
 import Link from "next/link";
 import gsap from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
@@ -11,38 +10,50 @@ if (typeof window !== "undefined") {
     gsap.registerPlugin(ScrollTrigger);
 }
 
-/* ------------------------------------------------------------------ */
-/* Marquee Data                                                        */
-/* ------------------------------------------------------------------ */
-
-const MARQUEE_1 = [
+const MARQUEE = [
     "Websites",
     "Apps",
     "High Performance",
-    "Software",
-    "Sub-Second Speed",
-    "Hosting & DevOps",
-    "Tech Support",
-    "Scalable Systems",
-    "Fluid Motion",
-    "Next.js 15+ & React 19",
-];
-
-const MARQUEE_2 = [
-    "Bugsmoker Atelier",
     "Digital Engineering",
     "Creative Direction",
     "Zero Downtime",
-    "Fluid 60+ FPS Motion",
-    "Enterprise Grade",
-    "Bespoke Platforms",
     "AI Integration",
-    "Cloud Architecture",
-    "Bespoke Systems",
+    "Next.js & React",
 ];
 
-const RIBBON_ITEMS_1 = [...MARQUEE_1, ...MARQUEE_1, ...MARQUEE_1, ...MARQUEE_1];
-const RIBBON_ITEMS_2 = [...MARQUEE_2, ...MARQUEE_2, ...MARQUEE_2, ...MARQUEE_2];
+/* One loop group = the list twice, so a single group is always wider than the screen */
+const GROUP = [...MARQUEE, ...MARQUEE];
+
+const RESTING = {
+    "--ink": "#ffffff",
+    "--ink-soft": "rgba(255,255,255,0.55)",
+    "--accent": "#ff5a1f",
+    "--line": "rgba(255,255,255,0.14)",
+    "--circle-bg": "#ffffff",
+    "--circle-fg": "#000000",
+};
+
+const ACTIVE = {
+    "--ink": "#000000",
+    "--ink-soft": "rgba(0,0,0,0.6)",
+    "--accent": "#ffffff",
+    "--line": "rgba(0,0,0,0.2)",
+    "--circle-bg": "#000000",
+    "--circle-fg": "#ffffff",
+};
+
+function StarIcon({ className = "" }) {
+    return (
+        <svg
+            viewBox="0 0 24 24"
+            className={className}
+            fill="currentColor"
+            aria-hidden="true"
+        >
+            <path d="M12 2C12 7.52 7.52 12 2 12C7.52 12 12 16.48 12 22C12 16.48 16.48 12 22 12C16.48 12 12 7.52 12 2Z" />
+        </svg>
+    );
+}
 
 /* Rotating text ring inside the circular button */
 function RotatingRing({
@@ -53,7 +64,7 @@ function RotatingRing({
     return (
         <svg
             viewBox="0 0 100 100"
-            className="absolute inset-0 animate-[spin_16s_linear_infinite] motion-reduce:animate-none pointer-events-none"
+            className="pointer-events-none absolute inset-0 animate-[spin_16s_linear_infinite] text-[color:var(--ink)] group-hover/cta:animate-[spin_7s_linear_infinite] motion-reduce:animate-none"
             aria-hidden="true"
         >
             <defs>
@@ -73,241 +84,168 @@ function RotatingRing({
     );
 }
 
-/* ------------------------------------------------------------------ */
-/* Component                                                           */
-/* ------------------------------------------------------------------ */
+function MarqueeGroup({ hidden = false }) {
+    return (
+        <div
+            className="flex shrink-0 items-center"
+            aria-hidden={hidden ? "true" : undefined}
+        >
+            {GROUP.map((label, i) => (
+                <span
+                    key={`${label}-${i}`}
+                    className="flex items-center gap-4 whitespace-nowrap pr-4 text-[11px] font-semibold uppercase tracking-[0.18em] sm:gap-6 sm:pr-6 sm:text-xs"
+                >
+                    {label}
+                    <StarIcon className="h-2.5 w-2.5 text-[color:var(--accent)]" />
+                </span>
+            ))}
+        </div>
+    );
+}
 
 export default function Cta({
-    showLogo = true,
     contactHref = "/contactus",
-    capabilitiesHref = "/services",
     title = "Let's Build Together",
-    subtitle = "[ View Capabilities ]",
+    label = "[ Have an idea? ]",
     className = "",
 }) {
     const rootRef = useRef(null);
-    const wrapRef = useRef(null);
-    const btnRef = useRef(null);
-    const stageRef = useRef(null);
-    const trackRef1 = useRef(null);
-    const trackRef2 = useRef(null);
+    const fillRef = useRef(null);
+    const trackRef = useRef(null);
 
-    /* 1. Magnetic button spring physics on hover */
-    useEffect(() => {
-        const wrap = wrapRef.current;
-        const btn = btnRef.current;
-        if (!wrap || !btn) return;
-
-        const isHover = window.matchMedia(
-            "(hover: hover) and (pointer: fine)"
-        ).matches;
-        if (!isHover) return;
-
-        const onBtnMove = (e) => {
-            const r = wrap.getBoundingClientRect();
-            const dx = e.clientX - (r.left + r.width / 2);
-            const dy = e.clientY - (r.top + r.height / 2);
-
-            gsap.to(btn, {
-                x: dx * 0.35,
-                y: dy * 0.35,
-                duration: 0.35,
-                ease: "power3.out",
-            });
-        };
-
-        const onBtnLeave = () => {
-            gsap.to(btn, {
-                x: 0,
-                y: 0,
-                duration: 0.9,
-                ease: "elastic.out(1, 0.4)",
-            });
-        };
-
-        wrap.addEventListener("mousemove", onBtnMove);
-        wrap.addEventListener("mouseleave", onBtnLeave);
-
-        return () => {
-            wrap.removeEventListener("mousemove", onBtnMove);
-            wrap.removeEventListener("mouseleave", onBtnLeave);
-        };
-    }, []);
-
-    /* 2. Dual Waving Marquee Ribbons animation */
     useEffect(() => {
         const root = rootRef.current;
-        const stage = stageRef.current;
-        const track1 = trackRef1.current;
-        const track2 = trackRef2.current;
-        if (!root || !stage || !track1 || !track2) return;
+        const fill = fillRef.current;
+        const track = trackRef.current;
+        if (!root || !fill || !track) return;
 
         const ctx = gsap.context(() => {
             const mm = gsap.matchMedia();
 
+            /* Shared hover-fill logic; duration is 0 for reduced motion */
+            const bindHover = (dur) => {
+                const canHover = window.matchMedia(
+                    "(hover: hover) and (pointer: fine)"
+                ).matches;
+                if (!canHover) return () => {};
+
+                const point = (e) => {
+                    const r = root.getBoundingClientRect();
+                    return `${e.clientX - r.left}px ${e.clientY - r.top}px`;
+                };
+
+                const onEnter = (e) => {
+                    if (e.pointerType !== "mouse") return;
+                    const at = point(e);
+                    gsap.killTweensOf([fill, root]);
+                    gsap.set(fill, { clipPath: `circle(0% at ${at})` });
+                    gsap.to(fill, {
+                        clipPath: `circle(150% at ${at})`,
+                        duration: dur,
+                        ease: "power3.inOut",
+                    });
+                    gsap.to(root, {
+                        ...ACTIVE,
+                        duration: dur * 0.6,
+                        ease: "power2.out",
+                    });
+                };
+
+                const onLeave = (e) => {
+                    if (e.pointerType !== "mouse") return;
+                    const at = point(e);
+                    gsap.killTweensOf([fill, root]);
+                    gsap.set(fill, { clipPath: `circle(150% at ${at})` });
+                    gsap.to(fill, {
+                        clipPath: `circle(0% at ${at})`,
+                        duration: dur,
+                        ease: "power3.inOut",
+                    });
+                    gsap.to(root, {
+                        ...RESTING,
+                        duration: dur * 0.6,
+                        ease: "power2.out",
+                    });
+                };
+
+                root.addEventListener("pointerenter", onEnter);
+                root.addEventListener("pointerleave", onLeave);
+
+                return () => {
+                    root.removeEventListener("pointerenter", onEnter);
+                    root.removeEventListener("pointerleave", onLeave);
+                };
+            };
+
             mm.add("(prefers-reduced-motion: no-preference)", () => {
-                const pills1 = gsap.utils.toArray(".wave-pill-1", track1);
-                const pills2 = gsap.utils.toArray(".wave-pill-2", track2);
-                if (pills1.length === 0 || pills2.length === 0) return;
-
-                const setTrack1X = gsap.quickSetter(track1, "x", "px");
-                const setTrack2X = gsap.quickSetter(track2, "x", "px");
-
-                const setPill1Y = pills1.map((p) =>
-                    gsap.quickSetter(p, "y", "px")
-                );
-                const setPill1Rot = pills1.map((p) =>
-                    gsap.quickSetter(p, "rotation", "deg")
-                );
-
-                const setPill2Y = pills2.map((p) =>
-                    gsap.quickSetter(p, "y", "px")
-                );
-                const setPill2Rot = pills2.map((p) =>
-                    gsap.quickSetter(p, "rotation", "deg")
+                /* Entrance reveal */
+                gsap.fromTo(
+                    ".cta-reveal",
+                    { y: 24, opacity: 0 },
+                    {
+                        y: 0,
+                        opacity: 1,
+                        duration: 0.9,
+                        ease: "power3.out",
+                        stagger: 0.1,
+                        scrollTrigger: {
+                            trigger: root,
+                            start: "top 88%",
+                            once: true,
+                        },
+                    }
                 );
 
-                let stepWidth1 = 180;
-                let stepWidth2 = 210;
-                let repeatWidth1 = MARQUEE_1.length * stepWidth1;
-                let repeatWidth2 = MARQUEE_2.length * stepWidth2;
-                let wavelength = 900;
-                let amplitude = 42;
-                let maxRot = 14;
+                const unbind = bindHover(0.7);
 
-                let xPos1 = 0;
-                let xPos2 = -repeatWidth2;
+                /* Marquee: -50% of a two-group track loops seamlessly */
+                const tween = gsap.fromTo(
+                    track,
+                    { xPercent: 0 },
+                    { xPercent: -50, duration: 36, ease: "none", repeat: -1 }
+                );
+
                 let vel = 0;
-                let isHovered = false;
-                let currentSpeed = 2.0;
-
-                const measure = () => {
-                    if (pills1.length >= 2) {
-                        const step1 =
-                            pills1[1].offsetLeft - pills1[0].offsetLeft;
-                        if (step1 > 20) stepWidth1 = step1;
-                    }
-                    if (pills2.length >= 2) {
-                        const step2 =
-                            pills2[1].offsetLeft - pills2[0].offsetLeft;
-                        if (step2 > 20) stepWidth2 = step2;
-                    }
-
-                    repeatWidth1 = MARQUEE_1.length * stepWidth1;
-                    repeatWidth2 = MARQUEE_2.length * stepWidth2;
-
-                    const waves1 = Math.max(2, Math.round(repeatWidth1 / 850));
-                    wavelength = repeatWidth1 / waves1;
-
-                    const width = window.innerWidth;
-                    amplitude = width < 640 ? 24 : width < 1024 ? 34 : 44;
-                    maxRot = width < 640 ? 10 : 15;
-                };
-
-                const applyPositions = () => {
-                    for (let i = 0; i < pills1.length; i++) {
-                        const screenX = xPos1 + i * stepWidth1;
-                        const angle = (screenX / wavelength) * Math.PI * 2;
-                        setPill1Y[i](Math.sin(angle) * amplitude);
-                        setPill1Rot[i](Math.cos(angle) * maxRot);
-                    }
-                    for (let j = 0; j < pills2.length; j++) {
-                        const screenX = xPos2 + j * stepWidth2;
-                        const angle =
-                            (screenX / wavelength) * Math.PI * 2 + Math.PI;
-                        setPill2Y[j](Math.sin(angle) * amplitude);
-                        setPill2Rot[j](Math.cos(angle) * maxRot);
-                    }
-                };
-
-                measure();
-                applyPositions();
-
-                const onResize = () => {
-                    measure();
-                    applyPositions();
-                };
-                window.addEventListener("resize", onResize);
+                let visible = false;
+                let scale = 1;
 
                 const st = ScrollTrigger.create({
                     trigger: root,
                     start: "top bottom",
                     end: "bottom top",
+                    onToggle: (self) => {
+                        visible = self.isActive;
+                        tween.paused(!visible);
+                    },
                     onUpdate: (self) => {
                         vel = self.getVelocity();
                     },
                 });
+                visible = st.isActive;
+                tween.paused(!visible);
 
-                const onEnter = (e) => {
-                    if (e.pointerType === "mouse") isHovered = true;
+                const tick = (time, deltaTime) => {
+                    if (!visible) return;
+                    const dt = Math.min(deltaTime, 64) / 16.667;
+                    const target = 1 + gsap.utils.clamp(0, 4, Math.abs(vel) / 300);
+                    scale += (target - scale) * (1 - Math.pow(1 - 0.1, dt));
+                    tween.timeScale(scale);
+                    vel *= Math.pow(0.9, dt);
                 };
-                const onLeave = () => {
-                    isHovered = false;
-                };
-
-                stage.addEventListener("pointerenter", onEnter);
-                stage.addEventListener("pointerleave", onLeave);
-
-                const tick = () => {
-                    const boost = gsap.utils.clamp(0, 6, Math.abs(vel) / 250);
-                    const targetSpeed = isHovered ? 0.35 : 2.0 + boost;
-                    currentSpeed += (targetSpeed - currentSpeed) * 0.1;
-
-                    // Ribbon 1 moves to the left
-                    xPos1 -= currentSpeed;
-                    if (xPos1 <= -repeatWidth1) {
-                        xPos1 += repeatWidth1;
-                    }
-                    setTrack1X(xPos1);
-
-                    // Ribbon 2 moves to the right
-                    xPos2 += currentSpeed * 0.95;
-                    if (xPos2 >= 0) {
-                        xPos2 -= repeatWidth2;
-                    }
-                    setTrack2X(xPos2);
-
-                    for (let i = 0; i < pills1.length; i++) {
-                        const screenX = xPos1 + i * stepWidth1;
-                        const angle = (screenX / wavelength) * Math.PI * 2;
-                        setPill1Y[i](Math.sin(angle) * amplitude);
-                        setPill1Rot[i](Math.cos(angle) * maxRot);
-                    }
-
-                    for (let j = 0; j < pills2.length; j++) {
-                        const screenX = xPos2 + j * stepWidth2;
-                        const angle =
-                            (screenX / wavelength) * Math.PI * 2 + Math.PI;
-                        setPill2Y[j](Math.sin(angle) * amplitude);
-                        setPill2Rot[j](Math.cos(angle) * maxRot);
-                    }
-
-                    vel *= 0.9;
-                };
-
                 gsap.ticker.add(tick);
 
                 return () => {
                     gsap.ticker.remove(tick);
-                    window.removeEventListener("resize", onResize);
-                    stage.removeEventListener("pointerenter", onEnter);
-                    stage.removeEventListener("pointerleave", onLeave);
+                    unbind();
                     st.kill();
+                    tween.kill();
                 };
             });
 
-            // Reduced motion fallback
+            /* Reduced motion: static, instant colour swap on hover */
             mm.add("(prefers-reduced-motion: reduce)", () => {
-                const pills1 = gsap.utils.toArray(".wave-pill-1", track1);
-                const pills2 = gsap.utils.toArray(".wave-pill-2", track2);
-                pills1.forEach((p, i) => {
-                    const y = Math.sin((i / 8) * Math.PI * 2) * 24;
-                    gsap.set(p, { y });
-                });
-                pills2.forEach((p, j) => {
-                    const y = Math.sin((j / 8) * Math.PI * 2 + Math.PI) * 24;
-                    gsap.set(p, { y });
-                });
+                gsap.set(".cta-reveal", { opacity: 1, y: 0 });
+                return bindHover(0);
             });
         }, root);
 
@@ -319,72 +257,62 @@ export default function Cta({
             ref={rootRef}
             id="cta-section"
             aria-label="Call to action"
-            className={`relative w-full select-none overflow-hidden rounded-xl bg-white font-['Outfit',sans-serif] text-black py-12 sm:py-16 md:py-20 ${className}`}
+            style={RESTING}
+            className={`group/cta relative w-full select-none overflow-hidden rounded-xl bg-black font-['Outfit',sans-serif] text-[color:var(--ink)] ring-1 ring-white/10 ${className}`}
         >
-            {/* Top Row: Brand Logo Mark + Magnetic Button Lockup */}
-            <div className="mx-auto max-w-[1400px] px-5 sm:px-8 md:px-12 flex flex-col md:flex-row items-center justify-between gap-8 md:gap-12">
-                {/* Left: Brand Logo Mark */}
-                {showLogo && (
-                    <div className="shrink-0 select-none flex flex-col items-center md:items-start text-center md:text-left gap-2">
-                        <Link
-                            href="/"
-                            aria-label="Bugsmoker Home"
-                            className="block group"
-                        >
-                            <Image
-                                src="/bs-logo.png"
-                                alt="Bugsmoker bS. mark"
-                                width={180}
-                                height={127}
-                                className="h-auto w-32 sm:w-40 md:w-44 object-contain transition-transform duration-300 group-hover:scale-[1.04]"
-                                priority
-                            />
-                        </Link>
-                        <span className="font-mono text-[10px] sm:text-[11px] uppercase tracking-[0.2em] text-neutral-400">
-                            Digital Engineering &bull; Studio
-                        </span>
-                    </div>
-                )}
+            {/* Orange fill that expands from the cursor */}
+            <div
+                ref={fillRef}
+                aria-hidden="true"
+                className="pointer-events-none absolute inset-0 z-0 bg-[#ff5a1f]"
+                style={{ clipPath: "circle(0% at 50% 50%)" }}
+            />
 
-                {/* Right: Magnetic Rotating Button + Text Lockup */}
-                <div className="flex flex-wrap items-center justify-center md:justify-end gap-6 sm:gap-8">
-                    {/* Magnetic Circular CTA Button */}
-                    <div
-                        ref={wrapRef}
-                        className="-m-3 p-3 sm:-m-4 sm:p-4 flex items-center justify-center cursor-pointer"
-                    >
+            {/* Headline row */}
+            <div className="relative z-10 mx-auto flex max-w-[1400px] items-center justify-between gap-6 px-5 py-8 sm:px-8 sm:py-10 md:px-12">
+                <div className="cta-reveal flex min-w-0 flex-col gap-3">
+                    <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-[color:var(--ink-soft)] sm:text-[11px]">
+                        {label}
+                    </span>
+
+                    <h2 className="text-[2.5rem] font-extrabold leading-[1] tracking-[-0.045em] sm:text-6xl md:text-7xl lg:text-8xl">
                         <Link
-                            ref={btnRef}
                             href={contactHref}
                             aria-label={`${title}, contact us`}
-                            className="group relative flex h-28 w-28 sm:h-32 sm:w-32 md:h-36 md:w-36 cursor-pointer items-center justify-center rounded-full bg-black text-white shadow-xl shadow-black/15 transition-colors duration-300 hover:bg-[#ff5a1f] will-change-transform"
+                            className="outline-none after:absolute after:inset-0 after:z-20 after:content-['']"
                         >
-                            {/* Outer rotating text ring */}
-                            <RotatingRing />
-
-                            {/* Inner white circle with arrow */}
-                            <span className="relative flex h-12 w-12 sm:h-14 sm:w-14 items-center justify-center rounded-full bg-white text-black shadow-md transition-transform duration-300 group-hover:rotate-45">
-                                <ArrowUpRight size={22} strokeWidth={2.4} />
+                            Let&apos;s build
+                            <br className="sm:hidden" />{" "}
+                            <span className="text-[color:var(--accent)]">
+                                together.
                             </span>
                         </Link>
-                    </div>
+                    </h2>
+                </div>
 
-                    {/* Title & Link */}
-                    <div className="flex flex-col items-center md:items-start gap-1.5">
-                        <span className="text-xl sm:text-2xl md:text-3xl font-extrabold tracking-[-0.03em] text-black">
-                            {title}
-                        </span>
-                        <Link
-                            href={capabilitiesHref}
-                            className="w-fit cursor-pointer font-mono text-xs sm:text-sm uppercase tracking-widest text-neutral-500 transition-colors hover:text-[#ff5a1f]"
-                        >
-                            {subtitle}
-                        </Link>
-                    </div>
+                {/* Circular button with rotating text ring */}
+                <div
+                    aria-hidden="true"
+                    className="cta-reveal relative flex h-28 w-28 shrink-0 items-center justify-center rounded-full border border-[color:var(--line)] sm:h-36 sm:w-36 md:h-44 md:w-44"
+                >
+                    <RotatingRing />
+
+                    <span className="relative flex h-12 w-12 items-center justify-center rounded-full bg-[color:var(--circle-bg)] text-[color:var(--circle-fg)] shadow-md transition-transform duration-300 group-hover/cta:rotate-45 sm:h-16 sm:w-16 md:h-20 md:w-20">
+                        <ArrowUpRight
+                            strokeWidth={2.4}
+                            className="h-5 w-5 sm:h-7 sm:w-7 md:h-9 md:w-9"
+                        />
+                    </span>
                 </div>
             </div>
 
-           
+            {/* Slim marquee strip */}
+            <div className="cta-reveal relative z-10 overflow-hidden border-t border-[color:var(--line)] py-3 text-[color:var(--ink-soft)] sm:py-3.5">
+                <div ref={trackRef} className="flex w-max will-change-transform">
+                    <MarqueeGroup />
+                    <MarqueeGroup hidden />
+                </div>
+            </div>
         </section>
     );
 }

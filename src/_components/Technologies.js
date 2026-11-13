@@ -472,25 +472,12 @@ export default function Technologies() {
             aria-label="Technologies and Tooling"
             className="relative mt-3 w-full select-none overflow-hidden rounded-xl bg-white py-12 font-['Outfit',sans-serif] text-black sm:py-16 md:py-20"
         >
-            {/* HEADING */}
-
-            <div className="tech-head relative z-30 mx-auto max-w-3xl px-4 text-center sm:px-8">
-                {/* <p className="font-mono text-[11px] uppercase tracking-[0.25em] text-[#ff5a1f] sm:text-xs">
-                    (Our stack)
-                </p> */}
-                <h2 className="mt-2 text-balance text-[clamp(1.9rem,7vw,3.5rem)] font-semibold lowercase leading-[.95] tracking-[-0.05em] sm:mt-3">
-                    tools we build with
-                    <span className="text-[#ff5a1f]">.</span>
-                </h2>
-            </div>
-
-            {/* EDGE FADES */}
+           
 
             <div className="pointer-events-none absolute inset-y-0 left-0 z-20 w-16 bg-gradient-to-r from-white via-white/80 to-transparent sm:w-28 md:w-40" />
 
             <div className="pointer-events-none absolute inset-y-0 right-0 z-20 w-16 bg-gradient-to-l from-white via-white/80 to-transparent sm:w-28 md:w-40" />
 
-            {/* WAVING TRACK */}
 
             <div
                 ref={stageRef}
