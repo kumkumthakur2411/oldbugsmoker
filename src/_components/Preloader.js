@@ -3,8 +3,9 @@
 import { useEffect, useRef } from "react";
 import { gsap } from "gsap";
 
-// Put flower.png in your /public folder
+// Put flower.png and tv.png (cutout tv-frame.png) in your /public folder
 const IMAGE_SRC = "/flower.png";
+const TV_IMAGE_SRC = "/tv-frame.png";
 
 /* Cluster layout: flowers sit close together and overlap only partially.
    size / cx / cy are percentages of the cluster box.
@@ -16,14 +17,13 @@ const FLOWERS = [
 ];
 
 // Total time the counter / progress line takes to fill (seconds)
-const PROGRESS_DURATION = 2.2;
+const PROGRESS_DURATION = 1.4;
 
-/* Curtain reveal settings */
-const CURTAIN_DURATION = 0.9; // seconds
-const CURVE_VW = 8; // height of the curved bottom edge (in vw)
+// Quick fade-out duration once 100% completes (seconds)
+const EXIT_DURATION = 0.4;
 
-// Never wait longer than this for the image (ms)
-const READY_TIMEOUT = 4000;
+// Never wait longer than this for the images (ms)
+const READY_TIMEOUT = 1500;
 
 export default function Preloader({ onComplete }) {
     const containerRef = useRef(null);
@@ -68,6 +68,7 @@ export default function Preloader({ onComplete }) {
                 const bar = q(".pl-bar");
                 const halo = q(".pl-halo");
                 const rings = q(".pl-ring");
+                const tv = q(".pl-tv");
 
                 const wrappers = FLOWERS.map((_, i) => q(`.pl-fw-${i}`));
                 const rotors = FLOWERS.map((_, i) => q(`.pl-fr-${i}`));
@@ -75,6 +76,12 @@ export default function Preloader({ onComplete }) {
                 /* Initial state */
                 gsap.set(topBar, { autoAlpha: 0, y: reduce ? 0 : -10 });
                 gsap.set(meta, { autoAlpha: 0, y: reduce ? 0 : 12 });
+                gsap.set(tv, {
+                    autoAlpha: 0,
+                    scale: reduce ? 1 : 0.92,
+                    y: reduce ? 0 : 14,
+                    transformOrigin: "50% 55%",
+                });
                 gsap.set(halo, {
                     autoAlpha: 0,
                     scale: reduce ? 1 : 0.65,
@@ -125,36 +132,50 @@ export default function Preloader({ onComplete }) {
                     defaults: { ease: "power3.out" },
                     onComplete: () => {
                         spins.forEach((s) => s.kill());
-                        window.__preloaderDone = true;
-                        window.dispatchEvent(new Event("preloader:done"));
+                        if (!window.__preloaderDone) {
+                            window.__preloaderDone = true;
+                            window.dispatchEvent(new Event("preloader:done"));
+                        }
                         onCompleteRef.current?.();
                     },
                 });
 
                 /* Editorial top bar + bottom counter & progress */
-                tl.to(topBar, { autoAlpha: 1, y: 0, duration: 0.6 }, 0);
-                tl.to(meta, { autoAlpha: 1, y: 0, duration: 0.6 }, 0);
+                tl.to(topBar, { autoAlpha: 1, y: 0, duration: 0.45 }, 0);
+                tl.to(meta, { autoAlpha: 1, y: 0, duration: 0.45 }, 0);
+
+                tl.to(
+                    tv,
+                    {
+                        autoAlpha: 1,
+                        scale: 1,
+                        y: 0,
+                        duration: reduce ? 0.35 : 0.6,
+                        ease: "power3.out",
+                    },
+                    0
+                );
 
                 tl.to(
                     halo,
                     {
                         autoAlpha: 1,
                         scale: 1,
-                        duration: 1.1,
+                        duration: 0.75,
                         ease: "power2.out",
                     },
-                    0.1
+                    0.05
                 );
                 tl.to(
                     rings,
                     {
                         autoAlpha: 1,
                         scale: 1,
-                        duration: 1.0,
-                        stagger: 0.12,
+                        duration: 0.75,
+                        stagger: 0.1,
                         ease: "power3.out",
                     },
-                    0.15
+                    0.08
                 );
 
                 const counter = { v: 0 };
@@ -174,7 +195,7 @@ export default function Preloader({ onComplete }) {
                             });
                         },
                     },
-                    0.2
+                    0
                 );
                 tl.to(
                     bar,
@@ -183,134 +204,70 @@ export default function Preloader({ onComplete }) {
                         duration: PROGRESS_DURATION,
                         ease: "power2.inOut",
                     },
-                    0.2
+                    0
                 );
 
                 /* Flowers bloom in, one after another */
-                const inStart = 0.3;
-                const inGap = 0.2;
+                const inStart = 0.15;
+                const inGap = 0.15;
                 wrappers.forEach((g, i) => {
                     tl.to(
                         g,
                         {
                             autoAlpha: 1,
                             scale: 1,
-                            duration: reduce ? 0.4 : 0.9,
-                            ease: reduce ? "power2.out" : "back.out(1.4)",
+                            duration: reduce ? 0.3 : 0.65,
+                            ease: reduce ? "power2.out" : "back.out(1.3)",
                         },
                         inStart + i * inGap
                     );
                 });
 
-                /* When the progress line is full, flowers & accents fade away */
-                const outStart = 0.2 + PROGRESS_DURATION + 0.1;
-                const outGap = 0.25;
-                const outDur = 0.5;
+                /* Immediate fade-out as soon as 100% completes: no black gap, no exit delay */
+                const revealStart = PROGRESS_DURATION;
 
-                [...wrappers].reverse().forEach((g, i) => {
-                    tl.to(
-                        g,
-                        {
-                            autoAlpha: 0,
-                            scale: reduce ? 1 : 0.5,
-                            duration: outDur,
-                            ease: "power2.in",
-                        },
-                        outStart + i * outGap
-                    );
-                });
+                tl.add(() => {
+                    unlock();
+                    window.__preloaderDone = true;
+                    window.dispatchEvent(new Event("preloader:done"));
+                }, revealStart);
 
+                tl.set(el, { pointerEvents: "none" }, revealStart);
                 tl.to(
-                    halo,
+                    el,
                     {
                         autoAlpha: 0,
-                        scale: reduce ? 1 : 0.8,
-                        duration: 0.55,
-                        ease: "power2.in",
+                        duration: reduce ? 0.3 : EXIT_DURATION,
+                        ease: "power2.out",
                     },
-                    outStart + 0.1
+                    revealStart
                 );
-                tl.to(
-                    rings,
-                    {
-                        autoAlpha: 0,
-                        scale: reduce ? 1 : 1.08,
-                        duration: 0.5,
-                        ease: "power2.in",
-                    },
-                    outStart + 0.1
-                );
-                tl.to(
-                    topBar,
-                    {
-                        autoAlpha: 0,
-                        y: reduce ? 0 : -8,
-                        duration: 0.35,
-                        ease: "power2.in",
-                    },
-                    outStart + 0.2
-                );
-                tl.to(
-                    meta,
-                    {
-                        autoAlpha: 0,
-                        y: reduce ? 0 : 8,
-                        duration: 0.35,
-                        ease: "power2.in",
-                    },
-                    outStart + 0.2
-                );
-
-                /* Curtain reveal: the screen lifts away with a curved edge */
-                const revealStart =
-                    outStart + (wrappers.length - 1) * outGap + outDur;
-
-                tl.add(() => unlock(), revealStart);
-
-                if (reduce) {
-                    tl.to(
-                        el,
-                        { autoAlpha: 0, duration: 0.5, ease: "power2.inOut" },
-                        revealStart
-                    );
-                } else {
-                    tl.to(
-                        el,
-                        {
-                            // travel the full height plus the curved edge so nothing stays visible
-                            y: () =>
-                                -(
-                                    window.innerHeight +
-                                    (window.innerWidth * CURVE_VW) / 100 +
-                                    4
-                                ),
-                            duration: CURTAIN_DURATION,
-                            ease: "power4.inOut",
-                        },
-                        revealStart
-                    );
-                }
-
                 tl.set(el, { display: "none" });
             }, el);
         };
 
-        /* Wait for the flower image so nothing pops in mid-animation */
-        const imageReady = new Promise((resolve) => {
-            const img = new Image();
-            img.src = IMAGE_SRC;
-            if (img.decode) {
-                img.decode().then(resolve, resolve);
-            } else {
-                img.onload = resolve;
-                img.onerror = resolve;
-            }
-        });
+        /* Wait for the TV and flower images so nothing pops in mid-animation */
+        const preloadImage = (src) =>
+            new Promise((resolve) => {
+                const img = new Image();
+                img.src = src;
+                if (img.decode) {
+                    img.decode().then(resolve, resolve);
+                } else {
+                    img.onload = resolve;
+                    img.onerror = resolve;
+                }
+            });
+
+        const imagesReady = Promise.all([
+            preloadImage(IMAGE_SRC),
+            preloadImage(TV_IMAGE_SRC),
+        ]);
         const timeout = new Promise((resolve) =>
             setTimeout(resolve, READY_TIMEOUT)
         );
 
-        Promise.race([imageReady, timeout]).then(build);
+        Promise.race([imagesReady, timeout]).then(build);
 
         return () => {
             cancelled = true;
@@ -325,26 +282,16 @@ export default function Preloader({ onComplete }) {
             role="status"
             aria-live="polite"
             aria-label="Loading"
-            className="fixed inset-0 z-[9999] select-none font-['Outfit',sans-serif] text-black will-change-transform"
+            className="fixed inset-0 z-[9999] select-none font-['Outfit',sans-serif] text-black will-change-[opacity]"
             style={{
                 background:
                     "linear-gradient(180deg, #fffdf9 0%, #fff8ef 52%, #ffffff 100%)",
             }}
         >
-            {/* Curved bottom edge that hangs below the screen and leads the lift */}
-            <div
-                aria-hidden="true"
-                className="pointer-events-none absolute inset-x-0 top-full bg-white shadow-[0_24px_60px_rgba(0,0,0,0.08)]"
-                style={{
-                    height: `${CURVE_VW}vw`,
-                    borderRadius: "0 0 50% 50% / 0 0 100% 100%",
-                }}
-            />
-
             {/* Top studio bar */}
             <div
                 aria-hidden="true"
-                className="pl-top invisible absolute inset-x-0 top-0 flex items-center justify-between px-[5%] pt-6 text-[10px] font-semibold uppercase tracking-[0.24em] text-black/45 sm:pt-8 sm:text-[11px]"
+                className="pl-top invisible absolute inset-x-0 top-0 z-10 flex items-center justify-between px-[5%] pt-6 text-[10px] font-semibold uppercase tracking-[0.24em] text-black/45 sm:pt-8 sm:text-[11px]"
             >
                 <span>Bugsmoker Studio</span>
                 <span className="flex items-center gap-2">
@@ -353,56 +300,110 @@ export default function Preloader({ onComplete }) {
                 </span>
             </div>
 
-            {/* Sunflower cluster with warm halo and orbital rings */}
+            {/* Centered retro TV with the sunflower cluster inside the CRT screen */}
             <div
                 aria-hidden="true"
-                className="absolute inset-0 flex items-center justify-center overflow-hidden pb-16 sm:pb-20"
+                className="absolute inset-0 z-10 flex items-center justify-center overflow-hidden px-4 pt-10 pb-24 sm:pb-28"
             >
                 <div
-                    className="relative flex aspect-square items-center justify-center"
-                    style={{ width: "min(68vw, 48vh)" }}
+                    className="pl-tv invisible relative select-none"
+                    style={{
+                        width: "min(78vw, 52vh, 480px)",
+                        aspectRatio: "1211 / 1299",
+                    }}
                 >
-                    {/* Warm radial sunflower glow */}
+                    {/* Soft ambient grounding glow beneath the TV */}
                     <div
-                        className="pl-halo invisible pointer-events-none absolute -inset-[18%] rounded-full"
+                        className="pointer-events-none absolute inset-x-[16%] bottom-[2%] h-[9%] rounded-full blur-2xl"
                         style={{
                             background:
-                                "radial-gradient(circle, rgba(255,196,60,0.26) 0%, rgba(255,90,31,0.10) 44%, rgba(255,255,255,0) 72%)",
+                                "radial-gradient(ellipse at center, rgba(25,12,48,0.28) 0%, rgba(25,12,48,0) 75%)",
                         }}
                     />
 
-                    {/* Subtle rotating rings framing the flowers */}
-                    <div className="pl-ring invisible pointer-events-none absolute inset-[2%] rounded-full border border-black/[0.06]" />
-                    <div className="pl-ring invisible pointer-events-none absolute -inset-[8%] rounded-full border border-dashed border-[#ff5a1f]/25" />
-
-                    {FLOWERS.map((f, i) => (
-                        <div
-                            key={i}
-                            className={`pl-fw-${i} invisible absolute will-change-transform`}
-                            style={{
-                                width: `${f.size}%`,
-                                height: `${f.size}%`,
-                                left: `${f.cx - f.size / 2}%`,
-                                top: `${f.cy - f.size / 2}%`,
-                                zIndex: f.z,
-                            }}
-                        >
-                            {/* eslint-disable-next-line @next/next/no-img-element */}
-                            <img
-                                src={IMAGE_SRC}
-                                alt=""
-                                draggable={false}
-                                className={`pl-fr-${i} block h-full w-full select-none object-contain drop-shadow-[0_14px_24px_rgba(217,119,6,0.18)] will-change-transform`}
+                    {/* Clipped CRT screen region positioned behind the transparent TV bezel */}
+                    <div
+                        className="absolute flex items-center justify-center overflow-hidden"
+                        style={{
+                            left: "17.8%",
+                            top: "39.8%",
+                            width: "56.5%",
+                            height: "42.5%",
+                            borderRadius: "18% / 22%",
+                            background:
+                                "radial-gradient(circle at 50% 48%, #28163e 0%, #140b21 68%, #09050f 100%)",
+                        }}
+                    >
+                        {/* Sunflower cluster container (preserves 1:1 overlap & spin layout) */}
+                        <div className="relative flex aspect-square h-[104%] items-center justify-center">
+                            {/* Warm radial sunflower glow */}
+                            <div
+                                className="pl-halo invisible pointer-events-none absolute -inset-[12%] rounded-full"
+                                style={{
+                                    background:
+                                        "radial-gradient(circle, rgba(255,196,60,0.34) 0%, rgba(255,90,31,0.14) 46%, rgba(20,11,33,0) 74%)",
+                                }}
                             />
+
+                            {/* Subtle rotating rings framing the flowers */}
+                            <div className="pl-ring invisible pointer-events-none absolute inset-[6%] rounded-full border border-white/15" />
+                            <div className="pl-ring invisible pointer-events-none absolute inset-[-2%] rounded-full border border-dashed border-[#ff5a1f]/45" />
+
+                            {FLOWERS.map((f, i) => (
+                                <div
+                                    key={i}
+                                    className={`pl-fw-${i} invisible absolute will-change-transform`}
+                                    style={{
+                                        width: `${f.size}%`,
+                                        height: `${f.size}%`,
+                                        left: `${f.cx - f.size / 2}%`,
+                                        top: `${f.cy - f.size / 2}%`,
+                                        zIndex: f.z,
+                                    }}
+                                >
+                                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                                    <img
+                                        src={IMAGE_SRC}
+                                        alt=""
+                                        draggable={false}
+                                        className={`pl-fr-${i} block h-full w-full select-none object-contain drop-shadow-[0_12px_20px_rgba(0,0,0,0.45)] will-change-transform`}
+                                    />
+                                </div>
+                            ))}
                         </div>
-                    ))}
+
+                        {/* Subtle CRT scanlines + curved screen reflection */}
+                        <div
+                            className="pointer-events-none absolute inset-0 opacity-20"
+                            style={{
+                                backgroundImage:
+                                    "repeating-linear-gradient(0deg, rgba(255,255,255,0.06) 0px, rgba(255,255,255,0.06) 1px, transparent 1px, transparent 4px)",
+                            }}
+                        />
+                        <div
+                            className="pointer-events-none absolute inset-0"
+                            style={{
+                                background:
+                                    "radial-gradient(ellipse at 28% 18%, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0.04) 36%, transparent 62%), inset 0 0 24px rgba(0,0,0,0.65)",
+                            }}
+                        />
+                    </div>
+
+                    {/* Transparent TV bezel foreground frame */}
+                    {/* eslint-disable-next-line @next/next/no-img-element */}
+                    <img
+                        src={TV_IMAGE_SRC}
+                        alt=""
+                        draggable={false}
+                        className="relative z-10 block h-full w-full select-none object-contain drop-shadow-[0_18px_32px_rgba(24,10,48,0.18)]"
+                    />
                 </div>
             </div>
 
             {/* Bottom meta: label, large editorial counter and gradient progress track */}
             <div
                 aria-hidden="true"
-                className="pl-meta invisible absolute inset-x-0 bottom-0 px-[5%] pb-7 sm:pb-[4%]"
+                className="pl-meta invisible absolute inset-x-0 bottom-0 z-10 px-[5%] pb-7 sm:pb-[4%]"
             >
                 <div className="mb-3 flex items-end justify-between gap-4 sm:mb-4">
                     <div className="flex items-center gap-2.5 pb-1">

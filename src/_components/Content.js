@@ -78,19 +78,15 @@ export default function Content() {
     return (
         <section
             id="manifesto-section"
-            className="relative w-full overflow-hidden bg-white px-5 py-16 text-[#18181b] sm:px-8 sm:py-20 md:px-12 md:py-28 lg:px-16 lg:py-32"
+            className="relative w-full overflow-hidden bg-white px-5 py-16 text-[#18181b] sm:px-8  md:px-12  lg:px-16 "
         >
-            <div className="mx-auto w-full max-w-[1440px]">
-                <div className="grid grid-cols-1 items-start gap-10 sm:gap-12 lg:grid-cols-12 lg:gap-14 xl:gap-20">
-                    {/* Empty space on desktop */}
-                    <div className="hidden lg:col-span-4 lg:block" />
-
-                    {/* Animated content */}
-                    <div className="min-w-0 lg:col-span-8">
-                        <div
-                            ref={textRef}
-                            className="font-['Outfit'] text-[clamp(1.65rem,5.3vw,3.6rem)] font-medium leading-[1.28] tracking-[-0.045em] text-neutral-900 sm:leading-[1.2] lg:text-[clamp(2.5rem,3.6vw,3.65rem)]"
-                        >
+            <div className="mx-auto w-full max-w-5xl text-center">
+                {/* Animated content */}
+                <div className="min-w-0">
+                    <div
+                        ref={textRef}
+                        className="font-['Outfit'] text-[clamp(1.65rem,5.3vw,3.6rem)] font-semibold leading-[1.28] tracking-[-0.045em] text-neutral-900 sm:leading-[1.2] lg:text-[clamp(2.5rem,3.6vw,3.65rem)]"
+                    >
                             {content.map((item, index) => {
                                 if (item.type === "image") {
                                     return (
@@ -118,7 +114,6 @@ export default function Content() {
                                     />
                                 );
                             })}
-                        </div>
                     </div>
                 </div>
             </div>
